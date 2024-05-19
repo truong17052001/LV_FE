@@ -6,8 +6,8 @@ import { FaFacebookF } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
 import { FaTiktok } from "react-icons/fa6";
 import { FaRegUser } from "react-icons/fa6";
-import { FaAngleDown } from "react-icons/fa6";
 import { FaGear } from "react-icons/fa6";
+import { FaSearch } from "react-icons/fa";
 const cx = classNames.bind(styles);
 
 function Header() {
@@ -47,26 +47,47 @@ function Header() {
           </div>
           <div className={cx("action")}>
             <a href="/" className={cx("text")}>
-              <FaRegUser className={cx("a")} />
-              <FaAngleDown />
-            </a>
-            <a href="/" className={cx("text")}>
               <FaGear className={cx("a")} />
-              <FaAngleDown />
             </a>
           </div>
         </div>
       </div>
       <div className={cx("bot-container", "divine")}>
-        <a className={cx("brand")}>
-          <img
-            src="https://mytour.webtravel.vn/images/logo-white.svg"
-            alt=""
-          ></img>
-          MyTravel
-        </a>
-        <div className={cx("brand")}>
-            
+        <div className={cx("navbar")}>
+          <a href="/" className={cx("text", "icon")}>
+            <FaSearch className={cx("a")} />
+          </a>
+          <div className={cx("navbar_content")}>
+            <a href="/" className={cx("text", "title")}>
+              Trang chủ
+            </a>
+            <a href="/" className={cx("text", "title")}>
+              Giới thiệu
+            </a>
+            <a href="/" className={cx("text", "title")}>
+              Du lịch
+            </a>
+            <a className={cx("brand")}>
+              <img
+                src="https://mytour.webtravel.vn/images/logo-white.svg"
+                alt=""
+              ></img>
+              Quang Trường
+            </a>
+            <a href="/" className={cx("text", "title")}>
+              Tin tức
+            </a>
+            <a href="/" className={cx("text", "title")}>
+              Khuyến mãi
+            </a>
+            <a href="/" className={cx("text", "title")}>
+              Liên hệ
+            </a>
+          </div>
+
+          <a href="/" className={cx("text")}>
+            <FaRegUser className={cx("a")} />
+          </a>
         </div>
       </div>
     </div>
