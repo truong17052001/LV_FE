@@ -2,6 +2,7 @@ import * as React from "react";
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 //icon
 import { FaSearch } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
@@ -85,6 +86,10 @@ function HomePage() {
           </form>
         </div>
       </section>
+      <section className={cx("hot_location")}>
+
+      </section>
+      <Footer></Footer>
     </div>
   );
 }

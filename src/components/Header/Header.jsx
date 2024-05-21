@@ -72,7 +72,7 @@ function Header() {
                 src="https://mytour.webtravel.vn/images/logo-white.svg"
                 alt=""
               ></img>
-              Quang Trường
+              Quang Trường Travel
             </a>
             <a href="/" className={cx("text", "title")}>
               Tin tức
