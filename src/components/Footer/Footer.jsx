@@ -16,23 +16,23 @@ function Footer() {
         <div className={cx("info")}>
           <h3>Chúng tôi là Quang Trường Travel</h3>
           <p>
-            <b>Trụ sở chính</b>
+            <b>Địa chỉ</b>
             <span>
-              : 217 Bis Nguyễn Thị Minh Khai, Phường Nguyễn Cư Trinh, Quận 1,
-              TP. Hồ Chí Minh.
+              : 47/1 TL22, Khu phố 1, Phường Thạnh Lộc, Quận 12, TP. Hồ Chí
+              Minh.
             </span>
           </p>
           <p>
             <b>Điện thoại</b>
-            <span>: 028 73056789 </span>
+            <span>: +84 938927980</span>
           </p>
           <p>
             <b>Website</b>
-            <span>: dulichviet.com.vn</span>
+            <span>: quangtruong.travel</span>
           </p>
           <p>
             <b>Email</b>
-            <span>: info@dulichviet.com.vn</span>
+            <span>: DH51902909@student.stu.edu.vn</span>
           </p>
         </div>
         <div className={cx("customer")}>
@@ -56,6 +56,10 @@ function Footer() {
             Nhập email để có cơ hội giảm 50% cho chuyến đi tiếp theo của Quý
             khách
           </p>
+          <div>
+            <input type="email" placeholder="Nhập email của bạn"></input>
+            <button type="submit">Đăng ký</button>
+          </div>
         </div>
       </div>
       <div className={cx("coppy-right")}>
@@ -66,7 +70,9 @@ function Footer() {
           ></img>
           Quang Trường Travel
         </a>
-        <span>© Bản quyền thuộc về Quang Trường | Cung cấp bởi Quang Trường</span>
+        <span>
+          © Bản quyền thuộc về Quang Trường | Cung cấp bởi Quang Trường
+        </span>
       </div>
     </div>
   );

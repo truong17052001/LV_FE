@@ -40,7 +40,7 @@
 }
 
 .m {
-  margin-right: 9px;
+  margin-right: 20px;
 }
 .info,
 .customer,
@@ -60,6 +60,29 @@
 }
 .email {
   flex-grow: 2;
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  input {
+    font-size: 20px;
+
+    width: 80%;
+    height: 50px;
+    padding-left: 10px;
+    border: none;
+    outline: none;
+  }
+  button {
+    font-size: 20px;
+
+    background-color: #297cbb;
+    border: none;
+    width: 19%;
+    height: 50px;
+    color: white;
+  }
 }
 .coppy-right {
   display: flex;
@@ -73,6 +96,7 @@
     justify-content: center;
     z-index: 3;
     color: #fff;
+    font-size: 24px;
     img {
       margin-right: 20px;
     }

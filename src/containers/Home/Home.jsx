@@ -42,9 +42,9 @@ function HomePage() {
                   placeholder="Chọn nơi khởi hành"
                   readOnly
                 ></input>
-                <div className={cx("list-search", open == true?"open":"")}>
-
-                </div>
+                <div
+                  className={cx("list-search", open == true ? "open" : "")}
+                ></div>
                 <RiArrowDropDownFill
                   className={cx("pointer")}
                   onClick={handleChange}
@@ -87,7 +87,69 @@ function HomePage() {
         </div>
       </section>
       <section className={cx("hot_location")}>
-
+        <h2>Điểm đến yêu thích</h2>
+        <div className={cx("list_location")}>
+          <div className={cx("item_location")}>
+            <div className={cx("img_location")}>
+              <img
+                src="https://i.pinimg.com/564x/90/18/68/901868d5cd433ee33ebff26a41af6948.jpg"
+                placeholder="img"
+              ></img>
+            </div>
+            <div className={cx("content_location")}>
+              <a>Hà Nội</a>
+              <p>Đã có 170.000 lượt khách</p>
+            </div>
+          </div>
+          <div className={cx("item_location")}>
+            <div className={cx("img_location")}>
+              <img
+                src="https://i.pinimg.com/564x/7d/c2/b9/7dc2b90aeb23fba4fd4ed56c596b73aa.jpg"
+                placeholder="img"
+              ></img>
+            </div>
+            <div className={cx("content_location")}>
+              <a>Đà Nẵng</a>
+              <p>Đã có 170.000 lượt khách</p>
+            </div>
+          </div>
+          <div className={cx("item_location")}>
+            <div className={cx("img_location")}>
+              <img
+                src="https://i.pinimg.com/564x/4b/68/b3/4b68b3912c0855d6aaa87d61d5cb4be0.jpg"
+                placeholder="img"
+              ></img>
+            </div>
+            <div className={cx("content_location")}>
+              <a>Huế</a>
+              <p>Đã có 170.000 lượt khách</p>
+            </div>
+          </div>
+          <div className={cx("item_location")}>
+            <div className={cx("img_location")}>
+              <img
+                src="https://i.pinimg.com/564x/03/eb/2c/03eb2c14d9af611d8dc6ed0e8bcf79ad.jpg"
+                placeholder="img"
+              ></img>
+            </div>
+            <div className={cx("content_location")}>
+              <a>Đà Lạt</a>
+              <p>Đã có 170.000 lượt khách</p>
+            </div>
+          </div>
+          <div className={cx("item_location")}>
+            <div className={cx("img_location")}>
+              <img
+                src="https://i.pinimg.com/564x/ae/17/d8/ae17d8585b8d214ea2398b3ab17f1e31.jpg"
+                placeholder="img"
+              ></img>
+            </div>
+            <div className={cx("content_location")}>
+              <a>Hồ Chí Minh</a>
+              <p>Đã có 170.000 lượt khách</p>
+            </div>
+          </div>
+        </div>
       </section>
       <Footer></Footer>
     </div>
