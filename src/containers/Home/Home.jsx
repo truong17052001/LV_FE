@@ -1,8 +1,11 @@
 import * as React from "react";
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
+//components
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import CardTour from "../../components/CardTour/CardTour";
+import CardLocation from "../../components/CardLocation/CardLocation";
 //icon
 import { FaSearch } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
@@ -89,66 +92,40 @@ function HomePage() {
       <section className={cx("hot_location")}>
         <h2>Điểm đến yêu thích</h2>
         <div className={cx("list_location")}>
-          <div className={cx("item_location")}>
-            <div className={cx("img_location")}>
-              <img
-                src="https://i.pinimg.com/564x/90/18/68/901868d5cd433ee33ebff26a41af6948.jpg"
-                placeholder="img"
-              ></img>
-            </div>
-            <div className={cx("content_location")}>
-              <a>Hà Nội</a>
-              <p>Đã có 170.000 lượt khách</p>
-            </div>
-          </div>
-          <div className={cx("item_location")}>
-            <div className={cx("img_location")}>
-              <img
-                src="https://i.pinimg.com/564x/7d/c2/b9/7dc2b90aeb23fba4fd4ed56c596b73aa.jpg"
-                placeholder="img"
-              ></img>
-            </div>
-            <div className={cx("content_location")}>
-              <a>Đà Nẵng</a>
-              <p>Đã có 170.000 lượt khách</p>
-            </div>
-          </div>
-          <div className={cx("item_location")}>
-            <div className={cx("img_location")}>
-              <img
-                src="https://i.pinimg.com/564x/4b/68/b3/4b68b3912c0855d6aaa87d61d5cb4be0.jpg"
-                placeholder="img"
-              ></img>
-            </div>
-            <div className={cx("content_location")}>
-              <a>Huế</a>
-              <p>Đã có 170.000 lượt khách</p>
-            </div>
-          </div>
-          <div className={cx("item_location")}>
-            <div className={cx("img_location")}>
-              <img
-                src="https://i.pinimg.com/564x/03/eb/2c/03eb2c14d9af611d8dc6ed0e8bcf79ad.jpg"
-                placeholder="img"
-              ></img>
-            </div>
-            <div className={cx("content_location")}>
-              <a>Đà Lạt</a>
-              <p>Đã có 170.000 lượt khách</p>
-            </div>
-          </div>
-          <div className={cx("item_location")}>
-            <div className={cx("img_location")}>
-              <img
-                src="https://i.pinimg.com/564x/ae/17/d8/ae17d8585b8d214ea2398b3ab17f1e31.jpg"
-                placeholder="img"
-              ></img>
-            </div>
-            <div className={cx("content_location")}>
-              <a>Hồ Chí Minh</a>
-              <p>Đã có 170.000 lượt khách</p>
-            </div>
-          </div>
+          <CardLocation
+            name="Hà Nội"
+            amount="17.000"
+            url="https://i.pinimg.com/564x/90/18/68/901868d5cd433ee33ebff26a41af6948.jpg"
+          ></CardLocation>
+          <CardLocation
+            name="Đà Nẵng"
+            amount="17.000"
+            url="https://i.pinimg.com/564x/7d/c2/b9/7dc2b90aeb23fba4fd4ed56c596b73aa.jpg"
+          ></CardLocation>
+          <CardLocation
+            name="Phú Quốc"
+            amount="17.000"
+            url="https://i.pinimg.com/736x/ff/8d/c1/ff8dc1ecb5269399e00033fbc92e934c.jpg"
+          ></CardLocation>
+          <CardLocation
+            name="Đà Lạt"
+            amount="17.000"
+            url="https://i.pinimg.com/564x/03/eb/2c/03eb2c14d9af611d8dc6ed0e8bcf79ad.jpg"
+          ></CardLocation>
+          <CardLocation
+            name="Hồ Chí Minh"
+            amount="17.000"
+            url="https://i.pinimg.com/564x/ae/17/d8/ae17d8585b8d214ea2398b3ab17f1e31.jpg"
+          ></CardLocation>
+        </div>
+      </section>
+      <section className={cx("hot_tour")}>
+        <h2>Tour ưu đãi</h2>
+        <div className={cx("list_tour")}>
+          <CardTour></CardTour>
+          <CardTour></CardTour>
+          <CardTour></CardTour>
+          <CardTour></CardTour>
         </div>
       </section>
       <Footer></Footer>
