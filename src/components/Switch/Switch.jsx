@@ -3,6 +3,7 @@ import styles from "./Switch.module.scss";
 
 const cx = classNames.bind(styles);
 
+/* eslint-disable react/prop-types */ 
 function Switch({children}) {
   return (
     <div className={cx("wrapper")}>

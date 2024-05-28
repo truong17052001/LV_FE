@@ -2,20 +2,23 @@ import * as React from "react";
 import classNames from "classnames/bind";
 import styles from "./Tour.module.scss";
 //rsuite
-import { DatePicker, SelectPicker, RangeSlider } from "rsuite";
+import { DatePicker, SelectPicker, RangeSlider, Pagination } from "rsuite";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/RangeSlider/styles/index.css";
+import "rsuite/Pagination/styles/index.css";
 //component
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import Switch from "../../components/Switch/Switch";
+import CardTour from "../../components/CardTour/CardTour";
 //icon
 
 const cx = classNames.bind(styles);
 
 function TourPage() {
   const [value, setValue] = React.useState([0, 7000000]);
+  const [activePage, setActivePage] = React.useState(5);
 
   const data = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng"].map((item) => ({
     label: item,
@@ -88,7 +91,7 @@ function TourPage() {
                 </div>
                 <div className={cx("mb")}>
                   <h5> Ngân sách của quý khách</h5>
-                  <div>
+                  <div className={cx("p")}>
                     <RangeSlider
                       progress
                       value={value}
@@ -114,7 +117,67 @@ function TourPage() {
               </div>
             </div>
           </div>
-          <div className={cx("list")}></div>
+          <div className={cx("right")}>
+            <div className={cx("info")}>
+              <h1>Du lịch TP. Hồ Chí Minh</h1>
+              <div className={cx("description")}>
+                <p>
+                  Du lịch đến với thành phố Hồ Chí Minh bạn có thể gặp những tòa
+                  nhà cao tầng nằm san sát, những khu vui chơi giải trí, trung
+                  tâm mua sắm sầm uất, nhưng cũng không thiếu những biệt thự cổ
+                  kính, những ngôi chợ truyền thống. Sài Gòn rộng lớn và không
+                  thiếu những “đặc sản” du lịch như du ngoạn ven sông Sài Gòn
+                  bằng tàu, thăm phố Tây Phạm Ngũ Lão, mua sắm ở chợ Bến Thành
+                  hay về với biển Cần Giờ.
+                </p>
+                <p>
+                  Đăng ký tour TP. Hồ Chí Minhcùng Vietravel, Quý khách có thể
+                  đến khám phá các điểm đến nổi bật sau: Củ Chi, Địa đạo Củ Chi,
+                  KDL Nông Trang Xanh, Cần Giờ, Bưu điện Trung tâm TP. Hồ Chí
+                  Minh, ...
+                </p>
+                <p>
+                  Để hiểu hơn về TP. Hồ Chí Minh Mời Quý khách tham khảo Kinh
+                  nghiệm du lịch TP. Hồ Chí Minh
+                </p>
+              </div>
+            </div>
+            <div className={cx("orther")}>
+              <div>Đã tìm thấy 78 tours cho Quý khách.</div>
+              <div>
+                Sắp xếp theo
+                <SelectPicker
+                  data={data}
+                  size="lg"
+                  placeholder="Tất cả"
+                  searchable={false}
+                />
+              </div>
+            </div>
+            <div className={cx("list")}>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+              <CardTour></CardTour>
+            </div>
+            <div className={cx("pagination")}>
+              <Pagination
+                prev
+                last
+                next
+                first
+                size="lg"
+                total={100}
+                limit={10}
+                activePage={activePage}
+                onChangePage={setActivePage}
+              />
+            </div>
+          </div>
         </div>
       </div>
       <Footer></Footer>

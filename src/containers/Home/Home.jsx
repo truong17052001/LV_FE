@@ -1,4 +1,3 @@
-import * as React from "react";
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 //components
@@ -6,22 +5,21 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import CardTour from "../../components/CardTour/CardTour";
 import CardLocation from "../../components/CardLocation/CardLocation";
+//rsuite
+import isBefore from "date-fns/isBefore";
+import { SelectPicker, DatePicker } from "rsuite";
+import "rsuite/SelectPicker/styles/index.css";
+import "rsuite/DatePicker/styles/index.css";
+
 //icon
 import { FaSearch } from "react-icons/fa";
-import { CiLocationOn } from "react-icons/ci";
-import { RiArrowDropDownFill } from "react-icons/ri";
-import { MdOutlineAttachMoney } from "react-icons/md";
-import { SlCalender } from "react-icons/sl";
-import { MdOutlineLocationOn } from "react-icons/md";
 const cx = classNames.bind(styles);
 
 function HomePage() {
-  const [open, setOpen] = React.useState(true);
-
-  const handleChange = () => {
-    if (open == true) setOpen(false);
-    else setOpen(true);
-  };
+  const data = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng"].map((item) => ({
+    label: item,
+    value: item,
+  }));
   return (
     <div className={cx("wrapper")}>
       <Header type={1}></Header>
@@ -38,51 +36,30 @@ function HomePage() {
           <form className={cx("form-search")}>
             <div className={cx("box-search")}>
               Nơi khởi hành
-              <div className={cx("input-search")}>
-                <CiLocationOn />
-                <input
-                  type="text"
-                  placeholder="Chọn nơi khởi hành"
-                  readOnly
-                ></input>
-                <div
-                  className={cx("list-search", open == true ? "open" : "")}
-                ></div>
-                <RiArrowDropDownFill
-                  className={cx("pointer")}
-                  onClick={handleChange}
-                />
-              </div>
+              <SelectPicker data={data} size="lg" placeholder="Chọn điểm đi" />
             </div>
             <div className={cx("box-search")}>
               Điểm đến
-              <div className={cx("input-search")}>
-                <MdOutlineLocationOn />
-                <input type="text" placeholder="Chọn điểm đến" readOnly></input>
-                <RiArrowDropDownFill className={cx("pointer")} />
-              </div>
+              <SelectPicker data={data} size="lg" placeholder="Chọn điểm đến" />
             </div>
             <div className={cx("box-search")}>
               Ngày khởi hành
-              <div className={cx("input-search")}>
-                <SlCalender />
-                <input
-                  type="text"
-                  placeholder="Chọn ngày khởi hành"
-                  readOnly
-                ></input>
-                <RiArrowDropDownFill className={cx("pointer")} />
-              </div>
+              <DatePicker
+                format="dd/MM/yyyy"
+                size="lg"
+                shouldDisableDate={(date) => isBefore(date, new Date())}
+              />
             </div>
             <div className={cx("box-search")}>
               Giá tour
-              <div className={cx("input-search")}>
-                <MdOutlineAttachMoney />
-                <input type="text" placeholder="Chọn giá tour" readOnly></input>
-                <RiArrowDropDownFill className={cx("pointer")} />
-              </div>
+              <SelectPicker
+                data={data}
+                size="lg"
+                placeholder="Tất cả"
+                searchable={false}
+              />
             </div>
-            <button>
+            <button className={cx("btn-search")}>
               <FaSearch />
               <p>Tìm kiếm</p>
             </button>

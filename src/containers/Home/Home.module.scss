@@ -55,11 +55,13 @@
   flex: 1;
   align-items: center;
   justify-content: space-between;
-  button {
+  gap: 16px;
+  .btn-search {
     width: 180px;
     height: 55px;
     color: white;
     font-weight: 600;
+    font-size: 17px;
     box-shadow: #000000 0px 0px 0px 0px;
     background-color: #297cbb;
     border-color: #297cbb;
@@ -76,41 +78,11 @@
   color: #67747c;
   font-weight: 600;
   display: flex;
+  flex:1;
   flex-direction: column;
 }
-.input-search {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  position: relative;
-  input {
-    margin-left: 10px;
-    width: 100%;
-    height: 41px;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #ccc;
-    font-size: 17px;
-    font-weight: 500;
-  }
-}
-.list-search {
-  z-index: -3;
-  content: "";
-  position: absolute;
-  top: 41px;
-  left: 0;
-  width: 100%;
-  height: 200px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-}
-
 .pointer {
   cursor: pointer;
-}
-.open {
-  z-index: 1;
 }
 
 .hot_location {

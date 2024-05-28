@@ -62,10 +62,10 @@ function Header({ type }) {
             <a href="/" className={cx("text", "title")}>
               Trang chủ
             </a>
-            <a href="/" className={cx("text", "title")}>
+            <a href="/about" className={cx("text", "title")}>
               Giới thiệu
             </a>
-            <a href="/" className={cx("text", "title")}>
+            <a href="/tour" className={cx("text", "title")}>
               Du lịch
             </a>
             <a className={cx("brand")}>
@@ -75,18 +75,18 @@ function Header({ type }) {
               ></img>
               Quang Trường Travel
             </a>
-            <a href="/" className={cx("text", "title")}>
+            <a href="/news" className={cx("text", "title")}>
               Tin tức
             </a>
-            <a href="/" className={cx("text", "title")}>
+            <a href="/sale" className={cx("text", "title")}>
               Khuyến mãi
             </a>
-            <a href="/" className={cx("text", "title")}>
+            <a href="/contact" className={cx("text", "title")}>
               Liên hệ
             </a>
           </div>
 
-          <a href="/" className={cx("text")}>
+          <a href="/info" className={cx("text")}>
             <FaRegUser className={cx("a")} />
           </a>
         </div>
