@@ -1,0 +1,123 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  width: 100%;
+  padding: 159px 60px 60px;
+}
+
+.breadcrumb {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  a {
+    text-decoration: none;
+    margin: 0px 10px;
+    color: #000;
+  }
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.filter {
+  width: 20%;
+  background: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.brand {
+  padding: 16px;
+}
+
+.keyword {
+  background: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  padding: 15px;
+}
+.heading {
+  padding: 8px 16px;
+  background-color: #4d4aef;
+  color: #fff;
+  span {
+    font-weight: 700;
+  }
+}
+.mb{
+    margin-bottom: 16px;
+}
+.input {
+  padding-top: 8px;
+  div {
+    width: 100%;
+    p{
+        margin-top: 10px;
+    }
+  }
+  h5 {
+    color: #2d4271;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 16px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+  }
+  select {
+    width: 100%;
+    height: auto;
+    appearance: none;
+    background-clip: padding-box;
+    background-color: #fff;
+    border: 1px solid #d8d8d8;
+    border-radius: 0.25rem;
+    color: #2d4271;
+    display: block;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 25px;
+    padding: 6px 12px;
+  }
+  select:focus {
+    background-color: #fff;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    color: #212529;
+    outline: 0;
+  }
+  button {
+    background-color: rgb(255, 255, 255);
+    color: rgb(33, 37, 41);
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 0 #e2f3ff;
+    user-select: none;
+    vertical-align: middle;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 26px;
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+}
+.text {
+  font-size: 24px;
+}
+.group {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+}
+.list {
+  flex: 1;
+  background-color: pink;
+}

@@ -5,6 +5,11 @@
   border-radius: 10px;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
+.item:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  -webkit-transform: translateY(-3px);
+  transform: translateY(-3px);
+}
 .img {
   position: relative;
   img {
@@ -97,44 +102,63 @@
     div {
       display: flex;
       align-items: center;
+      span {
+        font-weight: 700;
+      }
     }
   }
   .departure {
     font-size: 15px;
     color: #2d4271;
     margin-bottom: 16px;
+    span {
+      font-weight: 700;
+    }
   }
   .price {
     color: #2d4271;
     font-size: 18px;
-    div{
+    div {
+      font-weight: 700;
+      color: #e01600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      span {
+        background-color: #e01600;
+        color: #ffffff;
         font-weight: 700;
-        color: #e01600;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
-        span{
-            height: 100%;
-            background-color: #e01600;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 11px;
-            padding: 4px;
-            border-radius: 5px;
-        }
+        font-size: 41;
+        padding: 4px 8px;
+        gap: 5px;
+        border-radius: 5px;
+      }
     }
   }
 }
 
 .footer {
-    padding: 8px 16px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    span{
-        color: #e01600;
-        font-weight: 700;
-        font-size: 17px;
-        padding: 4px;
-    }
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  div {
+    height: 100%;
+    background-color: #e01600;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 4px;
+    border-radius: 5px;
+  }
+  span {
+    color: #e01600;
+    font-weight: 700;
+    font-size: 17px;
+    padding: 4px;
+  }
 }

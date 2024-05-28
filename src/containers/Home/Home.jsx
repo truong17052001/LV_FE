@@ -24,7 +24,7 @@ function HomePage() {
   };
   return (
     <div className={cx("wrapper")}>
-      <Header></Header>
+      <Header type={1}></Header>
       <section className={cx("banner")}>
         <div className={cx("bg-overlay")}></div>
         <div className={cx("title")}>

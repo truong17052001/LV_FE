@@ -4,7 +4,7 @@ import styles from "./CardTour.module.scss";
 const cx = classNames.bind(styles);
 //icon
 import { LuTicket } from "react-icons/lu";
-
+import { FaCartShopping } from "react-icons/fa6";
 function CardTour() {
   return (
     <div className={cx("item")}>
@@ -34,19 +34,23 @@ function CardTour() {
         <div className={cx("code")}>
           <div>Mã tour:</div>
           <div>
-            <LuTicket></LuTicket>NDSGN841-009-240524XE-H
+            <LuTicket></LuTicket>
+            <span>NDSGN841-009-240524XE-H</span>
           </div>
         </div>
-        <p className={cx("departure")}>Nơi khởi hành: TP. Hồ Chí Minh</p>
+        <p className={cx("departure")}>
+          Nơi khởi hành: <span>TP. Hồ Chí Minh</span>
+        </p>
         <div className={cx("price")}>
           Giá <del>2.990.000 ₫</del>
           <div>
-            2.690.000 ₫<span>Giảm 6%</span>
+            2.690.000 ₫<span><FaCartShopping></FaCartShopping>Đặt ngay</span>
           </div>
         </div>
       </div>
       <div className={cx("footer")}>
-        Số chỗ còn <span>9</span>
+        <div>Giảm 6%</div>
+        <p>Số chỗ còn <span>9</span></p>
       </div>
     </div>
   );
