@@ -5,7 +5,7 @@
 
 .container {
   width: 100%;
-  padding: 159px 60px 60px;
+  padding: 0px 60px 60px 60px;
 }
 
 .breadcrumb {
@@ -119,6 +119,7 @@
   display: grid;
   grid-template-columns: auto auto;
   gap: 10px;
+  text-align: center;
 }
 .right {
   flex: 1;
