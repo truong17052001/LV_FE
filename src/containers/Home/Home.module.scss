@@ -18,8 +18,8 @@
   width: 100%;
   height: 100vh;
   transition: border 0.3s, border-radius 0.3s, box-shadow 0.3s;
-  background-image: url(https://mytour.webtravel.vn/images/img1-2.jpeg);
-  background-position: bottom center;
+  background-image: url(https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg);
+  background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   z-index: -1;
@@ -75,10 +75,10 @@
   }
 }
 .box-search {
-  color: #67747c;
+  color: #2d4271;
   font-weight: 600;
   display: flex;
-  flex:1;
+  flex: 1;
   flex-direction: column;
 }
 .pointer {
@@ -96,6 +96,7 @@
     font-size: 40px;
     font-weight: 600;
     margin-bottom: 16px;
+    color: #2d4271;
   }
 }
 .list_location {
@@ -113,6 +114,7 @@
     font-size: 40px;
     font-weight: 600;
     margin-bottom: 16px;
+    color: #2d4271;
   }
 }
 .list_tour {

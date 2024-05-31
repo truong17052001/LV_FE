@@ -105,11 +105,10 @@ function ProfilePage() {
               <h5></h5>
               <div>
                 <Button
-                  color="red"
+                  color="blue"
                   size="lg"
                   appearance="primary"
                   startIcon={<IoExitOutline />}
-                  block
                 >
                   Đổi mật khẩu
                 </Button>

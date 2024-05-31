@@ -10,10 +10,11 @@ import { FaGear } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 const cx = classNames.bind(styles);
 
-/* eslint-disable react/prop-types */ 
+/* eslint-disable react/prop-types */
 function Header({ type }) {
   return (
-    <div className={cx("wrapper",type!=1?"bg1":"")}>
+    <div className={cx("wrapper", type != 1 ? "bg1" : "")}>
+      {type != 1 ? <div className={cx("foverlay")}></div> : ""}
       <div className={cx("top-container")}>
         <div className={cx("info")}>
           <a
@@ -53,7 +54,7 @@ function Header({ type }) {
           </div>
         </div>
       </div>
-      <div className={cx("bot-container", type==1?"divineB":"divineA")}>
+      <div className={cx("bot-container", type == 1 ? "divineB" : "divineA")}>
         <div className={cx("navbar")}>
           <a href="/" className={cx("text", "icon")}>
             <FaSearch className={cx("a")} />
