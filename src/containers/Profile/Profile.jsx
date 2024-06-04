@@ -45,7 +45,7 @@ function ProfilePage() {
           </div>
         </div>
         <div className={cx("right")}>
-          <div className={cx("info", "invisible")}>
+          <div className={cx("info", "")}>
             <div className={cx("heading", "mb")}>
               <h5>Thông tin cá nhân</h5>
               <p>
@@ -109,6 +109,7 @@ function ProfilePage() {
                   size="lg"
                   appearance="primary"
                   startIcon={<IoExitOutline />}
+                  block
                 >
                   Đổi mật khẩu
                 </Button>
