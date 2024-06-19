@@ -1,29 +1,63 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Tour.module.scss";
 //rsuite
-import { DatePicker, SelectPicker, RangeSlider, Pagination } from "rsuite";
+import {
+  DatePicker,
+  SelectPicker,
+  RangeSlider,
+  Pagination,
+  Toggle,
+} from "rsuite";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/RangeSlider/styles/index.css";
 import "rsuite/Pagination/styles/index.css";
+import "rsuite/Toggle/styles/index.css";
 //component
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import Switch from "../../components/Switch/Switch";
 import CardTour from "../../components/CardTour/CardTour";
 //icon
 
 const cx = classNames.bind(styles);
 
 function TourPage() {
-  const [value, setValue] = React.useState([0, 7000000]);
-  const [activePage, setActivePage] = React.useState(5);
-
+  const [value, setValue] = useState([0, 7000000]);
+  const [tours, setTours] = useState([]);
+  const [activePage, setActivePage] = useState(1);
+  const [total, setTotal] = useState(10);
+  const [limit, setLimit] = useState(9);
+  
+  
   const data = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng"].map((item) => ({
     label: item,
     value: item,
   }));
+  const params = {
+    page: activePage,
+    limit: limit
+  };
+  const limitOptions = [9, 15, 21];
+  useEffect(() => {
+    const getTours = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/client/tour",
+          {params }
+        );
+        if (response.data.data != null) {
+          setTours(response.data.data);
+          setActivePage(response.data.paginate.page);
+          setTotal(response.data.paginate.limit*response.data.paginate.total_page);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getTours();
+  }, [activePage]);
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -110,8 +144,8 @@ function TourPage() {
                 <div className={cx("mb")}>
                   <h5> Hiển thị những chuyến đi có</h5>
                   <div className={cx("group")}>
-                    <Switch>Khuyến mãi</Switch>
-                    <Switch>Còn chỗ</Switch>
+                    <Toggle></Toggle> Khuyến mãi
+                    <Toggle></Toggle> Còn chỗ
                   </div>
                 </div>
               </div>
@@ -155,14 +189,11 @@ function TourPage() {
               </div>
             </div>
             <div className={cx("list")}>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
-              <CardTour></CardTour>
+              { 
+                tours.length ? tours.map((tour, index) => {
+                return <CardTour key={index} id={tour.id} code={tour.code} title_tour={tour.title_tour} meet_place={tour.meet_place} meet_date={tour.meet_date} price={tour.price} img_tour={tour.img_tour}></CardTour>;
+              })
+              : ""}
             </div>
             <div className={cx("pagination")}>
               <Pagination
@@ -171,12 +202,15 @@ function TourPage() {
                 next
                 first
                 size="lg"
-                total={100}
-                limit={10}
+                total={total}
+                limit={9}
+                onChangeLimit={setLimit}
+                limitOptions={limitOptions}
                 activePage={activePage}
                 onChangePage={setActivePage}
               />
             </div>
+
           </div>
         </div>
       </div>

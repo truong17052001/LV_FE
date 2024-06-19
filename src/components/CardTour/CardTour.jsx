@@ -5,12 +5,12 @@ const cx = classNames.bind(styles);
 //icon
 import { LuTicket } from "react-icons/lu";
 import { FaCartShopping } from "react-icons/fa6";
-function CardTour() {
+function CardTour({id, code, title_tour, meet_place, meet_date, price, img_tour}) {
   return (
     <div className={cx("item")}>
       <div className={cx("img")}>
         <img
-          src="https://i.pinimg.com/736x/0d/6a/9e/0d6a9e63b220f854581dafae05c130be.jpg"
+          src={img_tour}
           placeholder="img"
         ></img>
         <div className={cx("summary")}>
@@ -24,27 +24,26 @@ function CardTour() {
         </div>
       </div>
       <div className={cx("body")}>
-        <p className={cx("date")}>24/05/2024 - 3 ngày</p>
+        <p className={cx("date")}>{meet_date} - 3 ngày</p>
         <p className={cx("title")}>
-          <a href="/">
-            Miền Tây: Châu Đốc - Núi Cấm - Rừng Tràm Trà Sư - Cần Thơ - Chợ Nổi
-            Cái Răng - Trải Nghiệm Tuyến Cao Tốc Mới Nhất Của Miền Tây
+          <a href={`/detail/${id}`}>
+            {title_tour}
           </a>
         </p>
         <div className={cx("code")}>
           <div>Mã tour:</div>
           <div>
             <LuTicket></LuTicket>
-            <span>NDSGN841-009-240524XE-H</span>
+            <span>{code}</span>
           </div>
         </div>
         <p className={cx("departure")}>
-          Nơi khởi hành: <span>TP. Hồ Chí Minh</span>
+          Nơi khởi hành: <span>{meet_place}</span>
         </p>
         <div className={cx("price")}>
           Giá <del>2.990.000 ₫</del>
           <div>
-            2.690.000 ₫<span><FaCartShopping></FaCartShopping>Đặt ngay</span>
+            {price}<span><FaCartShopping></FaCartShopping>Đặt ngay</span>
           </div>
         </div>
       </div>

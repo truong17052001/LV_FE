@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 //components
@@ -20,6 +22,27 @@ function HomePage() {
     label: item,
     value: item,
   }));
+  const [tours, setTours] = useState([]);
+  const params = {
+    page: 1,
+    limit: 4,
+  };
+  useEffect(() => {
+    const getTours = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/client/tour?",
+          { params }
+        );
+        if (response.data.data != null) {
+          setTours(response.data.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getTours();
+  }, []);
   return (
     <div className={cx("wrapper")}>
       <Header type={1}></Header>
@@ -99,10 +122,20 @@ function HomePage() {
       <section className={cx("hot_tour")}>
         <h2>Tour ưu đãi</h2>
         <div className={cx("list_tour")}>
-          <CardTour></CardTour>
-          <CardTour></CardTour>
-          <CardTour></CardTour>
-          <CardTour></CardTour>
+          {tours.map((tour, index) => {
+            return (
+              <CardTour
+                key={index}
+                id={index}
+                code={tour.code}
+                title_tour={tour.title_tour}
+                meet_place={tour.meet_place}
+                meet_date={tour.meet_date}
+                price={tour.price}
+                img_tour={tour.img_tour}
+              ></CardTour>
+            );
+          })}
         </div>
       </section>
       <Footer></Footer>

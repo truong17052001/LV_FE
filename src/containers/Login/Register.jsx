@@ -10,7 +10,9 @@ import login from "../../assets/img/login.jpg";
 //
 import { Input, Button, InputGroup } from "rsuite";
 import { Message, useToaster } from "rsuite";
-
+import 'rsuite/Message/styles/index.css';
+import 'rsuite/useToaster/styles/index.css';
+//icon
 import { IoExitOutline } from "react-icons/io5";
 import EyeIcon from "@rsuite/icons/legacy/Eye";
 import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
@@ -23,34 +25,36 @@ const message = (
 );
 const cx = classNames.bind(styles);
 
-function LoginPage() {
+function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [subPassword, setSubPassword] = useState("");
   const toaster = useToaster();
-  //
+
   const [visible, setVisible] = useState(false);
 
   const handleChange = () => {
     setVisible(!visible);
   };
 
-  async function handleLogin() {
+  async function handleRegister() {
     try {
+      if(password != subPassword){
+          toaster.push(message, { placement:'topCenter', duration: 5000 });
+      }
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/client/login",
+        "http://127.0.0.1:8000/api/client/register",
         { email: email, password: password }
       );
-      if (response.data != null) {
-        localStorage.setItem('user', JSON.stringify(response.data.data));
-        window.location.href = "/";
-      } else {
+      if (response.data != null && password == subPassword) {
         window.location.href = "/login";
+      } else {
+        window.location.href = "/register";
       }
     } catch (error) {
       console.log(error);
     }
   }
-
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -59,6 +63,9 @@ function LoginPage() {
         <div className={cx("box")}>
           <h5>Chào mừng đến với</h5>
           <h1 className={cx("title")}>Quang Trường Travel</h1>
+          {
+            //Register
+          }
           <div className={cx("form")}>
             <div className={cx("content")}>
               <h5>
@@ -94,20 +101,36 @@ function LoginPage() {
               </InputGroup>
             </div>
             <div className={cx("content")}>
+              <h5>
+                Nhập lại mật khẩu
+                <b>*</b>
+              </h5>
+              <InputGroup inside>
+                <Input
+                  type={visible ? "text" : "password"}
+                  placeholder="Nhập lại mật khẩu"
+                  value={subPassword}
+                  onChange={setSubPassword}
+                />
+                <InputGroup.Button onClick={handleChange}>
+                  {visible ? <EyeIcon /> : <EyeSlashIcon />}
+                </InputGroup.Button>
+              </InputGroup>
+            </div>
+            <div className={cx("content")}>
               <Button
                 color="blue"
                 size="lg"
                 appearance="primary"
                 startIcon={<IoExitOutline />}
-                onClick={handleLogin}
+                onClick={handleRegister}
               >
-                Đăng nhập
+                Đăng ký
               </Button>
             </div>
             <div className={cx("content")}>
               <div>
-                <a href="/">Quên mật khẩu</a>
-                <a href="/register">Bạn chưa đăng ký?</a>
+                <a href="/login">Đã có tài khoản</a>
               </div>
             </div>
           </div>
@@ -118,4 +141,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

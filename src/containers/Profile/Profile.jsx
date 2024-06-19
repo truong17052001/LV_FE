@@ -10,10 +10,23 @@ import { IoExitOutline } from "react-icons/io5";
 //rsuite
 import { Input } from "rsuite";
 import { Button } from "rsuite";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const cx = classNames.bind(styles);
+const handleLogout = () => {
+  localStorage.removeItem("user");
+  window.location.href = "/";
+};
 
+const user = localStorage.getItem("user");
+const data = JSON.parse(user);
 function ProfilePage() {
+  const [section, setSection] = useState(1);
+  const handleDirect = (number) => {
+    setSection(number);
+  };
+
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -24,28 +37,32 @@ function ProfilePage() {
               <img src={avatar}></img>
               <div className={cx("heading")}>
                 <h5>Quang Trường</h5>
-                <p>tran.quang.truong.17052001@gmail.com</p>
+                <p>{data.user.email}</p>
               </div>
             </div>
             <div className={cx("link")}>
               <h1>Tài khoản</h1>
               <div>
-                <a href="/">Thông tin cá nhân</a>
-                <a href="/">Đổi mật khẩu</a>
-                <a href="/">Đăng xuất</a>
+                <a onClick={(e) => {e.preventDefault(); handleDirect(1);}}>
+                  Thông tin cá nhân
+                </a>
+                <a onClick={(e) => {e.preventDefault();handleDirect(2);}}>
+                  Đổi mật khẩu
+                </a>
+                <a onClick={handleLogout}>Đăng xuất</a>
               </div>
               <h1>Đơn đặt chỗ</h1>
               <div>
-                <a href="/">Tất cả</a>
-                <a href="/">Chờ xác nhận</a>
-                <a href="/">Đã đặt</a>
+                <a>Tất cả</a>
+                <a>Chờ xác nhận</a>
+                <a>Đã đặt</a>
               </div>
               <h1>Đánh giá</h1>
             </div>
           </div>
         </div>
         <div className={cx("right")}>
-          <div className={cx("info", "")}>
+          <div className={cx("info", section != 1 ? "invisible" : "")}>
             <div className={cx("heading", "mb")}>
               <h5>Thông tin cá nhân</h5>
               <p>
@@ -56,26 +73,40 @@ function ProfilePage() {
             <div className={cx("content")}>
               <h5>Họ và tên</h5>
               <div>
-                <p>Trần Quang Trường</p>
+                <p>{data.user.name}</p>
                 <button className={cx("btn-edit")}>Chỉnh sửa</button>
               </div>
             </div>
             <div className={cx("content")}>
               <h5>Ngày sinh</h5>
               <div>
-                <p>17/05/2001</p>
+                <p>{data.user.birthday}</p>
                 <button className={cx("btn-edit")}>Chỉnh sửa</button>
               </div>
             </div>
             <div className={cx("content")}>
               <h5>Địa chỉ</h5>
               <div>
-                <p>Chưa có thông tin</p>
+                <p>{data.user.address}</p>
+                <button className={cx("btn-edit")}>Chỉnh sửa</button>
+              </div>
+            </div>
+            <div className={cx("content")}>
+              <h5>Số điện thoại</h5>
+              <div>
+                <p>{data.user.phone}</p>
+                <button className={cx("btn-edit")}>Chỉnh sửa</button>
+              </div>
+            </div>
+            <div className={cx("content")}>
+              <h5>Giới tính</h5>
+              <div>
+                <p>{data.user.gender}</p>
                 <button className={cx("btn-edit")}>Chỉnh sửa</button>
               </div>
             </div>
           </div>
-          <div className={cx("info")}>
+          <div className={cx("info", section != 2 ? "invisible" : "")}>
             <div className={cx("heading", "mb")}>
               <h5>Đổi mật khẩu</h5>
               <p>
@@ -92,7 +123,7 @@ function ProfilePage() {
             <div className={cx("content")}>
               <h5>Mật khẩu mới</h5>
               <div>
-                <Input placeholder="Mật khẩu mới" />
+                <Input placeholder="Mật khẩu mới" name="oke" />
               </div>
             </div>
             <div className={cx("content")}>

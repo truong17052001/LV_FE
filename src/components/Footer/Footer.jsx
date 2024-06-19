@@ -44,10 +44,10 @@ function Footer() {
         </div>
         <div className={cx("social")}>
           <h3>Kết nối với chúng tôi</h3>
-          <ImFacebook2 size="45px" className={cx("m")} />
-          <GrYoutube size="45px" className={cx("m")} />
-          <FaInstagram size="45px" className={cx("m")} />
-          <FaTiktok size="45px" className={cx("m")} />
+          <ImFacebook2 size="30px" className={cx("m")} />
+          <GrYoutube size="30px" className={cx("m")} />
+          <FaInstagram size="30px" className={cx("m")} />
+          <FaTiktok size="30px" className={cx("m")} />
           <a></a>
         </div>
         <div className={cx("email")}>

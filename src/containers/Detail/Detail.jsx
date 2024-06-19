@@ -1,3 +1,7 @@
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import parse from 'html-react-parser';
 import classNames from "classnames/bind";
 import styles from "./Detail.module.scss";
 //components
@@ -10,15 +14,37 @@ import { FaShoppingCart } from "react-icons/fa";
 import { FaAngleDown } from "react-icons/fa";
 //rsuite
 import { Timeline } from "rsuite";
-import "rsuite/Timeline/styles/index.css";
 import { Accordion } from "rsuite";
+
+import "rsuite/Timeline/styles/index.css";
 import "rsuite/Accordion/styles/index.css";
 const cx = classNames.bind(styles);
-function DetailPage() {
+function DetailPage({ props }) {
   // eslint-disable-next-line react/prop-types
   const Title = ({ title }) => {
     return <div className={cx("title")}>{title}</div>;
   };
+  const [tours, setTours] = useState([]);
+  const [click, setClick] = useState(0);
+
+  const { id } = useParams();
+  useEffect(() => {
+    const getDetail = async () => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/api/client/tour/${id}`
+        );
+        if (response.data.data != null) {
+          setTours(response.data.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getDetail();
+  }, []);
+  const activities = tours.activities;
+  const guider = tours.tour_guide;
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -30,13 +56,9 @@ function DetailPage() {
           <div className={cx("left")}>
             <div>
               <LuTicket color="#4d4aef"></LuTicket>
-              <span>NDSGN841-009-240524XE-H</span>
+              <span>{tours.code}</span>
             </div>
-            <h1>
-              Gói Dịch Vụ Trải Nghiệm Sài Gòn Bằng Xe Bus 2 Tầng Và Thưởng Thức
-              Buổi Tối Trên Du Thuyền Indochina | Nhân Sự Kiện - Lễ Hội Sông
-              Nước TPHCM lần II/2024
-            </h1>
+            <h1>{tours.title_tour}</h1>
             <div>
               <div className={cx("rate")}>
                 <span>9.4</span>
@@ -52,7 +74,7 @@ function DetailPage() {
             </div>
           </div>
           <div className={cx("right")}>
-            <span>489.000 ₫</span>/ khách
+            <span> {parseInt(tours.price).toLocaleString('en-US')} ₫</span>/ khách
             <div>
               <a>
                 <FaShoppingCart />
@@ -63,21 +85,40 @@ function DetailPage() {
         </div>
         <div className={cx("picture")}>
           <div className={cx("main")}>
-            <img src="https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg"></img>
-            <img src="https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg"></img>
+            <img src={tours.img_tour}></img>
+            <img src={tours.length != 0 ? tours.images[click].src : ""}></img>
           </div>
           <div className={cx("extra")}>
-            <img src="https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg"></img>
-            <img src="https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg"></img>
-            <img src="https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg"></img>
-            <img src="https://r4.wallpaperflare.com/wallpaper/298/808/883/night-vietnam-night-vietnam-wallpaper-e5c191c7144c4615b4dbb9401bcf0f53.jpg"></img>
-            <FaAngleDown cursor={"pointer"} />
+            <img
+              src={tours.length != 0 ? tours.images[0].src : ""}
+              onClick={() => {
+                setClick(0);
+              }}
+            ></img>
+            <img
+              src={tours.length != 0 ? tours.images[1].src : ""}
+              onClick={() => {
+                setClick(1);
+              }}
+            ></img>
+            <img
+              src={tours.length != 0 ? tours.images[2].src : ""}
+              onClick={() => {
+                setClick(2);
+              }}
+            ></img>
+            <img
+              src={tours.length != 0 ? tours.images[3].src : ""}
+              onClick={() => {
+                setClick(3);
+              }}
+            ></img>
           </div>
         </div>
         <div className={cx("description")}>
           <div className={cx("left")}>
             <p>
-              Khởi hành <b>15/06/2024 - Giờ đi: 16:06</b>
+              Khởi hành <b>{tours.meet_date} - Giờ đi: 16:06</b>
             </p>
             <p>
               Tập trung <b>16:06 ngày 15/06/2024</b>
@@ -86,7 +127,7 @@ function DetailPage() {
               Thời gian <b>1 ngày</b>
             </p>
             <p>
-              Nơi khởi hành <b>TP. Hồ Chí Minh</b>
+              Nơi khởi hành <b> {tours.meet_place}</b>
             </p>
             <p>
               Số chỗ còn nhận <b> 5</b>
@@ -140,91 +181,37 @@ function DetailPage() {
           <div className={cx("process")}>
             <div className={cx("left")}>
               <Timeline align="left">
-                <Timeline.Item
-                  time="Ngày"
-                  dot={<div className={cx("dot")}>1</div>}
-                >
-                  <p className={cx("date")}>06/06/2024</p>
-                  <p className={cx("location")}>
-                    TP.HCM - CHÂU ĐỐC - MIẾU BÀ CHÚA XỨ (Ăn sáng, trưa, chiều)
-                  </p>
-                </Timeline.Item>
-                <Timeline.Item
-                  time="Ngày"
-                  dot={<div className={cx("dot")}>2</div>}
-                >
-                  <p className={cx("date")}>06/06/2024</p>
-                  <p className={cx("location")}>
-                    TP.HCM - CHÂU ĐỐC - MIẾU BÀ CHÚA XỨ (Ăn sáng, trưa, chiều)
-                  </p>
-                </Timeline.Item>
-                <Timeline.Item
-                  time="Ngày"
-                  dot={<div className={cx("dot")}>3</div>}
-                >
-                  <p className={cx("date")}>06/06/2024</p>
-                  <p className={cx("location")}>
-                    TP.HCM - CHÂU ĐỐC - MIẾU BÀ CHÚA XỨ (Ăn sáng, trưa, chiều)
-                  </p>
-                </Timeline.Item>
+                {tours.length != 0
+                  ? activities.map((activity) => {
+                      return (
+                        <Timeline.Item
+                          time="Ngày"
+                          dot={<div className={cx("dot")}>{activity.day}</div>}
+                        >
+                          <p className={cx("date")}>{activity.date}</p>
+                          <p className={cx("location")}>{activity.title}</p>
+                        </Timeline.Item>
+                      );
+                    })
+                  : ""}
               </Timeline>
             </div>
             <div className={cx("right")}>
-              <div>
-                <h3>
-                  Ngày 1 - TP.HCM - CHÂU ĐỐC - MIẾU BÀ CHÚA XỨ (Ăn sáng, trưa,
-                  chiều)
-                </h3>
-                <div className={cx("excerpt")}>
-                  <span className={cx("line")}></span>
-                  <div>
-                    <p>
-                      Quý khách tập trung tại Vietravel (190 Pasteur, Phường Võ
-                      Thị Sáu, Quận 3, Tp.HCM), khởi hành đi
-                      <strong> Châu Đốc</strong> theo
-                      <strong>
-                        {" "}
-                        tuyến cao tốc TP.HCM - Trung Lương và Trung Lương - Mỹ
-                        Thuận
-                      </strong>{" "}
-                      ngắm nhìn những cánh đồng lúa và màu xanh vườn tược hai
-                      bên đường; Chinh phục <strong>cầu Vàm Cống: </strong>cầu
-                      dây văng lớn thứ hai nối liền đôi bờ Sông Hậu, được khánh
-                      thành trong sự háo hức của hàng vạn người dân sau bao năm
-                      chờ mong.
-                    </p>
-                    <p>
-                      Đến <strong>Châu Đốc,</strong> Quý khách trải nghiệm đi
-                      tàu trên sông Hậu khám phá nét đẹp bản địa của vùng đất An
-                      Giang
-                      <br></br>
-                      <strong>- Làng bè Châu Đốc: </strong>làng nghề nuôi cá nổi
-                      tiếng An Giang rực rỡ sắc màu tạo ra một trong những cung
-                      đường thuỷ độc đáo nhất miền Tây
-                      <br></br>
-                      <strong>
-                        - Tham quan Nhà dệt Thổ Cẩm truyền thống hơn 120 năm của
-                        nghệ nhân Mohamed;
-                      </strong>{" "}
-                      Quý khách có thể thuê trang phục Chăm và check-in
-                      <strong>
-                        {" "}
-                        phòng cưới độc đáo của người Chăm Islam
-                      </strong>{" "}
-                      (chi phí tự túc)
-                    </p>
-                    <p>
-                      Buổi chiều, xe đưa Quý khách tham quan{" "}
-                      <strong>
-                        Miếu Bà Chúa Xứ, Tây An Cổ Tự, Lăng Thoại Ngọc Hầu.
-                      </strong>
-                    </p>
-                    <p>
-                      <strong>Nghỉ đêm tại Châu Đốc.</strong>
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {tours.length != 0
+                ? activities.map((activity) => {
+                    return (
+                      <div>
+                        <h3>
+                          Ngày {activity.day} - {activity.title}
+                        </h3>
+                        <div className={cx("excerpt")}>
+                          <span className={cx("line")}></span>
+                          <div>{parse(activity.description)}</div>
+                        </div>
+                      </div>
+                    );
+                  })
+                : ""}
             </div>
           </div>
         </div>
@@ -240,15 +227,15 @@ function DetailPage() {
                   </tr>
                   <tr>
                     <td>Người lớn (Từ 12 tuổi trở lên)</td>
-                    <td className={cx("price")}>3.990.000 ₫</td>
+                    <td className={cx("price")}>{parseInt(tours.price).toLocaleString('en-US')} ₫</td>
                   </tr>
                   <tr>
                     <td>Trẻ em (Từ 5 - 11 tuổi)</td>
-                    <td className={cx("price")}>2.992.500 ₫</td>
+                    <td className={cx("price")}>{parseInt(tours.price).toLocaleString('en-US')} ₫</td>
                   </tr>
                   <tr>
                     <td>Em bé (Dưới 2 tuổi)</td>
-                    <td className={cx("price")}> 0 ₫</td>
+                    <td className={cx("price")}>{parseInt(tours.price).toLocaleString('en-US')} ₫</td>
                   </tr>
 
                   <tr className={cx("total")}>
@@ -264,7 +251,7 @@ function DetailPage() {
             <div className={cx("tour")}>
               <div>
                 <h3>Hướng dẫn viên dẫn đoàn</h3>
-                <p>ĐẶNG THỊ THANH TÂM</p>
+                <p>{tours.length != 0 && guider != null ? guider.name : "Đang cập nhật"}</p>
                 <span>
                   190 Pasteur, Phường Võ Thị Sáu, Quận 3, TP.HCM, Viet Nam
                 </span>
@@ -278,10 +265,7 @@ function DetailPage() {
           <h2>Những thông tin cần lưu ý</h2>
           <div>
             <Accordion bordered>
-              <Accordion.Panel
-                header={<Title title="Giá tour bao gồm" />}
-                defaultExpanded
-              >
+              <Accordion.Panel header={<Title title="Giá tour bao gồm" />}>
                 - Xe tham quan (16, 29, 30, 34, 45 chỗ tùy theo số lượng khách)
                 <br></br>- Hướng dẫn viên tiếng Việt.
                 <br></br>- Khách sạn: Hệ thống máy nước nóng lạnh, điện thoại,
@@ -309,18 +293,16 @@ function DetailPage() {
                 lòng mang Vé Du Lịch đến văn phòng đăng ký tour để làm thủ tục
                 chuyển/huỷ tour và chịu mất phí theo quy định của Vietravel.
                 Không giải quyết các trường hợp liên hệ chuyển/huỷ tour qua điện
-                thoại. 
-                <br></br>
-                - Thời gian hủy chuyến du lịch được tính cho ngày làm
+                thoại.
+                <br></br>- Thời gian hủy chuyến du lịch được tính cho ngày làm
                 việc, không tính thứ 7, Chủ Nhật và các ngày Lễ, Tết.
               </Accordion.Panel>
               <Accordion.Panel
                 header={<Title title="Giá tour không bao gồm" />}
               >
                 - Chi phí cá nhân: ăn uống ngoài chương trình, giặt ủi, phụ thu
-                phòng đơn…. 
-                <br></br>
-                - Chi phí tham quan ngoài chương trình.
+                phòng đơn….
+                <br></br>- Chi phí tham quan ngoài chương trình.
               </Accordion.Panel>
             </Accordion>
           </div>

@@ -12,6 +12,7 @@ const cx = classNames.bind(styles);
 
 /* eslint-disable react/prop-types */
 function Header({ type }) {
+  const user = localStorage.getItem("user");
   return (
     <div className={cx("wrapper", type != 1 ? "bg1" : "")}>
       {type != 1 ? <div className={cx("foverlay")}></div> : ""}
@@ -87,7 +88,7 @@ function Header({ type }) {
             </a>
           </div>
 
-          <a href="/info" className={cx("text")}>
+          <a href={ user != null ? "/info" : "/login" } className={cx("text")}>
             <FaRegUser className={cx("a")} />
           </a>
         </div>
