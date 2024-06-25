@@ -7,6 +7,7 @@ import DetailPage from "../../containers/Detail/Detail";
 import BookingPage from "../../containers/Booking/Booking";
 import DashBoardPage from "../../containers/Admin/Dashboard/Dashboard";
 import AdminTour from "../../containers/Admin/Tour/Tour";
+import AdminDetailTour from "../../containers/Admin/Tour/DetailTour";
 const publicRoutes = [
     {path: '/', component: HomePage},
     {path: '/tour', component: TourPage},
@@ -22,6 +23,9 @@ const publicRoutes = [
 const privateRoutes = [
     {path: '/dashboard', component: DashBoardPage},
     {path: '/admin/tour', component: AdminTour},
+    {path: '/admin/detail_tour/:id', component: AdminDetailTour},
+
+    
 ]
 
 

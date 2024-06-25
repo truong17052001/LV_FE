@@ -11,7 +11,6 @@ import Footer from "../../components/Footer/Footer";
 import { FaHeart } from "react-icons/fa";
 import { LuTicket } from "react-icons/lu";
 import { FaShoppingCart } from "react-icons/fa";
-import { FaAngleDown } from "react-icons/fa";
 //rsuite
 import { Timeline } from "rsuite";
 import { Accordion } from "rsuite";
@@ -19,7 +18,7 @@ import { Accordion } from "rsuite";
 import "rsuite/Timeline/styles/index.css";
 import "rsuite/Accordion/styles/index.css";
 const cx = classNames.bind(styles);
-function DetailPage({ props }) {
+function DetailPage() {
   // eslint-disable-next-line react/prop-types
   const Title = ({ title }) => {
     return <div className={cx("title")}>{title}</div>;
