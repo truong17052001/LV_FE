@@ -8,6 +8,8 @@ import BookingPage from "../../containers/Booking/Booking";
 import DashBoardPage from "../../containers/Admin/Dashboard/Dashboard";
 import AdminTour from "../../containers/Admin/Tour/Tour";
 import AdminDetailTour from "../../containers/Admin/Tour/DetailTour";
+import AdminGuider from "../../containers/Admin/Guider/Guider";
+import AdminDateGo from "../../containers/Admin/DateGo/DateGo";
 const publicRoutes = [
     {path: '/', component: HomePage},
     {path: '/tour', component: TourPage},
@@ -24,8 +26,9 @@ const privateRoutes = [
     {path: '/dashboard', component: DashBoardPage},
     {path: '/admin/tour', component: AdminTour},
     {path: '/admin/detail_tour/:id', component: AdminDetailTour},
+    {path: '/admin/guider', component: AdminGuider},
+    {path: '/admin/date', component: AdminDateGo},
 
-    
 ]
 
 
