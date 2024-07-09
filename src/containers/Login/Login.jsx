@@ -37,11 +37,11 @@ function LoginPage() {
   async function handleLogin() {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/client/login",
+        "http://127.0.0.1:8000/api/client/user/login",
         { email: email, password: password }
       );
       if (response.data != null) {
-        localStorage.setItem('user', JSON.stringify(response.data.data));
+        localStorage.setItem('user', JSON.stringify(response.data.data.user));
         window.location.href = "/";
       } else {
         window.location.href = "/login";

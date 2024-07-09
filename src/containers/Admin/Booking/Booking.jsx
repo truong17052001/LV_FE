@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
-import styles from "./Tour.module.scss";
+import styles from "./Booking.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
@@ -16,19 +16,19 @@ import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
 // Services
-import { getHotels, getPlaces, getVehicles, getTours, addTour, deleteTour } from "../../../core/services/apiServices";
+import { getHotels, getPlaces, getVehicles, getBookings, addBooking, deleteBooking } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
-function AdminTour() {
-  const [tours, setTours] = useState([]);
+function AdminBooking() {
+  const [Bookings, setBookings] = useState([]);
   const [search, setSearch] = useState("");
-  const [newTour, setNewTour] = useState({
+  const [newBooking, setNewBooking] = useState({
     code: "",
     title: "",
     meet_place: "",
     price: "",
-    img_tour: "",
+    img_Booking: "",
     note: ""
   });
   const [hotels, setHotels] = useState([]);
@@ -38,18 +38,18 @@ function AdminTour() {
 
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
-  const handleChange = (value, name) => setNewTour({ ...newTour, [name]: value });
+  const handleChange = (value, name) => setNewBooking({ ...newBooking, [name]: value });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [toursResponse, hotelsResponse, placesResponse, vehiclesResponse] = await Promise.all([
-          getTours(),
+        const [BookingsResponse, hotelsResponse, placesResponse, vehiclesResponse] = await Promise.all([
+          getBookings(),
           getHotels(),
           getPlaces(),
           getVehicles()
         ]);
-        if (toursResponse.data.data) setTours(toursResponse.data.data);
+        if (BookingsResponse.data.data) setBookings(BookingsResponse.data.data);
         if (hotelsResponse.data.data) setHotels(hotelsResponse.data.data.map(hotel => ({ label: hotel.name, value: hotel.id })));
         if (placesResponse.data.data) setPlaces(placesResponse.data.data.map(place => ({ label: place.name_place, value: place.id })));
         if (vehiclesResponse.data.data) setVehicles(vehiclesResponse.data.data.map(vehicle => ({ label: vehicle.name, value: vehicle.id })));
@@ -60,17 +60,17 @@ function AdminTour() {
     fetchData();
   }, []);
 
-  const filteredItems = tours.filter(
+  const filteredItems = Bookings.filter(
     (item) =>
-      item.title_tour.toLowerCase().includes(search.toLowerCase()) ||
+      item.title_Booking.toLowerCase().includes(search.toLowerCase()) ||
       item.code.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
     try {
-      const response = await addTour(newTour);
+      const response = await addBooking(newBooking);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/tour";
+        window.location.href = "/admin/Booking";
       }
     } catch (error) {
       console.log(error);
@@ -80,9 +80,9 @@ function AdminTour() {
   const handleDelete = async (id, e) => {
     e.preventDefault();
     try {
-      const response = await deleteTour(id);
+      const response = await deleteBooking(id);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/tour";
+        window.location.href = "/admin/Booking";
       }
     } catch (error) {
       console.log(error);
@@ -98,24 +98,24 @@ function AdminTour() {
     },
     {
       name: "Ảnh",
-      selector: (row) => <img src={row.img_tour} alt="tour" />,
+      selector: (row) => <img src={row.img_Booking} alt="Booking" />,
       sortable: true,
       width: "120px",
     },
     {
-      name: "Mã tour",
+      name: "Mã Booking",
       selector: (row) => row.code,
       sortable: true,
       width: "200px",
     },
     {
       name: "Tiêu đề",
-      selector: (row) => row.title_tour,
+      selector: (row) => row.title_Booking,
       sortable: true,
       width: "300px",
     },
     {
-      name: "Giá tour ( Đồng )",
+      name: "Giá Booking ( Đồng )",
       selector: (row) => parseInt(row.price).toLocaleString("en-US") + " VND",
       sortable: true,
       width: "150px",
@@ -150,7 +150,7 @@ function AdminTour() {
             appearance="primary"
             color="blue"
             icon={<EyeCloseIcon />}
-            href={`/admin/detail_tour/${row.id}`}
+            href={`/admin/detail_Booking/${row.id}`}
           >
             Xem
           </IconButton>
@@ -168,7 +168,7 @@ function AdminTour() {
         <div className={cx("right")}>
           <div className={cx("table")}>
             <DataTable
-              title="Danh sách tour"
+              title="Danh sách Booking"
               columns={columns}
               data={filteredItems}
               dense
@@ -204,51 +204,51 @@ function AdminTour() {
         </div>
         <Modal open={openAdd} onClose={handleCloseAdd}>
           <Modal.Header>
-            <Modal.Title>THÊM TOUR</Modal.Title>
+            <Modal.Title>THÊM Booking</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Mã tour</h5>
+              <h5>Mã Booking</h5>
               <Input
                 placeholder={"Nhập mã tại đây"}
-                value={newTour.code}
+                value={newBooking.code}
                 onChange={(value) => handleChange(value, "code")}
               />
-              <h5>Tiêu đề tour</h5>
+              <h5>Tiêu đề Booking</h5>
               <Input
                 placeholder={"Nhập tiêu đề tại đây"}
-                value={newTour.title}
+                value={newBooking.title}
                 onChange={(value) => handleChange(value, "title")}
               />
               <h5>Nơi tập trung</h5>
               <Input
                 placeholder={"Nhập nơi tập trung tại đây"}
-                value={newTour.meet_place}
+                value={newBooking.meet_place}
                 onChange={(value) => handleChange(value, "meet_place")}
               />
-              <h5>Giá tour ( VND )</h5>
+              <h5>Giá Booking ( VND )</h5>
               <Input
                 type="number"
-                placeholder={"Nhập giá tour tại đây"}
-                value={newTour.price}
+                placeholder={"Nhập giá Booking tại đây"}
+                value={newBooking.price}
                 onChange={(value) => handleChange(value, "price")}
               />
               <h5>Ảnh</h5>
               <Input
                 placeholder={"Nhập link ảnh tại đây"}
-                value={newTour.img_tour}
-                onChange={(value) => handleChange(value, "img_tour")}
+                value={newBooking.img_Booking}
+                onChange={(value) => handleChange(value, "img_Booking")}
               />
               <h5>Chú thích</h5>
               <Input
                 placeholder={"Nhập chú thích tại đây"}
-                value={newTour.note}
+                value={newBooking.note}
                 onChange={(value) => handleChange(value, "note")}
               />
               <h5>Khách sạn</h5>
               <TagPicker
                 data={hotels}
-                value={newTour.hotels}
+                value={newBooking.hotels}
                 onChange={(value) => handleChange(value, "hotels")}
                 style={{ width: '100%' }}
                 placeholder="Chọn khách sạn"
@@ -256,7 +256,7 @@ function AdminTour() {
               <h5>Địa danh</h5>
               <TagPicker
                 data={places}
-                value={newTour.places}
+                value={newBooking.places}
                 onChange={(value) => handleChange(value, "places")}
                 style={{ width: '100%' }}
                 placeholder="Chọn địa danh"
@@ -264,7 +264,7 @@ function AdminTour() {
               <h5>Phương tiện</h5>
               <TagPicker
                 data={vehicles}
-                value={newTour.vehicles}
+                value={newBooking.vehicles}
                 onChange={(value) => handleChange(value, "vehicles")}
                 style={{ width: '100%' }}
                 placeholder="Chọn phương tiện"
@@ -285,4 +285,4 @@ function AdminTour() {
   );
 }
 
-export default AdminTour;
+export default AdminBooking;

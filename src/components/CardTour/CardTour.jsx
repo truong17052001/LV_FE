@@ -5,7 +5,7 @@ const cx = classNames.bind(styles);
 //icon
 import { LuTicket } from "react-icons/lu";
 import { FaCartShopping } from "react-icons/fa6";
-function CardTour({id, code, title_tour, meet_place, meet_date, price, img_tour}) {
+function CardTour({id, code, title_tour, meet_place, price, img_tour}) {
   return (
     <div className={cx("item")}>
       <div className={cx("img")}>
@@ -24,7 +24,7 @@ function CardTour({id, code, title_tour, meet_place, meet_date, price, img_tour}
         </div>
       </div>
       <div className={cx("body")}>
-        <p className={cx("date")}>{meet_date} - 3 ngày</p>
+        <p className={cx("date")}> 3 ngày</p>
         <p className={cx("title")}>
           <a href={`/detail/${id}`}>
             {title_tour}
@@ -41,9 +41,9 @@ function CardTour({id, code, title_tour, meet_place, meet_date, price, img_tour}
           Nơi khởi hành: <span>{meet_place}</span>
         </p>
         <div className={cx("price")}>
-          Giá <del>2.990.000 ₫</del>
+          Giá <del>{parseInt(price*1 + price*6/100).toLocaleString("en-US")} ₫</del>
           <div>
-            {price}<span><FaCartShopping></FaCartShopping>Đặt ngay</span>
+          {parseInt(price).toLocaleString("en-US")} VND<span><FaCartShopping></FaCartShopping>Đặt ngay</span>
           </div>
         </div>
       </div>

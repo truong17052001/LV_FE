@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
-import styles from "./Guider.module.scss";
+import styles from "./Hotel.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Modal, Button, Input, InputGroup, IconButton } from "rsuite";
+import { Modal, Button, Input, InputGroup, IconButton, DatePicker } from "rsuite";
+import { parseISO, format } from "date-fns";
 import {
   Search as SearchIcon,
   Plus as PlusIcon,
@@ -16,26 +17,28 @@ import "rsuite/Modal/styles/index.css";
 import "rsuite/Input/styles/index.css";
 import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
+import "rsuite/DatePicker/styles/index.css";
+
 
 import {
-  getGuiders,
-  getGuider,
-  addGuider,
-  updateGuider,
-  deleteGuider,
+  getHotels,
+  getHotel,
+  addHotel,
+  updateHotel,
+  deleteHotel,
 } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
-function AdminGuider() {
-  const [guiders, setGuiders] = useState([]);
-  const [detailGuiders, setDetailGuiders] = useState({});
+function AdminHotel() {
+  const [hotels, setHotels] = useState([]);
+  const [detailHotels, setDetailHotels] = useState({});
   const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
   const handleOpenAdd = () => {
-    setDetailGuiders({});
+    setDetailHotels({});
     setOpenAdd(true);
   };
 
@@ -43,9 +46,9 @@ function AdminGuider() {
 
   const handleOpenEdit = async (id) => {
     try {
-      const response = await getGuider(id);
+      const response = await getHotel(id);
       if (response.data.data) {
-        setDetailGuiders(response.data.data);
+        setDetailHotels(response.data.data);
       }
     } catch (error) {
       console.error(error);
@@ -55,15 +58,15 @@ function AdminGuider() {
 
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const filteredItems = guiders.filter((item) =>
+  const filteredItems = hotels.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
     try {
-      const response = await addGuider(detailGuiders);
+      const response = await addHotel(detailHotels);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/guider";
+        window.location.href = "/admin/hotel";
       }
     } catch (error) {
       console.error(error);
@@ -73,9 +76,9 @@ function AdminGuider() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateGuider(detailGuiders.id, detailGuiders);
+      const response = await updateHotel(detailHotels.id, detailHotels);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/guider";
+        window.location.href = "/admin/hotel";
       }
     } catch (error) {
       console.error(error);
@@ -85,9 +88,9 @@ function AdminGuider() {
   const handleDelete = async (id, e) => {
     e.preventDefault();
     try {
-      const response = await deleteGuider(id);
+      const response = await deleteHotel(id);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/guider";
+        window.location.href = "/admin/hotel";
       }
     } catch (error) {
       console.error(error);
@@ -95,23 +98,22 @@ function AdminGuider() {
   };
 
   useEffect(() => {
-    const fetchGuiders = async () => {
+    const fetchHotels = async () => {
       try {
-        const response = await getGuiders();
+        const response = await getHotels();
         if (response.data.data) {
-          setGuiders(response.data.data);
+          setHotels(response.data.data);
         }
       } catch (error) {
         console.error(error);
       }
     };
-    fetchGuiders();
+    fetchHotels();
   }, []);
-
   const columns = [
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
-      name: "Tên hướng dẫn viên",
+      name: "Tên khách sạn",
       selector: (row) => row.name,
       sortable: true,
       width: "200px",
@@ -129,16 +131,22 @@ function AdminGuider() {
       width: "150px",
     },
     {
+      name: "Tiêu chuẩn",
+      selector: (row) => row.standard,
+      sortable: true,
+      width: "150px",
+    },
+    {
+      name: "Website",
+      selector: (row) => row.website,
+      sortable: true,
+      width: "150px",
+    },
+    {
       name: "Email",
       selector: (row) => row.email,
       sortable: true,
       width: "200px",
-    },
-    {
-      name: "Ảnh",
-      selector: (row) => <img src={row.img} alt="Guider" />,
-      sortable: true,
-      width: "150px",
     },
     {
       name: "Thao tác",
@@ -174,7 +182,7 @@ function AdminGuider() {
         <div className={cx("right")}>
           <div className={cx("table")}>
             <DataTable
-              title="Danh sách hướng dẫn viên"
+              title="Danh sách khách sạn"
               columns={columns}
               data={filteredItems}
               dense
@@ -194,7 +202,7 @@ function AdminGuider() {
                   </IconButton>
                   <InputGroup style={{ width: 400 }}>
                     <Input
-                      placeholder="Tìm kiếm theo tên hoặc mã"
+                      placeholder="Tìm kiếm theo tên"
                       value={search}
                       onChange={(value) => setSearch(value)}
                     />
@@ -211,16 +219,16 @@ function AdminGuider() {
 
         <Modal open={openAdd} onClose={handleCloseAdd}>
           <Modal.Header>
-            <Modal.Title>THÊM HƯỚNG DẪN VIÊN</Modal.Title>
+            <Modal.Title>THÊM KHÁCH SẠN</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Tên hướng dẫn viên</h5>
+              <h5>Tên khách sạn</h5>
               <Input
-                placeholder="Nhập tên hướng dẫn viên tại đây"
-                value={detailGuiders.name || ""}
+                placeholder="Nhập tên người dùng tại đây"
+                value={detailHotels.name || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     name: value,
                   }))
@@ -229,9 +237,9 @@ function AdminGuider() {
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailGuiders.phone || ""}
+                value={detailHotels.phone || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     phone: value,
                   }))
@@ -240,9 +248,9 @@ function AdminGuider() {
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailGuiders.address || ""}
+                value={detailHotels.address || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     address: value,
                   }))
@@ -251,22 +259,33 @@ function AdminGuider() {
               <h5>Email</h5>
               <Input
                 placeholder="Nhập email tại đây"
-                value={detailGuiders.email || ""}
+                value={detailHotels.email || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     email: value,
                   }))
                 }
               />
-              <h5>Ảnh</h5>
+              <h5>Website</h5>
               <Input
-                placeholder="Nhập link ảnh tại đây"
-                value={detailGuiders.img || ""}
+                placeholder="Nhập link website tại đây"
+                value={detailHotels.website || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
-                    img: value,
+                    website: value,
+                  }))
+                }
+              />
+              <h5>Tiêu chuẩn</h5>
+              <Input
+                placeholder="Nhập tiêu chuẩn tại đây"
+                value={detailHotels.standard || ""}
+                onChange={(value) =>
+                  setDetailHotels((prevState) => ({
+                    ...prevState,
+                    standard: value,
                   }))
                 }
               />
@@ -284,16 +303,16 @@ function AdminGuider() {
 
         <Modal open={openEdit} onClose={handleCloseEdit}>
           <Modal.Header>
-            <Modal.Title>CẬP NHẬT HƯỚNG DẪN VIÊN</Modal.Title>
+            <Modal.Title>CẬP NHẬT KHÁCH SẠN</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Tên hướng dẫn viên</h5>
+              <h5>Tên khách sạn</h5>
               <Input
-                placeholder="Nhập tên hướng dẫn viên tại đây"
-                value={detailGuiders.name || ""}
+                placeholder="Nhập tên khách sạn tại đây"
+                value={detailHotels.name || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     name: value,
                   }))
@@ -302,9 +321,9 @@ function AdminGuider() {
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailGuiders.phone || ""}
+                value={detailHotels.phone || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     phone: value,
                   }))
@@ -313,9 +332,9 @@ function AdminGuider() {
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailGuiders.address || ""}
+                value={detailHotels.address || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     address: value,
                   }))
@@ -324,22 +343,33 @@ function AdminGuider() {
               <h5>Email</h5>
               <Input
                 placeholder="Nhập email tại đây"
-                value={detailGuiders.email || ""}
+                value={detailHotels.email || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
                     email: value,
                   }))
                 }
               />
-              <h5>Ảnh</h5>
+              <h5>Website</h5>
               <Input
-                placeholder="Nhập link ảnh tại đây"
-                value={detailGuiders.img || ""}
+                placeholder="Nhập link website tại đây"
+                value={detailHotels.website || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailHotels((prevState) => ({
                     ...prevState,
-                    img: value,
+                    website: value,
+                  }))
+                }
+              />
+              <h5>Tiêu chuẩn</h5>
+              <Input
+                placeholder="Nhập tiêu chuẩn tại đây"
+                value={detailHotels.standard || ""}
+                onChange={(value) =>
+                  setDetailHotels((prevState) => ({
+                    ...prevState,
+                    standard: value,
                   }))
                 }
               />
@@ -359,4 +389,4 @@ function AdminGuider() {
   );
 }
 
-export default AdminGuider;
+export default AdminHotel;

@@ -43,7 +43,7 @@ function RegisterPage() {
           toaster.push(message, { placement:'topCenter', duration: 5000 });
       }
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/client/register",
+        "http://127.0.0.1:8000/api/client/user/register",
         { email: email, password: password }
       );
       if (response.data != null && password == subPassword) {

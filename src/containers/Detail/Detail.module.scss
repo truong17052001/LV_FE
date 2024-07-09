@@ -395,3 +395,40 @@
     justify-content: flex-start;
   }
 }
+.form{
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  .item{
+    display: flex;
+    gap: 16px;
+    border:1px solid #ccc;
+    padding: 16px;
+    align-items: center;
+  }
+  .date_go{
+    width: 100px;
+    height: 100%;
+    background-color: #4d4aef;
+    color: #fff;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .price{
+    flex:1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  h5{
+    font-size: 17px;
+  }
+  span{
+    color: #e01600;
+  }
+}
+

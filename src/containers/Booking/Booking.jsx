@@ -1,25 +1,95 @@
+import { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./Booking.module.scss";
 //components
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 //rsuite
-import { SelectPicker, Input, Toggle, Button } from "rsuite";
+import { SelectPicker, Input, Button, DatePicker } from "rsuite";
+import {
+  parseISO,
+  format,
+  addDays,
+  getMonth,
+  getDate,
+  getYear,
+} from "date-fns";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/Input/styles/index.css";
 import "rsuite/Toggle/styles/index.css";
 import "rsuite/Button/styles/index.css";
-
 //icon
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
 import { CiCircleMinus } from "react-icons/ci";
 import { IoPeople } from "react-icons/io5";
 import { CiCalendar } from "react-icons/ci";
+//api
+import { addBooking, getDetailDate } from "../../core/services/apiServices";
 const cx = classNames.bind(styles);
 
 function BookingPage() {
+  const { id } = useParams();
+  const user = localStorage.getItem("user");
+  const customer = JSON.parse(user);
+
+  const [booking, setBooking] = useState({
+    time_booking: format(new Date(), "yyyy-MM-dd"),
+    status: "Chưa thanh toán",
+    id_date: id,
+    id_customer: customer.id,
+    id_discount: 1,
+  });
+  const [detailBooking, setDetailBooking] = useState({
+    adults: [],
+    childrens: [],
+  });
+
+  const [date, setDate] = useState([]);
+  const [adult, setAdult] = useState(1);
+  const [children, setChildren] = useState(0);
+
+  const start = new Date(date.date);
+  const end = addDays(start, date.day);
   const data = ["Nam", "Nữ"].map((item) => ({ label: item, value: item }));
+  const handleBooking = () => {
+    handleAdd();
+  };
+  useEffect(() => {
+    date.length != 0
+      ? setBooking({
+          ...booking,
+          detailBooking: detailBooking,
+          total_price:
+            adult * date.tour.price + (children * date.tour.price * 50) / 100,
+        })
+      : "";
+  }, [detailBooking, adult, children]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const datesResponse = await getDetailDate(id);
+        if (datesResponse.data.data) {
+          setDate(datesResponse.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleAdd = async () => {
+    try {
+      const response = await addBooking(booking);
+      if (response.data.message === "Success") {
+        window.location.href = `/payment/${id}`;
+      }
+    } catch (error) {
+      console.error("Error adding booking:", error);
+    }
+  };
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -44,30 +114,62 @@ function BookingPage() {
                 <label>
                   Họ và Tên <b>*</b>
                 </label>
-                <input type="text" name="fullName" value="" />
-                <div className={cx("error")}>Vui lòng nhập thông tin</div>
+                <Input
+                  placeholder={"Nhập tên tại đây"}
+                  value={booking.name}
+                  onChange={(value) =>
+                    setBooking((preState) => ({
+                      ...preState,
+                      name: value,
+                    }))
+                  }
+                />
               </div>
               <div className={cx("box")}>
                 <label>
                   Email
                   <b>*</b>
                 </label>
-                <input type="text" name="fullName" value="" />
-                <div className={cx("error")}>Vui lòng nhập thông tin</div>
+                <Input
+                  placeholder={"Nhập email tại đây"}
+                  value={booking.email}
+                  onChange={(value) =>
+                    setBooking((preState) => ({
+                      ...preState,
+                      email: value,
+                    }))
+                  }
+                />
               </div>
               <div className={cx("box")}>
                 <label>
                   Số điện thoại <b>*</b>
                 </label>
-                <input type="text" name="fullName" value="" />
-                <div className={cx("error")}>Vui lòng nhập thông tin</div>
+                <Input
+                  placeholder={"Nhập số điện thoại tại đây"}
+                  value={booking.phone}
+                  onChange={(value) =>
+                    setBooking((preState) => ({
+                      ...preState,
+                      phone: value,
+                    }))
+                  }
+                />
               </div>
               <div className={cx("box")}>
                 <label>
                   Địa chỉ <b>*</b>
                 </label>
-                <input type="text" name="fullName" value="" />
-                <div className={cx("error")}>Vui lòng nhập thông tin</div>
+                <Input
+                  placeholder={"Nhập địa chỉ tại đây"}
+                  value={booking.address}
+                  onChange={(value) =>
+                    setBooking((preState) => ({
+                      ...preState,
+                      address: value,
+                    }))
+                  }
+                />
               </div>
             </form>
           </div>
@@ -79,11 +181,15 @@ function BookingPage() {
                 <p>Từ 12 tuổi</p>
               </div>
               <div className={cx("change_number")}>
-                <CiCircleMinus size={"25px"} />
-                <span className={cx("number")} id="adult">
-                  1
-                </span>
-                <CiCirclePlus size={"25px"} />
+                <CiCircleMinus
+                  size={"25px"}
+                  onClick={() => setAdult((prev) => Math.max(prev - 1, 1))}
+                />
+                <span className={cx("number")}>{adult}</span>
+                <CiCirclePlus
+                  size={"25px"}
+                  onClick={() => setAdult((prev) => prev + 1)}
+                />
               </div>
             </div>
             <div className={cx("change")}>
@@ -92,11 +198,15 @@ function BookingPage() {
                 <p>Dưới 12 tuổi</p>
               </div>
               <div className={cx("change_number")}>
-                <CiCircleMinus size={"25px"} />
-                <span className={cx("number")} id="adult">
-                  1
-                </span>
-                <CiCirclePlus size={"25px"} />
+                <CiCircleMinus
+                  size={"25px"}
+                  onClick={() => setChildren((prev) => Math.max(prev - 1, 0))}
+                />
+                <span className={cx("number")}>{children}</span>
+                <CiCirclePlus
+                  size={"25px"}
+                  onClick={() => setChildren((prev) => prev + 1)}
+                />
               </div>
             </div>
           </div>
@@ -107,34 +217,174 @@ function BookingPage() {
               <IoPeople size={"25px"} />
               Người lớn
             </div>
-            <div className={cx("info")}>
-              <div className={cx("name")}>
-                <label>Họ và tên</label>
-                <Input style={{ width: 250 }} placeholder={"Nhập họ tên"} />
-              </div>
-              <div className={cx("gender")}>
-                <label>Giới tính</label>
-                <SelectPicker
-                  data={data}
-                  searchable={false}
-                  defaultValue={"Nam"}
-                />
-              </div>
-              <div className={cx("birthday")}>
-                <label>Ngày sinh</label>
-                <div>
-                  <Input style={{ width: 70 }} placeholder={"Ngày"} />
-                  <Input style={{ width: 70 }} placeholder={"Tháng"} />
-                  <Input style={{ width: 100 }} placeholder={"Năm"} />
+            {Array.from({ length: adult }).map((_, i) => (
+              <div className={cx("info")} key={`adult-${i}`}>
+                <div className={cx("name")}>
+                  <label>Họ và tên</label>
+                  <Input
+                    style={{ width: 350 }}
+                    placeholder={"Nhập họ tên"}
+                    onChange={(value) => {
+                      setDetailBooking((prevState) => {
+                        const newState = { ...prevState };
+                        const newAdults = [...newState.adults];
+                        if (i >= 0 && i < newAdults.length) {
+                          newAdults[i] = {
+                            ...newAdults[i],
+                            name: value,
+                          };
+                        } else {
+                          newAdults.push({ name: value });
+                        }
+                        newState.adults = newAdults;
+                        return newState;
+                      });
+                    }}
+                  />
+                </div>
+                <div className={cx("gender")}>
+                  <label>Giới tính</label>
+                  <SelectPicker
+                    data={data}
+                    style={{ width: 150 }}
+                    searchable={false}
+                    placeholder={"Giới tính"}
+                    onChange={(value) => {
+                      setDetailBooking((prevState) => {
+                        const newState = { ...prevState };
+                        const newAdults = [...newState.adults];
+                        if (i >= 0 && i < newAdults.length) {
+                          newAdults[i] = {
+                            ...newAdults[i],
+                            gender: value,
+                          };
+                        } else {
+                          newAdults.push({ gender: value });
+                        }
+                        newState.adults = newAdults;
+                        return newState;
+                      });
+                    }}
+                  />
+                </div>
+                <div className={cx("birthday")}>
+                  <label>Ngày sinh</label>
+                  <div>
+                    <DatePicker
+                      format="yyyy-MM-dd"
+                      placeholder="Chọn ngày ngày sinh"
+                      block
+                      onChange={(value) => {
+                        setDetailBooking((prevState) => {
+                          const newState = { ...prevState };
+                          const newAdults = [...newState.adults];
+                          if (i >= 0 && i < newAdults.length) {
+                            newAdults[i] = {
+                              ...newAdults[i],
+                              birthday: format(value, "yyyy-MM-dd"),
+                            };
+                          } else {
+                            newAdults.push({
+                              birthday: format(value, "yyyy-MM-dd"),
+                            });
+                          }
+                          newState.adults = newAdults;
+                          return newState;
+                        });
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className={cx("add_room")}>
-                <label>Phòng đơn</label>
-                <div>
-                  <Toggle defaultChecked></Toggle>1.700.000 ₫
+            ))}
+            {children != 0 ? (
+              <div className={cx("title_customers")}>
+                <IoPeople size={"25px"} />
+                Trẻ em
+              </div>
+            ) : (
+              ""
+            )}
+            {Array.from({ length: children }).map((_, i) => (
+              <div className={cx("info")} key={`child-${i}`}>
+                <div className={cx("name")}>
+                  <label>Họ và tên</label>
+                  <Input
+                    style={{ width: 350 }}
+                    placeholder={"Nhập họ tên"}
+                    onChange={(value) => {
+                      setDetailBooking((prevState) => {
+                        const newState = { ...prevState };
+                        const newChildren = [...newState.childrens];
+                        if (i >= 0 && i < newChildren.length) {
+                          newChildren[i] = {
+                            ...newChildren[i],
+                            name: value,
+                          };
+                        } else {
+                          newChildren.push({ name: value });
+                        }
+                        newState.childrens = newChildren;
+                        return newState;
+                      });
+                    }}
+                  />
+                </div>
+                <div className={cx("gender")}>
+                  <label>Giới tính</label>
+                  <SelectPicker
+                    data={data}
+                    style={{ width: 150 }}
+                    searchable={false}
+                    placeholder={"Giới tính"}
+                    onChange={(value) => {
+                      setDetailBooking((prevState) => {
+                        const newState = { ...prevState };
+                        const newChildren = [...newState.childrens];
+                        if (i >= 0 && i < newChildren.length) {
+                          newChildren[i] = {
+                            ...newChildren[i],
+                            gender: value,
+                          };
+                        } else {
+                          newChildren.push({ gender: value });
+                        }
+                        newState.childrens = newChildren;
+                        return newState;
+                      });
+                    }}
+                  />
+                </div>
+                <div className={cx("birthday")}>
+                  <label>Ngày sinh</label>
+                  <div>
+                    <DatePicker
+                      format="yyyy-MM-dd"
+                      placeholder="Chọn ngày ngày sinh"
+                      block
+                      onChange={(value) => {
+                        setDetailBooking((prevState) => {
+                          const newState = { ...prevState };
+                          const newChildren = [...newState.childrens];
+                          if (i >= 0 && i < newChildren.length) {
+                            newChildren[i] = {
+                              ...newChildren[i],
+                              birthday: format(value, "yyyy-MM-dd"),
+                            };
+                          } else {
+                            newChildren.push({
+                              birthday: format(value, "yyyy-MM-dd"),
+                            });
+                          }
+                          newState.childrens = newChildren;
+                          return newState;
+                        });
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
           <div className={cx("note")}>
             <h3>Quý khách có ghi chú gì, hãy nói với chúng tôi !</h3>
@@ -146,26 +396,24 @@ function BookingPage() {
         </div>
         <div className={cx("bill")}>
           <h3>Tóm tắt chuyến đi</h3>
-          <div className={cx("packet_title")}>
+          {/* <div className={cx("packet_title")}>
             <span>
               Dịch vụ tùy chọn <b>Option 1</b>
             </span>
             <p>
               Tour trọn gói <span> (6 khách)</span>
             </p>
-          </div>
+          </div> */}
           <div className={cx("product")}>
             <div className={cx("product_img")}>
               <img
-                src="https://media.travel.com.vn/Tour/tfd_240514031013_967649_KDL CHUON CHUON 1.jpg"
+                src={date.length != 0 ? date.tour.img_tour || "" : "Đang tải"}
                 alt="image"
               />
             </div>
             <div className={cx("product_content")}>
               <p>
-                Đà Lạt – Khu Du lịch Chuồn Chuồn – Thung Lũng Tình Yêu – Mongo
-                Land - Vườn Bonsai Hoàng Long Ohayo ( Khách sạn tương đương 3
-                sao) 3N3Đ
+                {date.length != 0 ? date.tour.title_tour || "" : "Đang tải"}
               </p>
             </div>
           </div>
@@ -174,7 +422,10 @@ function BookingPage() {
               <CiCalendar className={cx("icon")} />
               <div>
                 <h4>Bắt đầu chuyến đi</h4>
-                <p className={cx("time")}>T5, 20 THÁNG 6 NĂM 2024</p>
+                <p className={cx("time")}>
+                  {getDate(start)} THÁNG {getMonth(start) + 1} NĂM
+                  {getYear(start)}
+                </p>
                 <p></p>
               </div>
             </div>
@@ -182,7 +433,9 @@ function BookingPage() {
               <CiCalendar className={cx("icon")} />
               <div>
                 <h4>Kết thúc chuyến đi</h4>
-                <p className={cx("time")}>CN, 23 THÁNG 6 NĂM 2024</p>
+                <p className={cx("time")}>
+                  {getDate(end)} THÁNG {getMonth(end) + 1} NĂM {getYear(end)}
+                </p>
                 <p></p>
               </div>
             </div>
@@ -194,7 +447,13 @@ function BookingPage() {
                   <th>Hành khách</th>
                   <th className={cx("price")}>
                     <span className={cx("total_booking")}>
-                      5.300.000&nbsp;₫
+                      {date.length != 0
+                        ? parseInt(
+                            adult * date.tour.price +
+                              (children * date.tour.price * 50) / 100
+                          ).toLocaleString("en-US")
+                        : 0}
+                      &nbsp;₫
                     </span>
                   </th>
                 </tr>
@@ -202,12 +461,35 @@ function BookingPage() {
               <tbody>
                 <tr>
                   <td>Người lớn</td>
-                  <td className={cx("price")}>1 x 3.690.000 ₫</td>
+                  <td className={cx("price")}>
+                    {adult} x{" "}
+                    {date.length != 0
+                      ? parseInt(date.tour.price).toLocaleString("en-US")
+                      : 0}{" "}
+                    ₫
+                  </td>
                 </tr>
-                <tr className={cx("th")}>
+                {children != 0 ? (
+                  <tr>
+                    <td>Trẻ em</td>
+                    <td className={cx("price")}>
+                      {children} x{" "}
+                      {date.length != 0
+                        ? parseInt((date.tour.price * 50) / 100).toLocaleString(
+                            "en-US"
+                          )
+                        : 0}{" "}
+                      ₫
+                    </td>
+                  </tr>
+                ) : (
+                  ""
+                )}
+
+                {/* <tr className={cx("th")}>
                   <td>Phụ thu phòng đơn</td>
                   <td className={cx("price")}>1.610.000 ₫</td>
-                </tr>
+                </tr> */}
               </tbody>
             </table>
             <div>
@@ -225,7 +507,13 @@ function BookingPage() {
                 <span>5.300.000 ₫</span>
               </div>
             </div>
-            <Button size="lg" color="red" appearance="primary" block>
+            <Button
+              size="lg"
+              color="red"
+              appearance="primary"
+              block
+              onClick={handleBooking}
+            >
               Đặt ngay
             </Button>
           </div>

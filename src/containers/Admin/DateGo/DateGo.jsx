@@ -1,168 +1,181 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+// AdminDateGo.jsx
+
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
 import styles from "./DateGo.module.scss";
-//components
 import SideNav from "../../../components/SideNav/SideNav";
-//rsuite
-import { Modal, Button } from "rsuite";
-import { Input, InputGroup } from "rsuite";
-import { IconButton } from "rsuite";
+import {
+  Modal,
+  Button,
+  SelectPicker,
+  Input,
+  IconButton,
+  InputGroup,
+  DatePicker,
+} from "rsuite";
+import { parseISO, format, isBefore, getMonth } from "date-fns";
 import SearchIcon from "@rsuite/icons/Search";
 import PlusIcon from "@rsuite/icons/Plus";
 import MinusIcon from "@rsuite/icons/Minus";
 import EditIcon from "@rsuite/icons/Edit";
-import "rsuite/Modal/styles/index.css";
-import "rsuite/Input/styles/index.css";
-import "rsuite/InputGroup/styles/index.css";
-import "rsuite/IconButton/styles/index.css";
+import {
+  getDates,
+  getDetailDate,
+  addDate,
+  updateDate,
+  deleteDate,
+  getTours,
+  getGuiders,
+} from "../../../core/services/apiServices";
+
 const cx = classNames.bind(styles);
+
 function AdminDateGo() {
+  const [dates, setDates] = useState([]);
+  const [tours, setTours] = useState([]);
   const [guiders, setGuiders] = useState([]);
-  const [detailGuiders, setDetailGuiders] = useState([]);
+  const [detailDate, setDetailDate] = useState({});
   const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const datesResponse = await getDates();
+        if (datesResponse.data.data) {
+          setDates(datesResponse.data.data);
+        }
+
+        const toursResponse = await getTours();
+        if (toursResponse.data.data) {
+          setTours(toursResponse.data.data);
+        }
+
+        const guidersResponse = await getGuiders();
+        if (guidersResponse.data.data) {
+          setGuiders(guidersResponse.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleOpenAdd = () => {
-    setDetailGuiders([]);
+    setDetailDate({});
     setOpenAdd(true);
   };
-  const handleCloseAdd = () => setOpenAdd(false);
-  const handleOpenEdit = async (id) => {
-    try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000/api/client/guider/${id}`
-      );
-      if (response.data.data != null) {
-        setDetailGuiders(response.data.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    setOpenEdit(true);
-  };
-  const handleCloseEdit = () => setOpenEdit(false);
-  const styles = {
-    width: 400,
+
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
   };
 
-  const filteredItems = guiders.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
-  const handleAdd = async () => {
+  const handleOpenEdit = async (id) => {
     try {
-      const response = await axios.post(
-        `http://127.0.0.1:8000/api/client/guider/add`,
-        {
-          name: detailGuiders.name,
-          phone: detailGuiders.phone,
-          address: detailGuiders.address,
-          email: detailGuiders.email,
-          img: detailGuiders.img,
-        }
-      );
-      if (response.data.message == "Success") {
-        window.location.href = "/admin/guider";
+      const response = await getDetailDate(id);
+      if (response.data.data) {
+        setDetailDate(response.data.data);
+        setOpenEdit(true);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching detail date:", error);
     }
   };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleAdd = async () => {
+    try {
+      const response = await addDate(detailDate);
+      if (response.data.message === "Success") {
+        window.location.href = "/admin/date";
+      }
+    } catch (error) {
+      console.error("Error adding date:", error);
+    }
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        `http://127.0.0.1:8000/api/client/guider/edit/${detailGuiders.id}`,
-        {
-          name: detailGuiders.name,
-          phone: detailGuiders.phone,
-          address: detailGuiders.address,
-          email: detailGuiders.email,
-          img: detailGuiders.img,
-        }
-      );
-      if (response.data.message == "Success") {
-        window.location.href = "/admin/guider";
+      const response = await updateDate(detailDate.id, detailDate);
+      if (response.data.message === "Success") {
+        window.location.href = "/admin/date";
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating date:", error);
     }
-  console.log(detailGuiders);
-
   };
+
   const handleDelete = async (id, e) => {
     e.preventDefault();
     try {
-      const response = await axios.delete(
-        `http://127.0.0.1:8000/api/client/guider/delete/${id}`
-      );
-
-      if (response.data.message == "Success") {
-        window.location.href = "/admin/guider";
+      const response = await deleteDate(id);
+      if (response.data.message === "Success") {
+        window.location.href = "/admin/date";
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting date:", error);
     }
   };
-  useEffect(() => {
-    const getGuiders = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/client/guider"
-        );
-        if (response.data.data != null) {
-          setGuiders(response.data.data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getGuiders();
-  }, []);
+
+  const filteredItems = dates.filter(
+    (item) =>
+      tours[item.id_tour - 1]?.code
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      guiders[item.id_guider - 1]?.name
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  );
+
   const columns = [
+    { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
-      name: "STT",
-      selector: (row) => row.id,
+      name: "Ngày đi",
+      selector: (row) => row.date,
       sortable: true,
-      width: "70px",
+      width: "120px",
     },
     {
-      name: "Tên hướng dẫn viên",
-      selector: (row) => row.name,
+      name: "Tháng",
+      selector: (row) => row.month,
       sortable: true,
-      width: "200px",
+      width: "100px",
     },
     {
-      name: "Số điện thoại",
-      selector: (row) => row.phone,
+      name: "Số ngày",
+      selector: (row) => row.day,
+      sortable: true,
+      width: "100px",
+    },
+    {
+      name: "Số chỗ còn lại",
+      selector: (row) => row.seat,
       sortable: true,
       width: "150px",
     },
     {
-      name: "Địa chỉ",
-      selector: (row) => row.address,
+      name: "Mã tour",
+      selector: (row) => tours[row.id_tour - 1]?.code,
       sortable: true,
-      width: "150px",
     },
     {
-      name: "Email",
-      selector: (row) => row.email,
+      name: "Hướng dẫn viên",
+      selector: (row) => guiders[row.id_guider - 1]?.name,
       sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Ảnh",
-      selector: (row) => <img src={row.img}></img>,
-      sortable: true,
-      width: "150px",
     },
     {
       name: "Thao tác",
       selector: (row) => (
         <div className={cx("action")}>
           <IconButton
-            width={"12px"}
             appearance="primary"
             color="red"
             icon={<MinusIcon />}
@@ -171,11 +184,10 @@ function AdminDateGo() {
             Xóa
           </IconButton>
           <IconButton
-            width={"12px"}
             appearance="primary"
             color="yellow"
             icon={<EditIcon />}
-            onClick={(e) => handleOpenEdit(row.id, e)}
+            onClick={() => handleOpenEdit(row.id)}
           >
             Sửa
           </IconButton>
@@ -185,17 +197,17 @@ function AdminDateGo() {
       width: "250px",
     },
   ];
+
   return (
     <div className={cx("wrapper")}>
       <div className={cx("content")}>
-        <SideNav></SideNav>
+        <SideNav />
         <div className={cx("right")}>
           <div className={cx("table")}>
             <DataTable
-              title="Danh sách hướng dẫn viên"
+              title="Danh sách ngày đi"
               columns={columns}
               data={filteredItems}
-              // selectableRows
               dense
               pagination
               highlightOnHover
@@ -211,13 +223,13 @@ function AdminDateGo() {
                   >
                     Thêm
                   </IconButton>
-                  <InputGroup style={styles}>
+                  <InputGroup style={{ width: 400 }}>
                     <Input
                       placeholder={"Tìm kiếm theo tên hoặc mã"}
                       value={search}
                       onChange={setSearch}
                     />
-                    <InputGroup.Addon color="green">
+                    <InputGroup.Addon>
                       <SearchIcon />
                     </InputGroup.Addon>
                   </InputGroup>
@@ -227,151 +239,191 @@ function AdminDateGo() {
             />
           </div>
         </div>
-        <Modal open={openAdd} onClose={handleCloseAdd}>
-          <Modal.Header>
-            <Modal.Title>THÊM HƯỚNG DẪN VIÊN</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className={cx("form")}>
-              <h5>Tên hướng dẫn viên</h5>
-              <Input
-                placeholder={"Nhập tên hướng dẫn viên tại đây"}
-                value={detailGuiders.name || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    name: value,
-                  }))
-                }
-              />
-              <h5>Số điện thoại</h5>
-              <Input
-                placeholder={"Nhập số điện thoại tại đây"}
-                value={detailGuiders.phone || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    phone: value,
-                  }))
-                }
-              />
-              <h5>Địa chỉ</h5>
-              <Input
-                placeholder={"Nhập địa chỉ tại đây"}
-                value={detailGuiders.address || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    address: value,
-                  }))
-                }
-              />
-              <h5>Email</h5>
-              <Input
-                placeholder={"Nhập email tại đây"}
-                value={detailGuiders.email || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    email: value,
-                  }))
-                }
-              />
-              <h5>Ảnh</h5>
-              <Input
-                placeholder={"Nhập link ảnh tại đây"}
-                value={detailGuiders.img || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    img: value,
-                  }))
-                }
-              />
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={handleAdd} appearance="primary">
-              Thêm
-            </Button>
-            <Button onClick={handleCloseAdd} appearance="subtle">
-              Hủy
-            </Button>
-          </Modal.Footer>
-        </Modal>
-        <Modal open={openEdit} onClose={handleCloseEdit}>
-          <Modal.Header>
-            <Modal.Title>CẬP NHẬT HƯỚNG DẪN VIÊN</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className={cx("form")}>
-              <h5>Tên hướng dẫn viên</h5>
-              <Input
-                placeholder={"Nhập tên hướng dẫn viên tại đây"}
-                value={detailGuiders.name || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    name: value,
-                  }))
-                }
-              />
-              <h5>Số điện thoại</h5>
-              <Input
-                placeholder={"Nhập số điện thoại tại đây"}
-                value={detailGuiders.phone || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    phone: value,
-                  }))
-                }
-              />
-              <h5>Địa chỉ</h5>
-              <Input
-                placeholder={"Nhập địa chỉ tại đây"}
-                value={detailGuiders.address || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    address: value,
-                  }))
-                }
-              />
-              <h5>Email</h5>
-              <Input
-                placeholder={"Nhập email tại đây"}
-                value={detailGuiders.email || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    email: value,
-                  }))
-                }
-              />
-              <h5>Ảnh</h5>
-              <Input
-                placeholder={"Nhập link ảnh tại đây"}
-                value={detailGuiders.img || ""}
-                onChange={(value) =>
-                  setDetailGuiders((preState) => ({
-                    ...preState,
-                    img: value,
-                  }))
-                }
-              />
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={handleUpdate} appearance="primary">
-              Lưu
-            </Button>
-            <Button onClick={handleCloseAdd} appearance="subtle">
-              Hủy
-            </Button>
-          </Modal.Footer>
-        </Modal>
       </div>
+
+      <Modal open={openAdd} onClose={handleCloseAdd}>
+        <Modal.Header>
+          <Modal.Title>THÊM NGÀY ĐI</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={handleAdd}>
+            <div className={cx("form")}>
+              <h5>Ngày khởi hành</h5>
+              <DatePicker
+                format="yyyy-MM-dd"
+                placeholder="Chọn ngày khởi hành"
+                block
+                value={parseISO(detailDate.date)}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    date: format(value, "yyyy-MM-dd"),
+                    month: getMonth(value) + 1,
+                  }))
+                }
+                shouldDisableDate={(date) => isBefore(date, new Date())}
+              />
+              <h5>Tháng khởi hành</h5>
+              <Input
+                placeholder={"Nhập tháng khởi hành tại đây"}
+                value={detailDate.month || ""}
+                disabled
+              />
+              <h5>Số ngày đi</h5>
+              <Input
+                type="number"
+                placeholder={"Nhập số ngày đi tại đây"}
+                value={detailDate.day || ""}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    day: value,
+                  }))
+                }
+              />
+              <h5>Số chỗ</h5>
+              <Input
+                type="number"
+                placeholder={"Nhập số chỗ tại đây"}
+                value={detailDate.seat || ""}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    seat: value,
+                  }))
+                }
+              />
+              <h5>Mã tour</h5>
+              <SelectPicker
+                data={tours.map((item) => ({
+                  label: item.code,
+                  value: item.id,
+                }))}
+                searchable
+                placeholder="Chọn tour"
+                block
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    id_tour: value,
+                  }))
+                }
+              />
+              <h5>Hướng dẫn viên</h5>
+              <SelectPicker
+                data={guiders.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))}
+                searchable
+                placeholder="Chọn hướng dẫn viên"
+                block
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    id_guider: value,
+                  }))
+                }
+              />
+            </div>
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button type="submit" onClick={handleAdd} appearance="primary">
+            Thêm
+          </Button>
+          <Button onClick={handleCloseAdd} appearance="subtle">
+            Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal open={openEdit} onClose={handleCloseEdit}>
+        <Modal.Header>
+          <Modal.Title>SỬA NGÀY ĐI</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={handleUpdate}>
+            <div className={cx("form")}>
+              <h5>Ngày khởi hành</h5>
+              <DatePicker
+                format="yyyy-MM-dd"
+                placeholder="Chọn ngày khởi hành"
+                block
+                value={parseISO(detailDate.date)}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    date: format(value, "yyyy-MM-dd"),
+                    month: getMonth(value) + 1,
+                  }))
+                }
+                shouldDisableDate={(date) => isBefore(date, new Date())}
+              />
+              <h5>Tháng khởi hành</h5>
+              <Input
+                placeholder={"Nhập tháng khởi hành tại đây"}
+                value={detailDate.month || ""}
+                disabled
+              />
+              <h5>Số chỗ</h5>
+              <Input
+                type="number"
+                placeholder={"Nhập số chỗ tại đây"}
+                value={detailDate.seat || ""}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    seat: value,
+                  }))
+                }
+              />
+              <h5>Mã tour</h5>
+              <SelectPicker
+                data={tours.map((item) => ({
+                  label: item.code,
+                  value: item.id,
+                }))}
+                searchable
+                placeholder="Chọn tour"
+                block
+                value={parseInt(detailDate.id_tour)}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    id_tour: value,
+                  }))
+                }
+              />
+              <h5>Hướng dẫn viên</h5>
+              <SelectPicker
+                data={guiders.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))}
+                searchable
+                placeholder="Chọn hướng dẫn viên"
+                block
+                value={detailDate.id_guider}
+                onChange={(value) =>
+                  setDetailDate((prev) => ({
+                    ...prev,
+                    id_guider: value,
+                  }))
+                }
+              />
+            </div>
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button type="submit" onClick={handleUpdate} appearance="primary">
+            Lưu
+          </Button>
+          <Button onClick={handleCloseEdit} appearance="subtle">
+            Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

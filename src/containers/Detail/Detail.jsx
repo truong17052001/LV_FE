@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import parse from 'html-react-parser';
+import parse from "html-react-parser";
 import classNames from "classnames/bind";
 import styles from "./Detail.module.scss";
 //components
@@ -14,9 +13,14 @@ import { FaShoppingCart } from "react-icons/fa";
 //rsuite
 import { Timeline } from "rsuite";
 import { Accordion } from "rsuite";
-
+import { Modal, Button } from "rsuite";
+//api
+import { getTourDetails } from "../../core/services/apiServices";
 import "rsuite/Timeline/styles/index.css";
 import "rsuite/Accordion/styles/index.css";
+import "rsuite/Button/styles/index.css";
+//util
+import { formatDate } from "../../core/Utils/DateUtils";
 const cx = classNames.bind(styles);
 function DetailPage() {
   // eslint-disable-next-line react/prop-types
@@ -25,23 +29,27 @@ function DetailPage() {
   };
   const [tours, setTours] = useState([]);
   const [click, setClick] = useState(0);
-
+  const [openDateGo, setOpenDateGo] = useState(false);
+  const handleCloseDateGo = () => setOpenDateGo(false);
+  const handleOpenDateGo = () => {
+    setOpenDateGo(true);
+  };
   const { id } = useParams();
   useEffect(() => {
-    const getDetail = async () => {
+    const fetchDetails = async () => {
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/client/tour/${id}`
-        );
-        if (response.data.data != null) {
+        const response = await getTourDetails(id);
+        if (response.data.data) {
           setTours(response.data.data);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
-    getDetail();
+    fetchDetails();
   }, []);
+  console.log(tours);
+  const dateGo = tours.date_go;
   const activities = tours.activities;
   const guider = tours.tour_guide;
   return (
@@ -73,11 +81,12 @@ function DetailPage() {
             </div>
           </div>
           <div className={cx("right")}>
-            <span> {parseInt(tours.price).toLocaleString('en-US')} ₫</span>/ khách
-            <div>
+            <span> {parseInt(tours.price).toLocaleString("en-US")} VND</span>/
+            khách
+            <div onClick={handleOpenDateGo}>
               <a>
                 <FaShoppingCart />
-                Đặt ngay
+                Chọn ngày
               </a>
             </div>
           </div>
@@ -226,15 +235,21 @@ function DetailPage() {
                   </tr>
                   <tr>
                     <td>Người lớn (Từ 12 tuổi trở lên)</td>
-                    <td className={cx("price")}>{parseInt(tours.price).toLocaleString('en-US')} ₫</td>
+                    <td className={cx("price")}>
+                      {parseInt(tours.price).toLocaleString("en-US")} ₫
+                    </td>
                   </tr>
                   <tr>
                     <td>Trẻ em (Từ 5 - 11 tuổi)</td>
-                    <td className={cx("price")}>{parseInt(tours.price).toLocaleString('en-US')} ₫</td>
+                    <td className={cx("price")}>
+                      {parseInt(tours.price).toLocaleString("en-US")} ₫
+                    </td>
                   </tr>
                   <tr>
                     <td>Em bé (Dưới 2 tuổi)</td>
-                    <td className={cx("price")}>{parseInt(tours.price).toLocaleString('en-US')} ₫</td>
+                    <td className={cx("price")}>
+                      {parseInt(tours.price).toLocaleString("en-US")} ₫
+                    </td>
                   </tr>
 
                   <tr className={cx("total")}>
@@ -250,7 +265,11 @@ function DetailPage() {
             <div className={cx("tour")}>
               <div>
                 <h3>Hướng dẫn viên dẫn đoàn</h3>
-                <p>{tours.length != 0 && guider != null ? guider.name : "Đang cập nhật"}</p>
+                <p>
+                  {tours.length != 0 && guider != null
+                    ? guider.name
+                    : "Đang cập nhật"}
+                </p>
                 <span>
                   190 Pasteur, Phường Võ Thị Sáu, Quận 3, TP.HCM, Viet Nam
                 </span>
@@ -308,6 +327,33 @@ function DetailPage() {
         </div>
       </div>
       <Footer></Footer>
+      <Modal open={openDateGo} onClose={handleCloseDateGo}>
+        <Modal.Header>
+          <Modal.Title>Chọn ngày đi</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className={cx("form")}>
+            {tours.length != 0
+              ? dateGo.map((go) => {
+                  return (
+                    <div className={cx("item")}>
+                      <div className={cx("date_go")}>{formatDate(go.date)}</div>
+                      <div className={cx("price")}>
+                        <h5>{tours.title_tour}</h5>
+                        <span>
+                          {parseInt(tours.price).toLocaleString("en-US")}. VND
+                        </span>
+                        <Button color="red" appearance="primary" href={`/booking/${go.id}`}>
+                          Chọn
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })
+              : ""}
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

@@ -49,14 +49,11 @@
     .others {
       border-radius: 16px;
       background-color: #2d4271;
+      color: #fff;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      h4{
-        color: #fff;
-        
-      }
       .item{
         display: flex;
         justify-content: space-between;

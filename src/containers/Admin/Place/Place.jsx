@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
-import styles from "./Guider.module.scss";
+import styles from "./Place.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Modal, Button, Input, InputGroup, IconButton } from "rsuite";
+import {
+  Modal,
+  Button,
+  Input,
+  InputGroup,
+  IconButton,
+  DatePicker,
+} from "rsuite";
+import { parseISO, format } from "date-fns";
 import {
   Search as SearchIcon,
   Plus as PlusIcon,
@@ -16,26 +24,27 @@ import "rsuite/Modal/styles/index.css";
 import "rsuite/Input/styles/index.css";
 import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
+import "rsuite/DatePicker/styles/index.css";
 
 import {
-  getGuiders,
-  getGuider,
-  addGuider,
-  updateGuider,
-  deleteGuider,
+  getPlaces,
+  getPlace,
+  addPlace,
+  updatePlace,
+  deletePlace,
 } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
-function AdminGuider() {
-  const [guiders, setGuiders] = useState([]);
-  const [detailGuiders, setDetailGuiders] = useState({});
+function AdminPlace() {
+  const [places, setPlaces] = useState([]);
+  const [detailPlaces, setDetailPlaces] = useState({});
   const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
   const handleOpenAdd = () => {
-    setDetailGuiders({});
+    setDetailPlaces({});
     setOpenAdd(true);
   };
 
@@ -43,9 +52,9 @@ function AdminGuider() {
 
   const handleOpenEdit = async (id) => {
     try {
-      const response = await getGuider(id);
+      const response = await getPlace(id);
       if (response.data.data) {
-        setDetailGuiders(response.data.data);
+        setDetailPlaces(response.data.data);
       }
     } catch (error) {
       console.error(error);
@@ -55,15 +64,15 @@ function AdminGuider() {
 
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const filteredItems = guiders.filter((item) =>
+  const filteredItems = places.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
     try {
-      const response = await addGuider(detailGuiders);
+      const response = await addPlace(detailPlaces);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/guider";
+        window.location.href = "/admin/place";
       }
     } catch (error) {
       console.error(error);
@@ -73,9 +82,9 @@ function AdminGuider() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateGuider(detailGuiders.id, detailGuiders);
+      const response = await updatePlace(detailPlaces.id, detailPlaces);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/guider";
+        window.location.href = "/admin/place";
       }
     } catch (error) {
       console.error(error);
@@ -85,9 +94,9 @@ function AdminGuider() {
   const handleDelete = async (id, e) => {
     e.preventDefault();
     try {
-      const response = await deleteGuider(id);
+      const response = await deletePlace(id);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/guider";
+        window.location.href = "/admin/place";
       }
     } catch (error) {
       console.error(error);
@@ -95,50 +104,37 @@ function AdminGuider() {
   };
 
   useEffect(() => {
-    const fetchGuiders = async () => {
+    const fetchPlaces = async () => {
       try {
-        const response = await getGuiders();
+        const response = await getPlaces();
         if (response.data.data) {
-          setGuiders(response.data.data);
+          setPlaces(response.data.data);
         }
       } catch (error) {
         console.error(error);
       }
     };
-    fetchGuiders();
+    fetchPlaces();
   }, []);
-
   const columns = [
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
-      name: "Tên hướng dẫn viên",
+      name: "Tên địa danh",
       selector: (row) => row.name,
       sortable: true,
-      width: "200px",
+      width: "250px",
     },
     {
-      name: "Số điện thoại",
-      selector: (row) => row.phone,
+      name: "Mô tả địa danh",
+      selector: (row) => row.dec,
       sortable: true,
-      width: "150px",
+      width: "450px",
     },
     {
-      name: "Địa chỉ",
-      selector: (row) => row.address,
+      name: "Trạng thái",
+      selector: (row) => row.state,
       sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Email",
-      selector: (row) => row.email,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Ảnh",
-      selector: (row) => <img src={row.img} alt="Guider" />,
-      sortable: true,
-      width: "150px",
+      width: "120px",
     },
     {
       name: "Thao tác",
@@ -174,7 +170,7 @@ function AdminGuider() {
         <div className={cx("right")}>
           <div className={cx("table")}>
             <DataTable
-              title="Danh sách hướng dẫn viên"
+              title="Danh sách địa danh"
               columns={columns}
               data={filteredItems}
               dense
@@ -194,7 +190,7 @@ function AdminGuider() {
                   </IconButton>
                   <InputGroup style={{ width: 400 }}>
                     <Input
-                      placeholder="Tìm kiếm theo tên hoặc mã"
+                      placeholder="Tìm kiếm theo tên"
                       value={search}
                       onChange={(value) => setSearch(value)}
                     />
@@ -211,62 +207,40 @@ function AdminGuider() {
 
         <Modal open={openAdd} onClose={handleCloseAdd}>
           <Modal.Header>
-            <Modal.Title>THÊM HƯỚNG DẪN VIÊN</Modal.Title>
+            <Modal.Title>THÊM ĐỊA DANH</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Tên hướng dẫn viên</h5>
+              <h5>Tên địa danh</h5>
               <Input
-                placeholder="Nhập tên hướng dẫn viên tại đây"
-                value={detailGuiders.name || ""}
+                placeholder="Nhập tên địa danh tại đây"
+                value={detailPlaces.name || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailPlaces((prevState) => ({
                     ...prevState,
                     name: value,
                   }))
                 }
               />
-              <h5>Số điện thoại</h5>
+              <h5>Mô tả địa danh</h5>
               <Input
-                placeholder="Nhập số điện thoại tại đây"
-                value={detailGuiders.phone || ""}
+                placeholder="Nhập mô tả địa danh tại đây"
+                value={detailPlaces.dec || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailPlaces((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    dec: value,
                   }))
                 }
               />
-              <h5>Địa chỉ</h5>
+              <h5>Trạng thái</h5>
               <Input
-                placeholder="Nhập địa chỉ tại đây"
-                value={detailGuiders.address || ""}
+                placeholder="Nhập trạng thái địa danh tại đây"
+                value={detailPlaces.state || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailPlaces((prevState) => ({
                     ...prevState,
-                    address: value,
-                  }))
-                }
-              />
-              <h5>Email</h5>
-              <Input
-                placeholder="Nhập email tại đây"
-                value={detailGuiders.email || ""}
-                onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
-                    ...prevState,
-                    email: value,
-                  }))
-                }
-              />
-              <h5>Ảnh</h5>
-              <Input
-                placeholder="Nhập link ảnh tại đây"
-                value={detailGuiders.img || ""}
-                onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
-                    ...prevState,
-                    img: value,
+                    state: value,
                   }))
                 }
               />
@@ -284,62 +258,40 @@ function AdminGuider() {
 
         <Modal open={openEdit} onClose={handleCloseEdit}>
           <Modal.Header>
-            <Modal.Title>CẬP NHẬT HƯỚNG DẪN VIÊN</Modal.Title>
+            <Modal.Title>CẬP NHẬT ĐỊA DANH</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Tên hướng dẫn viên</h5>
+              <h5>Tên địa danh</h5>
               <Input
-                placeholder="Nhập tên hướng dẫn viên tại đây"
-                value={detailGuiders.name || ""}
+                placeholder="Nhập tên địa danh tại đây"
+                value={detailPlaces.name || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailPlaces((prevState) => ({
                     ...prevState,
                     name: value,
                   }))
                 }
               />
-              <h5>Số điện thoại</h5>
+              <h5>Mô tả địa danh</h5>
               <Input
-                placeholder="Nhập số điện thoại tại đây"
-                value={detailGuiders.phone || ""}
+                placeholder="Nhập mô tả địa danh tại đây"
+                value={detailPlaces.dec || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailPlaces((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    dec: value,
                   }))
                 }
               />
-              <h5>Địa chỉ</h5>
+              <h5>Trạng thái</h5>
               <Input
-                placeholder="Nhập địa chỉ tại đây"
-                value={detailGuiders.address || ""}
+                placeholder="Nhập trạng thái địa danh tại đây"
+                value={detailPlaces.state || ""}
                 onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
+                  setDetailPlaces((prevState) => ({
                     ...prevState,
-                    address: value,
-                  }))
-                }
-              />
-              <h5>Email</h5>
-              <Input
-                placeholder="Nhập email tại đây"
-                value={detailGuiders.email || ""}
-                onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
-                    ...prevState,
-                    email: value,
-                  }))
-                }
-              />
-              <h5>Ảnh</h5>
-              <Input
-                placeholder="Nhập link ảnh tại đây"
-                value={detailGuiders.img || ""}
-                onChange={(value) =>
-                  setDetailGuiders((prevState) => ({
-                    ...prevState,
-                    img: value,
+                    state: value,
                   }))
                 }
               />
@@ -359,4 +311,4 @@ function AdminGuider() {
   );
 }
 
-export default AdminGuider;
+export default AdminPlace;
