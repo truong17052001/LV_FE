@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Tour.module.scss";
@@ -8,56 +9,78 @@ import {
   SelectPicker,
   RangeSlider,
   Pagination,
-  Toggle,
+  Input,
 } from "rsuite";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/RangeSlider/styles/index.css";
 import "rsuite/Pagination/styles/index.css";
 import "rsuite/Toggle/styles/index.css";
+import isBefore from "date-fns/isBefore";
+import { parseISO, format } from "date-fns";
 //component
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import CardTour from "../../components/CardTour/CardTour";
 //icon
 
+//api
+import { getPlaces, getTours } from "../../core/services/apiServices";
 const cx = classNames.bind(styles);
 
 function TourPage() {
   const [value, setValue] = useState([0, 7000000]);
   const [tours, setTours] = useState([]);
+  const [places, setPlaces] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [total, setTotal] = useState(10);
   const [limit, setLimit] = useState(9);
-  
-  
-  const data = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng"].map((item) => ({
-    label: item,
-    value: item,
-  }));
-  const params = {
-    page: activePage,
-    limit: limit
-  };
-  const limitOptions = [9, 15, 21];
-  useEffect(() => {
-    const getTours = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/client/tour",
-          {params }
+  const [search, setSearch] = useState([]);
+
+  const fetchTours = async (params) => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/client/tour",
+        { params: params }
+      );
+      if (response.data.data) {
+        setTours(response.data.data);
+        setTotal(
+          response.data.paginate.limit * response.data.paginate.total_page
         );
-        if (response.data.data != null) {
-          setTours(response.data.data);
-          setActivePage(response.data.paginate.page);
-          setTotal(response.data.paginate.limit*response.data.paginate.total_page);
-        }
-      } catch (error) {
-        console.log(error);
       }
+      const placesResponse = await getPlaces();
+      if (placesResponse.data.data) {
+        setPlaces(
+          placesResponse.data.data.map((place) => ({
+            label: place.ten,
+            value: place.id,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching tours:", error);
+    }
+  };
+
+  const limitOptions = [9, 15, 21];
+
+  useEffect(() => {
+    const params = {
+      page: activePage,
+      limit: limit,
+      ...search,
     };
-    getTours();
-  }, [activePage]);
+    fetchTours(params);
+  }, [activePage, limit, search]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("page", activePage);
+    urlParams.set("limit", limit);
+    fetchTours(urlParams);
+  }, []);
+
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -71,11 +94,11 @@ function TourPage() {
               <h2>Bộ lọc tìm kiếm</h2>
             </div>
             <div className={cx("keyword")}>
-              <div className={cx("heading")}>
+              {/* <div className={cx("heading")}>
                 <span>Đà Lạt</span>
-              </div>
+              </div> */}
               <div className={cx("input")}>
-                <div className={cx("mb")}>
+                {/* <div className={cx("mb")}>
                   <h5>Điểm đi</h5>
                   <div>
                     <SelectPicker
@@ -85,42 +108,74 @@ function TourPage() {
                       block
                     />
                   </div>
-                </div>
+                </div> */}
                 <div className={cx("mb")}>
                   <h5> Điểm đến</h5>
                   <div>
                     <SelectPicker
-                      data={data}
+                      data={places}
                       size="lg"
                       placeholder="Chọn điểm đến"
-                      block
+                      onChange={(value) => {
+                        setSearch((preState) => ({
+                          ...preState,
+                          diemden: value,
+                        }));
+                      }}
                     />
                   </div>
                 </div>
                 <div className={cx("mb")}>
                   <h5> Số ngày</h5>
                   <div className={cx("group")}>
-                    <button>1-3 ngày</button>
-                    <button>4-7 ngày</button>
-                    <button>8-14 ngày</button>
-                    <button>14+ ngày</button>
+                    <Input
+                      type="number"
+                      size="lg"
+                      placeholder="Nhập số ngày đi"
+                      onChange={(value) => {
+                        setSearch((preState) => ({
+                          ...preState,
+                          songay: value,
+                        }));
+                      }}
+                    />
                   </div>
                 </div>
                 <div className={cx("mb")}>
                   <h5>Ngày đi</h5>
                   <DatePicker
-                    format="dd/MM/yyyy"
-                    size="lg"
-                    className={cx("cut")}
+                    format="yyyy-MM-dd"
+                    placeholder="Chọn ngày khởi hành"
+                    shouldDisableDate={(date) => isBefore(date, new Date())}
+                    onChange={(value) => {
+                      if (value) {
+                        setSearch((prevState) => ({
+                          ...prevState,
+                          ngaydi: format(value, "yyyy-MM-dd"),
+                        }));
+                      } else {
+                        setSearch((prevState) => ({
+                          ...prevState,
+                          ngaydi: null,
+                        }));
+                      }
+                    }}
                   />
                 </div>
                 <div className={cx("mb")}>
                   <h5> Số người</h5>
                   <div className={cx("group")}>
-                    <button>1 người</button>
-                    <button>2 người</button>
-                    <button>3-5 người</button>
-                    <button>5+ người</button>
+                    <Input
+                      type="number"
+                      size="lg"
+                      placeholder="Nhập số người"
+                      onChange={(value) => {
+                        setSearch((preState) => ({
+                          ...preState,
+                          songuoi: value,
+                        }));
+                      }}
+                    />
                   </div>
                 </div>
                 <div className={cx("mb")}>
@@ -129,11 +184,16 @@ function TourPage() {
                     <RangeSlider
                       progress
                       value={value}
-                      step={1000}
+                      step={100000}
                       min={0}
                       max={10000000}
                       onChange={(value) => {
                         setValue(value);
+                        setSearch((preState) => ({
+                          ...preState,
+                          giamin: value[0],
+                          giamax: value[1],
+                        }));
                       }}
                     />
                     <p>
@@ -141,13 +201,13 @@ function TourPage() {
                     </p>
                   </div>
                 </div>
-                <div className={cx("mb")}>
+                {/* <div className={cx("mb")}>
                   <h5> Hiển thị những chuyến đi có</h5>
                   <div className={cx("group")}>
                     <Toggle></Toggle> Khuyến mãi
                     <Toggle></Toggle> Còn chỗ
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -181,7 +241,7 @@ function TourPage() {
               <div>
                 Sắp xếp theo
                 <SelectPicker
-                  data={data}
+                  data={places}
                   size="lg"
                   placeholder="Tất cả"
                   searchable={false}
@@ -189,11 +249,21 @@ function TourPage() {
               </div>
             </div>
             <div className={cx("list")}>
-              { 
-                tours.length ? tours.map((tour, index) => {
-                return <CardTour key={index} id={tour.id} code={tour.code} title_tour={tour.title_tour} meet_place={tour.meet_place} meet_date={tour.meet_date} price={tour.price} img_tour={tour.img_tour}></CardTour>;
-              })
-              : ""}
+              {tours.length
+                ? tours.map((tour, index) => {
+                    return (
+                      <CardTour
+                        key={index}
+                        id={tour.id}
+                        code={tour.matour}
+                        title_tour={tour.tieude}
+                        meet_place={tour.noikh}
+                        price={tour.gia_a}
+                        img_tour={tour.anh}
+                      ></CardTour>
+                    );
+                  })
+                : ""}
             </div>
             <div className={cx("pagination")}>
               <Pagination
@@ -210,7 +280,6 @@ function TourPage() {
                 onChangePage={setActivePage}
               />
             </div>
-
           </div>
         </div>
       </div>

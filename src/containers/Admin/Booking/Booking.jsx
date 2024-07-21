@@ -5,7 +5,7 @@ import styles from "./Booking.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Modal, Button, Input, InputGroup, IconButton, TagPicker } from "rsuite";
+import { Modal, Button, Input, InputGroup, IconButton, TagPicker, SelectPicker } from "rsuite";
 import SearchIcon from "@rsuite/icons/Search";
 import PlusIcon from "@rsuite/icons/Plus";
 import MinusIcon from "@rsuite/icons/Minus";
@@ -16,24 +16,16 @@ import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
 // Services
-import { getHotels, getPlaces, getVehicles, getBookings, addBooking, deleteBooking } from "../../../core/services/apiServices";
+import { getTours, getBookings, addBooking, deleteBooking } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
 function AdminBooking() {
-  const [Bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState("");
   const [newBooking, setNewBooking] = useState({
-    code: "",
-    title: "",
-    meet_place: "",
-    price: "",
-    img_Booking: "",
-    note: ""
   });
-  const [hotels, setHotels] = useState([]);
-  const [places, setPlaces] = useState([]);
-  const [vehicles, setVehicles] = useState([]);
+  const [tours, setTours] = useState([]);
   const [openAdd, setOpenAdd] = useState(false);
 
   const handleOpenAdd = () => setOpenAdd(true);
@@ -43,16 +35,13 @@ function AdminBooking() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [BookingsResponse, hotelsResponse, placesResponse, vehiclesResponse] = await Promise.all([
+        const [bookingsResponse, toursResponse] = await Promise.all([
           getBookings(),
-          getHotels(),
-          getPlaces(),
-          getVehicles()
+          getTours(),
+        
         ]);
-        if (BookingsResponse.data.data) setBookings(BookingsResponse.data.data);
-        if (hotelsResponse.data.data) setHotels(hotelsResponse.data.data.map(hotel => ({ label: hotel.name, value: hotel.id })));
-        if (placesResponse.data.data) setPlaces(placesResponse.data.data.map(place => ({ label: place.name_place, value: place.id })));
-        if (vehiclesResponse.data.data) setVehicles(vehiclesResponse.data.data.map(vehicle => ({ label: vehicle.name, value: vehicle.id })));
+        if (bookingsResponse.data.data) setBookings(bookingsResponse.data.data);
+        if (toursResponse.data.data) setTours(toursResponse.data.data.map(tours => ({ label: tours.matour, value: tours.id })));
       } catch (error) {
         console.log(error);
       }
@@ -60,17 +49,17 @@ function AdminBooking() {
     fetchData();
   }, []);
 
-  const filteredItems = Bookings.filter(
+  const filteredItems = bookings.filter(
     (item) =>
-      item.title_Booking.toLowerCase().includes(search.toLowerCase()) ||
-      item.code.toLowerCase().includes(search.toLowerCase())
+      item.ten.toLowerCase().includes(search.toLowerCase()) ||
+      item.sobooking.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
     try {
       const response = await addBooking(newBooking);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/Booking";
+        window.location.href = "/admin/booking";
       }
     } catch (error) {
       console.log(error);
@@ -82,7 +71,7 @@ function AdminBooking() {
     try {
       const response = await deleteBooking(id);
       if (response.data.message === "Success") {
-        window.location.href = "/admin/Booking";
+        window.location.href = "/admin/booking";
       }
     } catch (error) {
       console.log(error);
@@ -97,38 +86,50 @@ function AdminBooking() {
       width: "70px",
     },
     {
-      name: "Ảnh",
-      selector: (row) => <img src={row.img_Booking} alt="Booking" />,
-      sortable: true,
-      width: "120px",
-    },
-    {
       name: "Mã Booking",
-      selector: (row) => row.code,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Tiêu đề",
-      selector: (row) => row.title_Booking,
-      sortable: true,
-      width: "300px",
-    },
-    {
-      name: "Giá Booking ( Đồng )",
-      selector: (row) => parseInt(row.price).toLocaleString("en-US") + " VND",
+      selector: (row) => row.sobooking,
       sortable: true,
       width: "150px",
     },
     {
-      name: "Nơi tập trung",
-      selector: (row) => row.meet_place,
+      name: "Ngày đặt",
+      selector: (row) => row.ngay,
+      sortable: true,
+      width: "150px",
+    },
+    {
+      name: "Họ tên",
+      selector: (row) => row.ten,
+      sortable: true,
+      width: "100px",
+    },
+    {
+      name: "Số điện thoại",
+      selector: (row) => row.sdt,
+      sortable: true,
+      width: "100px",
+    },
+    {
+      name: "Địa chỉ",
+      selector: (row) => row.diachi,
+      sortable: true,
+      width: "100px",
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+      width: "100px",
+    },
+    {
+      name: "Tổng tiền",
+      selector: (row) => parseInt(row.tongtien).toLocaleString("en-US") + " VND",
       sortable: true,
       width: "150px",
     },
     {
       name: "Trạng thái",
-      selector: (row) => row.note,
+      selector: (row) => row.trangthai,
       sortable: true,
       width: "120px",
     },
@@ -150,7 +151,7 @@ function AdminBooking() {
             appearance="primary"
             color="blue"
             icon={<EyeCloseIcon />}
-            href={`/admin/detail_Booking/${row.id}`}
+            href={`/admin/detail_booking/${row.id}`}
           >
             Xem
           </IconButton>
@@ -204,70 +205,48 @@ function AdminBooking() {
         </div>
         <Modal open={openAdd} onClose={handleCloseAdd}>
           <Modal.Header>
-            <Modal.Title>THÊM Booking</Modal.Title>
+            <Modal.Title>THÊM BOOKING</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Mã Booking</h5>
+              <h5>Ngày đặt</h5>
               <Input
                 placeholder={"Nhập mã tại đây"}
-                value={newBooking.code}
+                value={newBooking.sobooking}
                 onChange={(value) => handleChange(value, "code")}
               />
-              <h5>Tiêu đề Booking</h5>
+              <h5>Họ tên</h5>
               <Input
-                placeholder={"Nhập tiêu đề tại đây"}
-                value={newBooking.title}
+                placeholder={"Nhập họ tên tại đây"}
+                value={newBooking.ten}
                 onChange={(value) => handleChange(value, "title")}
               />
-              <h5>Nơi tập trung</h5>
+              <h5>Địa chỉ</h5>
               <Input
-                placeholder={"Nhập nơi tập trung tại đây"}
-                value={newBooking.meet_place}
+                placeholder={"Nhập địa chỉ tại đây"}
+                value={newBooking.diachi}
                 onChange={(value) => handleChange(value, "meet_place")}
               />
-              <h5>Giá Booking ( VND )</h5>
+              <h5>Số điện thoại</h5>
               <Input
                 type="number"
-                placeholder={"Nhập giá Booking tại đây"}
-                value={newBooking.price}
+                placeholder={"Nhập giá số điện thoại tại đây"}
+                value={newBooking.sdt}
                 onChange={(value) => handleChange(value, "price")}
               />
-              <h5>Ảnh</h5>
+              <h5>Email</h5>
               <Input
-                placeholder={"Nhập link ảnh tại đây"}
-                value={newBooking.img_Booking}
-                onChange={(value) => handleChange(value, "img_Booking")}
+                placeholder={"Nhập giá email tại đây"}
+                value={newBooking.sdt}
+                onChange={(value) => handleChange(value, "price")}
               />
-              <h5>Chú thích</h5>
-              <Input
-                placeholder={"Nhập chú thích tại đây"}
-                value={newBooking.note}
-                onChange={(value) => handleChange(value, "note")}
-              />
-              <h5>Khách sạn</h5>
-              <TagPicker
-                data={hotels}
-                value={newBooking.hotels}
-                onChange={(value) => handleChange(value, "hotels")}
+              <h5>Tour</h5>
+              <SelectPicker
+                data={tours}
+                value={newBooking.tours}
+                onChange={(value) => handleChange(value, "tours")}
                 style={{ width: '100%' }}
-                placeholder="Chọn khách sạn"
-              />
-              <h5>Địa danh</h5>
-              <TagPicker
-                data={places}
-                value={newBooking.places}
-                onChange={(value) => handleChange(value, "places")}
-                style={{ width: '100%' }}
-                placeholder="Chọn địa danh"
-              />
-              <h5>Phương tiện</h5>
-              <TagPicker
-                data={vehicles}
-                value={newBooking.vehicles}
-                onChange={(value) => handleChange(value, "vehicles")}
-                style={{ width: '100%' }}
-                placeholder="Chọn phương tiện"
+                placeholder="Chọn tour"
               />
             </div>
           </Modal.Body>

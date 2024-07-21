@@ -1,28 +1,22 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import classNames from "classnames/bind";
-import styles from "./Tour.module.scss";
+import styles from "./Booking.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { TagPicker, Button, Input, useToaster, Message } from "rsuite";
+import { Button, Input } from "rsuite";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/Button/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
 // Services
-import {
-  getTourDetails,
-  getHotels,
-  getPlaces,
-  getVehicles,
-  updateTour,
-} from "../../../core/services/apiServices";
+import { getBooking, updateBooking } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
-function AdminDetailTour() {
-  const [detailTours, setDetailTours] = useState({
+function AdminDetailBooking() {
+  const [detailBooking, setDetailBooking] = useState({
     code: "",
     title_tour: "",
     meet_place: "",
@@ -30,24 +24,16 @@ function AdminDetailTour() {
     img_tour: "",
     note: "",
   });
-  const [hotel, setHotel] = useState([]);
-  const [vehicle, setVehicle] = useState([]);
-  const [place, setPlace] = useState([]);
-  const [selectedHotels, setSelectedHotels] = useState([]);
-
-  const handleSelect = (value) => setSelectedHotels(value);
-
   const { id } = useParams();
-  const toaster = useToaster();
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateTour(id, {
-        ...detailTours,
+      const response = await updateBooking(id, {
+        ...detailBooking,
       });
       if (response.data.message === "Success") {
-        window.location.href = "/admin/tour";
+        window.location.href = "/admin/booking";
       }
     } catch (error) {
       console.error(error);
@@ -57,25 +43,10 @@ function AdminDetailTour() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [tourResponse, hotelResponse, placeResponse, vehicleResponse] =
-          await Promise.all([
-            getTourDetails(id),
-            getHotels(),
-            getPlaces(),
-            getVehicles(),
-          ]);
+        const [tourResponse] = await Promise.all([getBooking(id)]);
 
         if (tourResponse.data.data) {
-          setDetailTours(tourResponse.data.data);
-        }
-        if (hotelResponse.data.data) {
-          setHotel(hotelResponse.data.data);
-        }
-        if (placeResponse.data.data) {
-          setPlace(placeResponse.data.data);
-        }
-        if (vehicleResponse.data.data) {
-          setVehicle(vehicleResponse.data.data);
+          setDetailBooking(tourResponse.data.data);
         }
       } catch (error) {
         console.error(error);
@@ -83,16 +54,6 @@ function AdminDetailTour() {
     };
     fetchData();
   }, [id]);
-
-  const hotels = hotel.map((item) => ({ label: item.name, value: item.id }));
-  const transportMeans = vehicle.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }));
-  const landmarks = place.map((item) => ({
-    label: item.name_place,
-    value: item.id,
-  }));
 
   return (
     <div className={cx("wrapper")}>
@@ -106,36 +67,34 @@ function AdminDetailTour() {
                 <h5>Mã tour</h5>
                 <Input
                   placeholder="Nhập mã tại đây"
-                  value={detailTours.code || ""}
+                  value={detailBooking.ngay || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, code: value }))
+                    setDetailBooking((prev) => ({ ...prev, code: value }))
                   }
                 />
                 <h5>Tiêu đề tour</h5>
                 <Input
                   placeholder="Nhập tiêu đề tại đây"
-                  value={detailTours.title_tour || ""}
+                  value={detailBooking.ten || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, title_tour: value }))
+                    setDetailBooking((prev) => ({ ...prev, title_tour: value }))
                   }
                 />
                 <h5>Nơi tập trung</h5>
                 <Input
                   placeholder="Nhập nơi tập trung tại đây"
-                  value={detailTours.meet_place || ""}
+                  value={detailBooking.diachi || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, meet_place: value }))
+                    setDetailBooking((prev) => ({ ...prev, meet_place: value }))
                   }
                 />
                 <h5>Giá tour (VND)</h5>
                 <Input
                   type="number"
                   placeholder="Nhập giá tour tại đây"
-                  value={
-                    isNaN(detailTours.price) ? "" : parseInt(detailTours.price)
-                  }
+                  value={detailBooking.sdt}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({
+                    setDetailBooking((prev) => ({
                       ...prev,
                       price: parseFloat(value),
                     }))
@@ -144,17 +103,17 @@ function AdminDetailTour() {
                 <h5>Ảnh</h5>
                 <Input
                   placeholder="Nhập link ảnh tại đây"
-                  value={detailTours.img_tour || ""}
+                  value={detailBooking.email || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, img_tour: value }))
+                    setDetailBooking((prev) => ({ ...prev, img_tour: value }))
                   }
                 />
                 <h5>Chú thích</h5>
                 <Input
                   placeholder="Nhập chú thích tại đây"
-                  value={detailTours.note || ""}
+                  value={detailBooking.note || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, note: value }))
+                    setDetailBooking((prev) => ({ ...prev, note: value }))
                   }
                 />
                 <Button
@@ -165,56 +124,6 @@ function AdminDetailTour() {
                   Lưu
                 </Button>
               </div>
-              <div className={cx("others")}>
-                <h4>Thông tin bổ sung</h4>
-                <div className={cx("item")}>
-                  <TagPicker
-                    data={hotels}
-                    searchable
-                    style={{ width: "77%" }}
-                    onChange={handleSelect}
-                    placeholder="Chọn khách sạn"
-                  />
-                  <Button color="green" appearance="primary">
-                    Chọn
-                  </Button>
-                </div>
-                <div className={cx("item")}>
-                  <TagPicker
-                    data={transportMeans}
-                    searchable
-                    style={{ width: "77%" }}
-                    onChange={handleSelect}
-                    placeholder="Chọn phương tiện vận chuyển"
-                  />
-                  <Button
-                    color="green"
-                    appearance="primary"
-                    onClick={() =>
-                      toaster.push(
-                        <Message showIcon type="success" closable>
-                          Thành công
-                        </Message>,
-                        { placement: "topEnd", duration: 2000 }
-                      )
-                    }
-                  >
-                    Chọn
-                  </Button>
-                </div>
-                <div className={cx("item")}>
-                  <TagPicker
-                    data={landmarks}
-                    searchable
-                    style={{ width: "77%" }}
-                    onChange={handleSelect}
-                    placeholder="Chọn địa danh"
-                  />
-                  <Button color="green" appearance="primary">
-                    Chọn
-                  </Button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -223,4 +132,4 @@ function AdminDetailTour() {
   );
 }
 
-export default AdminDetailTour;
+export default AdminDetailBooking;

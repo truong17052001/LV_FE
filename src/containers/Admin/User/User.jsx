@@ -1,11 +1,20 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
 import styles from "./User.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Modal, Button, Input, InputGroup, IconButton, DatePicker } from "rsuite";
+import {
+  Modal,
+  Button,
+  Input,
+  InputGroup,
+  IconButton,
+  DatePicker,
+  SelectPicker,
+} from "rsuite";
 import { parseISO, format } from "date-fns";
 import {
   Search as SearchIcon,
@@ -18,7 +27,7 @@ import "rsuite/Input/styles/index.css";
 import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
-
+import "rsuite/SelectPicker/styles/index.css";
 
 import {
   getUsers,
@@ -36,7 +45,12 @@ function AdminUser() {
   const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-
+  //
+  const permission = ["Admin", "Khách hàng"].map((item) => ({
+    label: item,
+    value: item,
+  }));
+  //
   const handleOpenAdd = () => {
     setDetailUsers({});
     setOpenAdd(true);
@@ -51,16 +65,15 @@ function AdminUser() {
         setDetailUsers(response.data.data);
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     }
     setOpenEdit(true);
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
-
+  
   const filteredItems = users.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  item.ten.toLowerCase().includes(search.toLowerCase()))
 
   const handleAdd = async () => {
     try {
@@ -69,10 +82,9 @@ function AdminUser() {
         window.location.href = "/admin/user";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error.response.data.error[0])
     }
   };
-
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -81,7 +93,7 @@ function AdminUser() {
         window.location.href = "/admin/user";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     }
   };
 
@@ -93,7 +105,7 @@ function AdminUser() {
         window.location.href = "/admin/user";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     }
   };
 
@@ -105,7 +117,7 @@ function AdminUser() {
           setUsers(response.data.data);
         }
       } catch (error) {
-        console.error(error);
+        toast.error(error);
       }
     };
     fetchUsers();
@@ -114,33 +126,33 @@ function AdminUser() {
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
       name: "Họ và tên",
-      selector: (row) => row.name,
+      selector: (row) => row.ten,
       sortable: true,
       width: "200px",
     },
     {
       name: "Số điện thoại",
-      selector: (row) => row.phone,
+      selector: (row) => row.sdt,
       sortable: true,
-      width: "150px",
+      width: "140px",
     },
     {
       name: "Địa chỉ",
-      selector: (row) => row.address,
+      selector: (row) => row.diachi,
       sortable: true,
-      width: "150px",
+      width: "100px",
     },
     {
       name: "Ngày sinh",
-      selector: (row) => row.birthday,
+      selector: (row) => row.ngaysinh,
       sortable: true,
-      width: "150px",
+      width: "120px",
     },
     {
       name: "Giới tính",
-      selector: (row) => row.gender,
+      selector: (row) => row.gioitinh,
       sortable: true,
-      width: "150px",
+      width: "100px",
     },
     {
       name: "Email",
@@ -149,8 +161,14 @@ function AdminUser() {
       width: "200px",
     },
     {
+      name: "Quyền",
+      selector: (row) => row.quyen,
+      sortable: true,
+      width: "100px",
+    },
+    {
       name: "Ảnh",
-      selector: (row) => <img src={row.img} alt="User" />,
+      selector: (row) => <img src={row.anh} alt="User" />,
       sortable: true,
       width: "150px",
     },
@@ -232,33 +250,33 @@ function AdminUser() {
               <h5>Tên người dùng</h5>
               <Input
                 placeholder="Nhập tên người dùng tại đây"
-                value={detailUsers.name || ""}
+                value={detailUsers.ten || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailUsers.phone || ""}
+                value={detailUsers.sdt || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    sdt: value,
                   }))
                 }
               />
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailUsers.address || ""}
+                value={detailUsers.diachi || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    address: value,
+                    diachi: value,
                   }))
                 }
               />
@@ -276,45 +294,58 @@ function AdminUser() {
               <h5>Mật khẩu</h5>
               <Input
                 placeholder="Nhập mật khẩu tại đây"
-                value={detailUsers.password || ""}
+                value={detailUsers.matkhau || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    password: value,
+                    matkhau: value,
                   }))
                 }
+              />
+              <h5>Quyền hạn</h5>
+              <SelectPicker
+                data={permission}
+                style={{ width: 150 }}
+                searchable={false}
+                placeholder={"Quyền"}
+                onChange={(value) => {
+                  setDetailUsers((prevState) => ({
+                    ...prevState,
+                    quyen: value,
+                  }));
+                }}
               />
               <h5>Ngày sinh</h5>
               <DatePicker
                 format="yyyy-MM-dd"
                 placeholder="Nhập ngày sinh tại đây"
-                value={parseISO(detailUsers.birthday)}
+                value={parseISO(detailUsers.ngaysinh)}
                 onChange={(value) => {
                   setDetailUsers((preState) => ({
                     ...preState,
-                    birthday: format(value, "yyyy-MM-dd"),
+                    ngaysinh: format(value, "yyyy-MM-dd"),
                   }));
                 }}
               />
               <h5>Giới tính</h5>
               <Input
                 placeholder="Nhập giới tính tại đây"
-                value={detailUsers.gender || ""}
+                value={detailUsers.gioitinh || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    gender: value,
+                    gioitinh: value,
                   }))
                 }
               />
               <h5>Ảnh</h5>
               <Input
                 placeholder="Nhập link ảnh tại đây"
-                value={detailUsers.img || ""}
+                value={detailUsers.anh || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    img: value,
+                    anh: value,
                   }))
                 }
               />
@@ -339,33 +370,33 @@ function AdminUser() {
               <h5>Tên người dùng</h5>
               <Input
                 placeholder="Nhập tên người dùng tại đây"
-                value={detailUsers.name || ""}
+                value={detailUsers.ten || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailUsers.phone || ""}
+                value={detailUsers.sdt || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    sdt: value,
                   }))
                 }
               />
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailUsers.address || ""}
+                value={detailUsers.diachi || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    address: value,
+                    diachi: value,
                   }))
                 }
               />
@@ -384,35 +415,48 @@ function AdminUser() {
               <DatePicker
                 format="yyyy-MM-dd"
                 placeholder="Nhập ngày sinh tại đây"
-                value={parseISO(detailUsers.birthday)}
+                value={parseISO(detailUsers.ngaysinh)}
                 onChange={(value) => {
                   setDetailUsers((preState) => ({
                     ...preState,
-                    birthday: format(value, "yyyy-MM-dd"),
+                    ngaysinh: format(value, "yyyy-MM-dd"),
                   }));
                 }}
               />
               <h5>Giới tính</h5>
               <Input
                 placeholder="Nhập giới tính tại đây"
-                value={detailUsers.gender || ""}
+                value={detailUsers.gioitinh || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    gender: value,
+                    gioitinh: value,
                   }))
                 }
               />
               <h5>Ảnh</h5>
               <Input
                 placeholder="Nhập link ảnh tại đây"
-                value={detailUsers.img || ""}
+                value={detailUsers.anh || ""}
                 onChange={(value) =>
                   setDetailUsers((prevState) => ({
                     ...prevState,
-                    img: value,
+                    anh: value,
                   }))
                 }
+              />
+              <h5>Quyền hạn</h5>
+              <SelectPicker
+                data={permission}
+                style={{ width: 150 }}
+                searchable={false}
+                placeholder={"Quyền"}
+                onChange={(value) => {
+                  setDetailUsers((prevState) => ({
+                    ...prevState,
+                    quyen: value,
+                  }));
+                }}
               />
             </div>
           </Modal.Body>

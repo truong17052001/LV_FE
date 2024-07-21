@@ -5,7 +5,7 @@ import styles from "./Tour.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Modal, Button, Input, InputGroup, IconButton, TagPicker } from "rsuite";
+import { Modal, Button, Input, InputGroup, IconButton, TagPicker, TagInput } from "rsuite";
 import SearchIcon from "@rsuite/icons/Search";
 import PlusIcon from "@rsuite/icons/Plus";
 import MinusIcon from "@rsuite/icons/Minus";
@@ -15,6 +15,8 @@ import "rsuite/Input/styles/index.css";
 import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
+import "rsuite/TagInput/styles/index.css";
+
 // Services
 import { getHotels, getPlaces, getVehicles, getTours, addTour, deleteTour } from "../../../core/services/apiServices";
 
@@ -23,19 +25,13 @@ const cx = classNames.bind(styles);
 function AdminTour() {
   const [tours, setTours] = useState([]);
   const [search, setSearch] = useState("");
-  const [newTour, setNewTour] = useState({
-    code: "",
-    title: "",
-    meet_place: "",
-    price: "",
-    img_tour: "",
-    note: ""
-  });
+  const [newTour, setNewTour] = useState({});
   const [hotels, setHotels] = useState([]);
   const [places, setPlaces] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [openAdd, setOpenAdd] = useState(false);
 
+  const [openAdd, setOpenAdd] = useState(false);
+ 
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
   const handleChange = (value, name) => setNewTour({ ...newTour, [name]: value });
@@ -50,9 +46,9 @@ function AdminTour() {
           getVehicles()
         ]);
         if (toursResponse.data.data) setTours(toursResponse.data.data);
-        if (hotelsResponse.data.data) setHotels(hotelsResponse.data.data.map(hotel => ({ label: hotel.name, value: hotel.id })));
-        if (placesResponse.data.data) setPlaces(placesResponse.data.data.map(place => ({ label: place.name_place, value: place.id })));
-        if (vehiclesResponse.data.data) setVehicles(vehiclesResponse.data.data.map(vehicle => ({ label: vehicle.name, value: vehicle.id })));
+        if (hotelsResponse.data.data) setHotels(hotelsResponse.data.data.map(hotel => ({ label: hotel.ten, value: hotel.id })));
+        if (placesResponse.data.data) setPlaces(placesResponse.data.data.map(place => ({ label: place.ten, value: place.id })));
+        if (vehiclesResponse.data.data) setVehicles(vehiclesResponse.data.data.map(vehicle => ({ label: vehicle.ten, value: vehicle.id })));
       } catch (error) {
         console.log(error);
       }
@@ -62,10 +58,10 @@ function AdminTour() {
 
   const filteredItems = tours.filter(
     (item) =>
-      item.title_tour.toLowerCase().includes(search.toLowerCase()) ||
-      item.code.toLowerCase().includes(search.toLowerCase())
+      item.tieude.toLowerCase().includes(search.toLowerCase()) ||
+      item.matour.toLowerCase().includes(search.toLowerCase())
   );
-
+    console.log(newTour);
   const handleAdd = async () => {
     try {
       const response = await addTour(newTour);
@@ -98,37 +94,43 @@ function AdminTour() {
     },
     {
       name: "Ảnh",
-      selector: (row) => <img src={row.img_tour} alt="tour" />,
+      selector: (row) => <img src={row.anh} alt="tour" />,
       sortable: true,
       width: "120px",
     },
     {
       name: "Mã tour",
-      selector: (row) => row.code,
+      selector: (row) => row.matour,
       sortable: true,
       width: "200px",
     },
     {
       name: "Tiêu đề",
-      selector: (row) => row.title_tour,
+      selector: (row) => row.tieude,
       sortable: true,
       width: "300px",
     },
     {
-      name: "Giá tour ( Đồng )",
-      selector: (row) => parseInt(row.price).toLocaleString("en-US") + " VND",
+      name: "Giá người lớn",
+      selector: (row) => parseInt(row.gia_a).toLocaleString("en-US") + " VND",
+      sortable: true,
+      width: "150px",
+    },
+    {
+      name: "Giá trẻ em",
+      selector: (row) => parseInt(row.gia_c).toLocaleString("en-US") + " VND",
       sortable: true,
       width: "150px",
     },
     {
       name: "Nơi tập trung",
-      selector: (row) => row.meet_place,
+      selector: (row) => row.noikh,
       sortable: true,
       width: "150px",
     },
     {
       name: "Trạng thái",
-      selector: (row) => row.note,
+      selector: (row) => row.trangthai,
       sortable: true,
       width: "120px",
     },
@@ -211,39 +213,53 @@ function AdminTour() {
               <h5>Mã tour</h5>
               <Input
                 placeholder={"Nhập mã tại đây"}
-                value={newTour.code}
-                onChange={(value) => handleChange(value, "code")}
+                value={newTour.matour}
+                onChange={(value) => handleChange(value, "matour")}
               />
               <h5>Tiêu đề tour</h5>
               <Input
                 placeholder={"Nhập tiêu đề tại đây"}
-                value={newTour.title}
-                onChange={(value) => handleChange(value, "title")}
+                value={newTour.tieude}
+                onChange={(value) => handleChange(value, "tieude")}
               />
               <h5>Nơi tập trung</h5>
               <Input
                 placeholder={"Nhập nơi tập trung tại đây"}
-                value={newTour.meet_place}
-                onChange={(value) => handleChange(value, "meet_place")}
+                value={newTour.noikh}
+                onChange={(value) => handleChange(value, "noikh")}
               />
-              <h5>Giá tour ( VND )</h5>
+              <h5>Giá người lớn ( VND )</h5>
               <Input
                 type="number"
-                placeholder={"Nhập giá tour tại đây"}
-                value={newTour.price}
-                onChange={(value) => handleChange(value, "price")}
+                placeholder={"Nhập giá tour người lớn tại đây"}
+                value={newTour.gia_a}
+                onChange={(value) => handleChange(value, "gia_a")}
               />
-              <h5>Ảnh</h5>
+              <h5>Giá trẻ em( VND )</h5>
+              <Input
+                type="number"
+                placeholder={"Nhập giá tour trẻ em tại đây"}
+                value={newTour.gia_c}
+                onChange={(value) => handleChange(value, "gia_c")}
+              />
+              <h5>Ảnh đại diện</h5>
               <Input
                 placeholder={"Nhập link ảnh tại đây"}
-                value={newTour.img_tour}
-                onChange={(value) => handleChange(value, "img_tour")}
+                value={newTour.anh}
+                onChange={(value) => handleChange(value, "anh")}
+              />
+              <h5>Ảnh phụ</h5>
+              <TagInput
+                placeholder={"Nhập link ảnh tại đây"}
+                value={newTour.images}
+                onChange={(value) => handleChange(value, "images")}
+                style={{ width: '100%' }}
               />
               <h5>Chú thích</h5>
               <Input
                 placeholder={"Nhập chú thích tại đây"}
-                value={newTour.note}
-                onChange={(value) => handleChange(value, "note")}
+                value={newTour.trangthai}
+                onChange={(value) => handleChange(value, "trangthai")}
               />
               <h5>Khách sạn</h5>
               <TagPicker

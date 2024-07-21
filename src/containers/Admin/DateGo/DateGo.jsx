@@ -127,10 +127,10 @@ function AdminDateGo() {
 
   const filteredItems = dates.filter(
     (item) =>
-      tours[item.id_tour - 1]?.code
+      tours[item.matour - 1]?.matour
         .toLowerCase()
         .includes(search.toLowerCase()) ||
-      guiders[item.id_guider - 1]?.name
+      guiders[item.mahdv - 1]?.ten
         .toLowerCase()
         .includes(search.toLowerCase())
   );
@@ -139,36 +139,36 @@ function AdminDateGo() {
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
       name: "Ngày đi",
-      selector: (row) => row.date,
+      selector: (row) => row.ngay,
       sortable: true,
       width: "120px",
     },
     {
       name: "Tháng",
-      selector: (row) => row.month,
+      selector: (row) => row.thang,
       sortable: true,
       width: "100px",
     },
     {
       name: "Số ngày",
-      selector: (row) => row.day,
+      selector: (row) => row.songaydi,
       sortable: true,
       width: "100px",
     },
     {
       name: "Số chỗ còn lại",
-      selector: (row) => row.seat,
+      selector: (row) => row.chongoi,
       sortable: true,
       width: "150px",
     },
     {
       name: "Mã tour",
-      selector: (row) => tours[row.id_tour - 1]?.code,
+      selector: (row) => tours[row.matour - 1]?.matour,
       sortable: true,
     },
     {
       name: "Hướng dẫn viên",
-      selector: (row) => guiders[row.id_guider - 1]?.name,
+      selector: (row) => guiders[row.mahdv - 1]?.ten,
       sortable: true,
     },
     {
@@ -253,12 +253,12 @@ function AdminDateGo() {
                 format="yyyy-MM-dd"
                 placeholder="Chọn ngày khởi hành"
                 block
-                value={parseISO(detailDate.date)}
+                value={parseISO(detailDate.ngay)}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    date: format(value, "yyyy-MM-dd"),
-                    month: getMonth(value) + 1,
+                    ngay: format(value, "yyyy-MM-dd"),
+                    thang: getMonth(value) + 1,
                   }))
                 }
                 shouldDisableDate={(date) => isBefore(date, new Date())}
@@ -266,18 +266,18 @@ function AdminDateGo() {
               <h5>Tháng khởi hành</h5>
               <Input
                 placeholder={"Nhập tháng khởi hành tại đây"}
-                value={detailDate.month || ""}
+                value={detailDate.thang || ""}
                 disabled
               />
               <h5>Số ngày đi</h5>
               <Input
                 type="number"
                 placeholder={"Nhập số ngày đi tại đây"}
-                value={detailDate.day || ""}
+                value={detailDate.songaydi || ""}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    day: value,
+                    songaydi: value,
                   }))
                 }
               />
@@ -285,18 +285,18 @@ function AdminDateGo() {
               <Input
                 type="number"
                 placeholder={"Nhập số chỗ tại đây"}
-                value={detailDate.seat || ""}
+                value={detailDate.chongoi || ""}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    seat: value,
+                    chongoi: value,
                   }))
                 }
               />
               <h5>Mã tour</h5>
               <SelectPicker
                 data={tours.map((item) => ({
-                  label: item.code,
+                  label: item.matour,
                   value: item.id,
                 }))}
                 searchable
@@ -305,14 +305,14 @@ function AdminDateGo() {
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    id_tour: value,
+                    matour: value,
                   }))
                 }
               />
               <h5>Hướng dẫn viên</h5>
               <SelectPicker
                 data={guiders.map((item) => ({
-                  label: item.name,
+                  label: item.ten,
                   value: item.id,
                 }))}
                 searchable
@@ -321,7 +321,7 @@ function AdminDateGo() {
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    id_guider: value,
+                    mahdv: value,
                   }))
                 }
               />
@@ -350,12 +350,12 @@ function AdminDateGo() {
                 format="yyyy-MM-dd"
                 placeholder="Chọn ngày khởi hành"
                 block
-                value={parseISO(detailDate.date)}
+                value={parseISO(detailDate.ngay)}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    date: format(value, "yyyy-MM-dd"),
-                    month: getMonth(value) + 1,
+                    ngay: format(value, "yyyy-MM-dd"),
+                    thang: getMonth(value) + 1,
                   }))
                 }
                 shouldDisableDate={(date) => isBefore(date, new Date())}
@@ -363,52 +363,52 @@ function AdminDateGo() {
               <h5>Tháng khởi hành</h5>
               <Input
                 placeholder={"Nhập tháng khởi hành tại đây"}
-                value={detailDate.month || ""}
+                value={detailDate.thang || ""}
                 disabled
               />
               <h5>Số chỗ</h5>
               <Input
                 type="number"
                 placeholder={"Nhập số chỗ tại đây"}
-                value={detailDate.seat || ""}
+                value={detailDate.chongoi || ""}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    seat: value,
+                    chongoi: value,
                   }))
                 }
               />
               <h5>Mã tour</h5>
               <SelectPicker
                 data={tours.map((item) => ({
-                  label: item.code,
+                  label: item.matour,
                   value: item.id,
                 }))}
                 searchable
                 placeholder="Chọn tour"
                 block
-                value={parseInt(detailDate.id_tour)}
+                value={parseInt(detailDate.matour)}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    id_tour: value,
+                    matour: value,
                   }))
                 }
               />
               <h5>Hướng dẫn viên</h5>
               <SelectPicker
                 data={guiders.map((item) => ({
-                  label: item.name,
+                  label: item.ten,
                   value: item.id,
                 }))}
                 searchable
                 placeholder="Chọn hướng dẫn viên"
                 block
-                value={detailDate.id_guider}
+                value={detailDate.mahdv}
                 onChange={(value) =>
                   setDetailDate((prev) => ({
                     ...prev,
-                    id_guider: value,
+                    mahdv: value,
                   }))
                 }
               />

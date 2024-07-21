@@ -44,7 +44,7 @@ function RegisterPage() {
       }
       const response = await axios.post(
         "http://127.0.0.1:8000/api/client/user/register",
-        { email: email, password: password }
+        { email: email, matkhau: password, quyen: 'Khách hàng' }
       );
       if (response.data != null && password == subPassword) {
         window.location.href = "/login";

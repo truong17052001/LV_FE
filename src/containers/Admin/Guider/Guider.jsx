@@ -56,7 +56,7 @@ function AdminGuider() {
   const handleCloseEdit = () => setOpenEdit(false);
 
   const filteredItems = guiders.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+    item.ten.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
@@ -112,19 +112,19 @@ function AdminGuider() {
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
       name: "Tên hướng dẫn viên",
-      selector: (row) => row.name,
+      selector: (row) => row.ten,
       sortable: true,
       width: "200px",
     },
     {
       name: "Số điện thoại",
-      selector: (row) => row.phone,
+      selector: (row) => row.sdt,
       sortable: true,
       width: "150px",
     },
     {
       name: "Địa chỉ",
-      selector: (row) => row.address,
+      selector: (row) => row.diachi,
       sortable: true,
       width: "150px",
     },
@@ -136,7 +136,7 @@ function AdminGuider() {
     },
     {
       name: "Ảnh",
-      selector: (row) => <img src={row.img} alt="Guider" />,
+      selector: (row) => <img src={row.anh} alt="Guider" />,
       sortable: true,
       width: "150px",
     },
@@ -218,33 +218,33 @@ function AdminGuider() {
               <h5>Tên hướng dẫn viên</h5>
               <Input
                 placeholder="Nhập tên hướng dẫn viên tại đây"
-                value={detailGuiders.name || ""}
+                value={detailGuiders.ten || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailGuiders.phone || ""}
+                value={detailGuiders.sdt || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    sdt: value,
                   }))
                 }
               />
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailGuiders.address || ""}
+                value={detailGuiders.diachi || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    address: value,
+                    diachi: value,
                   }))
                 }
               />
@@ -262,11 +262,11 @@ function AdminGuider() {
               <h5>Ảnh</h5>
               <Input
                 placeholder="Nhập link ảnh tại đây"
-                value={detailGuiders.img || ""}
+                value={detailGuiders.anh || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    img: value,
+                    anh: value,
                   }))
                 }
               />
@@ -291,33 +291,33 @@ function AdminGuider() {
               <h5>Tên hướng dẫn viên</h5>
               <Input
                 placeholder="Nhập tên hướng dẫn viên tại đây"
-                value={detailGuiders.name || ""}
+                value={detailGuiders.ten || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailGuiders.phone || ""}
+                value={detailGuiders.sdt || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    sdt: value,
                   }))
                 }
               />
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailGuiders.address || ""}
+                value={detailGuiders.diachi || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    address: value,
+                    diachi: value,
                   }))
                 }
               />
@@ -335,11 +335,11 @@ function AdminGuider() {
               <h5>Ảnh</h5>
               <Input
                 placeholder="Nhập link ảnh tại đây"
-                value={detailGuiders.img || ""}
+                value={detailGuiders.anh || ""}
                 onChange={(value) =>
                   setDetailGuiders((prevState) => ({
                     ...prevState,
-                    img: value,
+                    anh: value,
                   }))
                 }
               />

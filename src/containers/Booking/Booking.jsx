@@ -1,4 +1,5 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./Booking.module.scss";
@@ -7,14 +8,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 //rsuite
 import { SelectPicker, Input, Button, DatePicker } from "rsuite";
-import {
-  parseISO,
-  format,
-  addDays,
-  getMonth,
-  getDate,
-  getYear,
-} from "date-fns";
+import { format, addDays, getMonth, getDate, getYear } from "date-fns";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/Input/styles/index.css";
 import "rsuite/Toggle/styles/index.css";
@@ -35,11 +29,11 @@ function BookingPage() {
   const customer = JSON.parse(user);
 
   const [booking, setBooking] = useState({
-    time_booking: format(new Date(), "yyyy-MM-dd"),
-    status: "Chưa thanh toán",
-    id_date: id,
-    id_customer: customer.id,
-    id_discount: 1,
+    ngay: format(new Date(), "yyyy-MM-dd"),
+    trangthai: "Chưa thanh toán",
+    mand: id,
+    makh: customer.id,
+    magg: null,
   });
   const [detailBooking, setDetailBooking] = useState({
     adults: [],
@@ -50,8 +44,8 @@ function BookingPage() {
   const [adult, setAdult] = useState(1);
   const [children, setChildren] = useState(0);
 
-  const start = new Date(date.date);
-  const end = addDays(start, date.day);
+  const start = new Date(date.ngay);
+  const end = addDays(start, date.songaydi);
   const data = ["Nam", "Nữ"].map((item) => ({ label: item, value: item }));
   const handleBooking = () => {
     handleAdd();
@@ -61,8 +55,7 @@ function BookingPage() {
       ? setBooking({
           ...booking,
           detailBooking: detailBooking,
-          total_price:
-            adult * date.tour.price + (children * date.tour.price * 50) / 100,
+          tongtien: adult * date.tour.gia_a + children * date.tour.gia_c,
         })
       : "";
   }, [detailBooking, adult, children]);
@@ -74,7 +67,7 @@ function BookingPage() {
           setDate(datesResponse.data.data);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        toast.error(error.response.data.message);
       }
     };
     fetchData();
@@ -84,10 +77,13 @@ function BookingPage() {
     try {
       const response = await addBooking(booking);
       if (response.data.message === "Success") {
-        window.location.href = `/payment/${id}`;
+        toast.success("Đặt chỗ thành công mời thanh toán");
+        window.location.href = `/payment/${response.data.data.id}`;
+      }else{
+        toast.error(response.data.error);
       }
     } catch (error) {
-      console.error("Error adding booking:", error);
+      toast.error(error.response.data.message);
     }
   };
   return (
@@ -116,11 +112,11 @@ function BookingPage() {
                 </label>
                 <Input
                   placeholder={"Nhập tên tại đây"}
-                  value={booking.name}
+                  value={booking.ten}
                   onChange={(value) =>
                     setBooking((preState) => ({
                       ...preState,
-                      name: value,
+                      ten: value,
                     }))
                   }
                 />
@@ -147,11 +143,11 @@ function BookingPage() {
                 </label>
                 <Input
                   placeholder={"Nhập số điện thoại tại đây"}
-                  value={booking.phone}
+                  value={booking.sdt}
                   onChange={(value) =>
                     setBooking((preState) => ({
                       ...preState,
-                      phone: value,
+                      sdt: value,
                     }))
                   }
                 />
@@ -162,11 +158,11 @@ function BookingPage() {
                 </label>
                 <Input
                   placeholder={"Nhập địa chỉ tại đây"}
-                  value={booking.address}
+                  value={booking.diachi}
                   onChange={(value) =>
                     setBooking((preState) => ({
                       ...preState,
-                      address: value,
+                      diachi: value,
                     }))
                   }
                 />
@@ -231,10 +227,10 @@ function BookingPage() {
                         if (i >= 0 && i < newAdults.length) {
                           newAdults[i] = {
                             ...newAdults[i],
-                            name: value,
+                            ten: value,
                           };
                         } else {
-                          newAdults.push({ name: value });
+                          newAdults.push({ ten: value });
                         }
                         newState.adults = newAdults;
                         return newState;
@@ -256,10 +252,10 @@ function BookingPage() {
                         if (i >= 0 && i < newAdults.length) {
                           newAdults[i] = {
                             ...newAdults[i],
-                            gender: value,
+                            gioitinh: value,
                           };
                         } else {
-                          newAdults.push({ gender: value });
+                          newAdults.push({ gioitinh: value });
                         }
                         newState.adults = newAdults;
                         return newState;
@@ -281,11 +277,11 @@ function BookingPage() {
                           if (i >= 0 && i < newAdults.length) {
                             newAdults[i] = {
                               ...newAdults[i],
-                              birthday: format(value, "yyyy-MM-dd"),
+                              ngaysinh: format(value, "yyyy-MM-dd"),
                             };
                           } else {
                             newAdults.push({
-                              birthday: format(value, "yyyy-MM-dd"),
+                              ngaysinh: format(value, "yyyy-MM-dd"),
                             });
                           }
                           newState.adults = newAdults;
@@ -319,10 +315,10 @@ function BookingPage() {
                         if (i >= 0 && i < newChildren.length) {
                           newChildren[i] = {
                             ...newChildren[i],
-                            name: value,
+                            ten: value,
                           };
                         } else {
-                          newChildren.push({ name: value });
+                          newChildren.push({ ten: value });
                         }
                         newState.childrens = newChildren;
                         return newState;
@@ -344,10 +340,10 @@ function BookingPage() {
                         if (i >= 0 && i < newChildren.length) {
                           newChildren[i] = {
                             ...newChildren[i],
-                            gender: value,
+                            gioitinh: value,
                           };
                         } else {
-                          newChildren.push({ gender: value });
+                          newChildren.push({ gioitinh: value });
                         }
                         newState.childrens = newChildren;
                         return newState;
@@ -369,11 +365,11 @@ function BookingPage() {
                           if (i >= 0 && i < newChildren.length) {
                             newChildren[i] = {
                               ...newChildren[i],
-                              birthday: format(value, "yyyy-MM-dd"),
+                              ngaysinh: format(value, "yyyy-MM-dd"),
                             };
                           } else {
                             newChildren.push({
-                              birthday: format(value, "yyyy-MM-dd"),
+                              ngaysinh: format(value, "yyyy-MM-dd"),
                             });
                           }
                           newState.childrens = newChildren;
@@ -407,14 +403,12 @@ function BookingPage() {
           <div className={cx("product")}>
             <div className={cx("product_img")}>
               <img
-                src={date.length != 0 ? date.tour.img_tour || "" : "Đang tải"}
+                src={date.length != 0 ? date.tour.anh || "" : "Đang tải"}
                 alt="image"
               />
             </div>
             <div className={cx("product_content")}>
-              <p>
-                {date.length != 0 ? date.tour.title_tour || "" : "Đang tải"}
-              </p>
+              <p>{date.length != 0 ? date.tour.tieude || "" : "Đang tải"}</p>
             </div>
           </div>
           <div className={cx("go_tour")}>
@@ -449,8 +443,7 @@ function BookingPage() {
                     <span className={cx("total_booking")}>
                       {date.length != 0
                         ? parseInt(
-                            adult * date.tour.price +
-                              (children * date.tour.price * 50) / 100
+                            adult * date.tour.gia_a + children * date.tour.gia_c
                           ).toLocaleString("en-US")
                         : 0}
                       &nbsp;₫
@@ -464,7 +457,7 @@ function BookingPage() {
                   <td className={cx("price")}>
                     {adult} x{" "}
                     {date.length != 0
-                      ? parseInt(date.tour.price).toLocaleString("en-US")
+                      ? parseInt(date.tour.gia_a).toLocaleString("en-US")
                       : 0}{" "}
                     ₫
                   </td>
@@ -475,9 +468,7 @@ function BookingPage() {
                     <td className={cx("price")}>
                       {children} x{" "}
                       {date.length != 0
-                        ? parseInt((date.tour.price * 50) / 100).toLocaleString(
-                            "en-US"
-                          )
+                        ? parseInt(date.tour.gia_c).toLocaleString("en-US")
                         : 0}{" "}
                       ₫
                     </td>
@@ -504,7 +495,9 @@ function BookingPage() {
               </div>
               <div className={cx("total")}>
                 <h3>Tổng tiền</h3>
-                <span>5.300.000 ₫</span>
+                <span>
+                  {parseInt(booking.tongtien).toLocaleString("en-US")} ₫
+                </span>
               </div>
             </div>
             <Button

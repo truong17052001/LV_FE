@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
@@ -9,25 +10,18 @@ import Footer from "../../components/Footer/Footer";
 import login from "../../assets/img/login.jpg";
 //
 import { Input, Button, InputGroup } from "rsuite";
-import { Message, useToaster } from "rsuite";
 
 import { IoExitOutline } from "react-icons/io5";
 import EyeIcon from "@rsuite/icons/legacy/Eye";
 import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
 import AvatarIcon from "@rsuite/icons/legacy/Avatar";
 
-const message = (
-  <Message showIcon type={'error'} closable>
-    Mật khẩu không trùng khớp
-  </Message>
-);
 const cx = classNames.bind(styles);
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const toaster = useToaster();
-  //
+
   const [visible, setVisible] = useState(false);
 
   const handleChange = () => {
@@ -38,16 +32,17 @@ function LoginPage() {
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/api/client/user/login",
-        { email: email, password: password }
+        { email: email, matkhau: password }
       );
       if (response.data != null) {
-        localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        toast.success("Đăng nhập thành công!");
         window.location.href = "/";
       } else {
         window.location.href = "/login";
       }
     } catch (error) {
-      console.log(error);
+      toast.error("Đăng nhập thất bại!");
     }
   }
 

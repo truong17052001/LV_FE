@@ -10,6 +10,7 @@ import DashBoardPage from "../../containers/Admin/Dashboard/Dashboard";
 import AdminTour from "../../containers/Admin/Tour/Tour";
 import AdminBooking from "../../containers/Admin/Booking/Booking";
 import AdminDetailTour from "../../containers/Admin/Tour/DetailTour";
+import AdminDetailBooking from "../../containers/Admin/Booking/DetailBooking";
 import AdminGuider from "../../containers/Admin/Guider/Guider";
 import AdminUser from "../../containers/Admin/User/User";
 import AdminHotel from "../../containers/Admin/Hotel/Hotel";
@@ -32,6 +33,7 @@ const privateRoutes = [
   { path: "/admin/tour", component: AdminTour },
   { path: "/admin/booking", component: AdminBooking },
   { path: "/admin/detail_tour/:id", component: AdminDetailTour },
+  { path: "/admin/detail_booking/:id", component: AdminDetailBooking },
   { path: "/admin/guider", component: AdminGuider },
   { path: "/admin/date", component: AdminDateGo },
   { path: "/admin/user", component: AdminUser },

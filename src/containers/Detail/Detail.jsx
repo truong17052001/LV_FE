@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import parse from "html-react-parser";
 import classNames from "classnames/bind";
 import styles from "./Detail.module.scss";
@@ -14,11 +15,16 @@ import { FaShoppingCart } from "react-icons/fa";
 import { Timeline } from "rsuite";
 import { Accordion } from "rsuite";
 import { Modal, Button } from "rsuite";
-//api
-import { getTourDetails } from "../../core/services/apiServices";
 import "rsuite/Timeline/styles/index.css";
 import "rsuite/Accordion/styles/index.css";
 import "rsuite/Button/styles/index.css";
+// Services
+import {
+  getTourDetails,
+  getHotels,
+  getPlaces,
+  getVehicles,
+} from "../../core/services/apiServices";
 //util
 import { formatDate } from "../../core/Utils/DateUtils";
 const cx = classNames.bind(styles);
@@ -27,12 +33,18 @@ function DetailPage() {
   const Title = ({ title }) => {
     return <div className={cx("title")}>{title}</div>;
   };
+  const user = localStorage.getItem("user");
   const [tours, setTours] = useState([]);
+  const [hotel, setHotel] = useState([]);
+  const [vehicle, setVehicle] = useState([]);
+  const [place, setPlace] = useState([]);
   const [click, setClick] = useState(0);
   const [openDateGo, setOpenDateGo] = useState(false);
   const handleCloseDateGo = () => setOpenDateGo(false);
   const handleOpenDateGo = () => {
-    setOpenDateGo(true);
+    if (user) {
+      setOpenDateGo(true);
+    } else toast.warn("Bạn phải đăng nhập để đặt tour!");
   };
   const { id } = useParams();
   useEffect(() => {
@@ -42,16 +54,33 @@ function DetailPage() {
         if (response.data.data) {
           setTours(response.data.data);
         }
+        const [hotelResponse, placeResponse, vehicleResponse] =
+        await Promise.all([
+          getHotels(),
+          getPlaces(),
+          getVehicles(),
+        ]);
+        if (hotelResponse.data.data) {
+          setHotel(hotelResponse.data.data);
+        }
+        if (placeResponse.data.data) {
+          setPlace(placeResponse.data.data);
+        }
+        if (vehicleResponse.data.data) {
+          setVehicle(vehicleResponse.data.data);
+        }
       } catch (error) {
         console.error(error);
       }
     };
     fetchDetails();
   }, []);
-  console.log(tours);
-  const dateGo = tours.date_go;
-  const activities = tours.activities;
-  const guider = tours.tour_guide;
+  const dateGo = tours.date_go || [];
+  const activities = tours.activities || [];
+  const guider = tours.tour_guide || [];
+  const imageList = tours.images || [];
+  const hotels = tours.hotel || [];
+  const imageList = tours.images || [];
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -63,9 +92,9 @@ function DetailPage() {
           <div className={cx("left")}>
             <div>
               <LuTicket color="#4d4aef"></LuTicket>
-              <span>{tours.code}</span>
+              <span>{tours.matour}</span>
             </div>
-            <h1>{tours.title_tour}</h1>
+            <h1>{tours.tieude}</h1>
             <div>
               <div className={cx("rate")}>
                 <span>9.4</span>
@@ -81,7 +110,7 @@ function DetailPage() {
             </div>
           </div>
           <div className={cx("right")}>
-            <span> {parseInt(tours.price).toLocaleString("en-US")} VND</span>/
+            <span> {parseInt(tours.gia_a).toLocaleString("en-US")} VND</span>/
             khách
             <div onClick={handleOpenDateGo}>
               <a>
@@ -93,64 +122,60 @@ function DetailPage() {
         </div>
         <div className={cx("picture")}>
           <div className={cx("main")}>
-            <img src={tours.img_tour}></img>
-            <img src={tours.length != 0 ? tours.images[click].src : ""}></img>
+            <img src={tours.anh}></img>
+            <img
+              src={imageList.length != 0 ? tours.images[click].nguon : ""}
+            ></img>
           </div>
           <div className={cx("extra")}>
-            <img
-              src={tours.length != 0 ? tours.images[0].src : ""}
-              onClick={() => {
-                setClick(0);
-              }}
-            ></img>
-            <img
-              src={tours.length != 0 ? tours.images[1].src : ""}
-              onClick={() => {
-                setClick(1);
-              }}
-            ></img>
-            <img
-              src={tours.length != 0 ? tours.images[2].src : ""}
-              onClick={() => {
-                setClick(2);
-              }}
-            ></img>
-            <img
-              src={tours.length != 0 ? tours.images[3].src : ""}
-              onClick={() => {
-                setClick(3);
-              }}
-            ></img>
+            {tours.images &&
+              tours.images.slice(0, 4).map((value, index) => {
+                console.log(index);
+                return (
+                  <img
+                    key={index}
+                    src={tours.length != 0 ? tours.images[index].nguon : ""}
+                    onClick={() => {
+                      setClick(index);
+                    }}
+                    alt={`Tour Image ${index}`}
+                  ></img>
+                );
+              })}
           </div>
         </div>
         <div className={cx("description")}>
           <div className={cx("left")}>
             <p>
-              Khởi hành <b>{tours.meet_date} - Giờ đi: 16:06</b>
+              Tập trung{" "}
+              <b>{dateGo.length != 0 ? dateGo[0].ngay : "Đang cập nhật"}</b>
             </p>
             <p>
-              Tập trung <b>16:06 ngày 15/06/2024</b>
+              Thời gian{" "}
+              <b>
+                {dateGo.length != 0
+                  ? dateGo[0].songaydi + " ngày"
+                  : "Đang cập nhật"}
+              </b>
             </p>
             <p>
-              Thời gian <b>1 ngày</b>
+              Nơi khởi hành <b>{tours.noikh}</b>
             </p>
             <p>
-              Nơi khởi hành <b> {tours.meet_place}</b>
-            </p>
-            <p>
-              Số chỗ còn nhận <b> 5</b>
+              Số chỗ còn nhận{" "}
+              <b>{dateGo.length != 0 ? dateGo[0].chongoi : "Đang cập nhật"}</b>
             </p>
           </div>
           <div className={cx("right")}>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/thoi%20gian.png"></img>
               <label>Thời gian</label>
-              <p>1 ngày</p>
+              <p>{dateGo.length != 0 ? dateGo[0].songaydi : "Đang cập nhật"} ngày</p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/phuong%20tien%20di%20chuyen.png"></img>
               <label>Phương tiện di chuyển</label>
-              <p>Xe du lịch, Tàu hoả</p>
+              <p>{console.log(tours.mapt)}</p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/diem%20tham%20quan.png"></img>
@@ -194,10 +219,10 @@ function DetailPage() {
                       return (
                         <Timeline.Item
                           time="Ngày"
-                          dot={<div className={cx("dot")}>{activity.day}</div>}
+                          dot={<div className={cx("dot")}>{activity.stt}</div>}
                         >
-                          <p className={cx("date")}>{activity.date}</p>
-                          <p className={cx("location")}>{activity.title}</p>
+                          <p className={cx("date")}>{activity.ngay}</p>
+                          <p className={cx("location")}>{activity.tieude}</p>
                         </Timeline.Item>
                       );
                     })
@@ -210,11 +235,11 @@ function DetailPage() {
                     return (
                       <div>
                         <h3>
-                          Ngày {activity.day} - {activity.title}
+                          Ngày {activity.stt} - {activity.tieude}
                         </h3>
                         <div className={cx("excerpt")}>
                           <span className={cx("line")}></span>
-                          <div>{parse(activity.description)}</div>
+                          <div>{parse(activity.mota)}</div>
                         </div>
                       </div>
                     );
@@ -236,20 +261,18 @@ function DetailPage() {
                   <tr>
                     <td>Người lớn (Từ 12 tuổi trở lên)</td>
                     <td className={cx("price")}>
-                      {parseInt(tours.price).toLocaleString("en-US")} ₫
+                      {parseInt(tours.gia_a).toLocaleString("en-US")} ₫
                     </td>
                   </tr>
                   <tr>
                     <td>Trẻ em (Từ 5 - 11 tuổi)</td>
                     <td className={cx("price")}>
-                      {parseInt(tours.price).toLocaleString("en-US")} ₫
+                      {parseInt(tours.gia_c).toLocaleString("en-US")} ₫
                     </td>
                   </tr>
                   <tr>
-                    <td>Em bé (Dưới 2 tuổi)</td>
-                    <td className={cx("price")}>
-                      {parseInt(tours.price).toLocaleString("en-US")} ₫
-                    </td>
+                    <td>Em bé (Dưới 5 tuổi)</td>
+                    <td className={cx("price")}>Miễn phí</td>
                   </tr>
 
                   <tr className={cx("total")}>
@@ -267,7 +290,7 @@ function DetailPage() {
                 <h3>Hướng dẫn viên dẫn đoàn</h3>
                 <p>
                   {tours.length != 0 && guider != null
-                    ? guider.name
+                    ? guider.ten
                     : "Đang cập nhật"}
                 </p>
                 <span>
@@ -333,24 +356,28 @@ function DetailPage() {
         </Modal.Header>
         <Modal.Body>
           <div className={cx("form")}>
-            {tours.length != 0
+            {dateGo.length != 0
               ? dateGo.map((go) => {
                   return (
                     <div className={cx("item")}>
-                      <div className={cx("date_go")}>{formatDate(go.date)}</div>
+                      <div className={cx("date_go")}>{formatDate(go.ngay)}</div>
                       <div className={cx("price")}>
-                        <h5>{tours.title_tour}</h5>
+                        <h5>{tours.tieude}</h5>
                         <span>
-                          {parseInt(tours.price).toLocaleString("en-US")}. VND
+                          {parseInt(tours.gia_a).toLocaleString("en-US")}. VND
                         </span>
-                        <Button color="red" appearance="primary" href={`/booking/${go.id}`}>
+                        <Button
+                          color="red"
+                          appearance="primary"
+                          href={`/booking/${go.id}`}
+                        >
                           Chọn
                         </Button>
                       </div>
                     </div>
                   );
                 })
-              : ""}
+              : "Hiện tại chưa có lịch trình cho tour này"}
           </div>
         </Modal.Body>
       </Modal>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 //components
@@ -9,40 +8,61 @@ import CardTour from "../../components/CardTour/CardTour";
 import CardLocation from "../../components/CardLocation/CardLocation";
 //rsuite
 import isBefore from "date-fns/isBefore";
-import { SelectPicker, DatePicker } from "rsuite";
+import { parseISO, format } from "date-fns";
+import { SelectPicker, DatePicker, Input } from "rsuite";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
 
 //icon
 import { FaSearch } from "react-icons/fa";
+//api
+import { getPlaces, getTours } from "../../core/services/apiServices";
 const cx = classNames.bind(styles);
 
 function HomePage() {
-  const data = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng"].map((item) => ({
-    label: item,
-    value: item,
-  }));
+  const data = ["Dưới 5tr", "Từ 5-10tr", "Từ 10-20tr", "Trên 20tr"].map(
+    (item) => ({
+      label: item,
+      value: item,
+    })
+  );
   const [tours, setTours] = useState([]);
+  const [places, setPlaces] = useState([]);
+  const [search, setSearch] = useState([]);
   const params = {
     page: 1,
     limit: 4,
+    ...search,
   };
+
   useEffect(() => {
-    const getTours = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/client/tour?",
-          { params }
-        );
-        if (response.data.data != null) {
-          setTours(response.data.data);
+        const placesResponse = await getPlaces();
+        if (placesResponse.data.data) {
+          setPlaces(
+            placesResponse.data.data.map((place) => ({
+              label: place.ten,
+              value: place.id,
+            }))
+          );
+        }
+        const toursResponse = await getTours(params);
+        if (toursResponse.data.data) {
+          setTours(toursResponse.data.data);
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching data:", error);
       }
     };
-    getTours();
+    fetchData();
   }, []);
+
+  const handleSearch = () => {
+    const searchParams = new URLSearchParams(search).toString();
+    window.location.href = `/tour?${searchParams}`;
+  };
+
   return (
     <div className={cx("wrapper")}>
       <Header type={1}></Header>
@@ -56,21 +76,46 @@ function HomePage() {
           </p>
         </div>
         <div className={cx("search-home")}>
-          <form className={cx("form-search")}>
+          <div className={cx("form-search")}>
             <div className={cx("box-search")}>
-              Nơi khởi hành
-              <SelectPicker data={data} size="lg" placeholder="Chọn điểm đi" />
+              Tên tour
+              <Input
+                size="lg"
+                placeholder="Nhập tên tour"
+                onChange={(value) => {
+                  setSearch((preState) => ({
+                    ...preState,
+                    tieude: value,
+                  }));
+                }}
+              />
             </div>
             <div className={cx("box-search")}>
               Điểm đến
-              <SelectPicker data={data} size="lg" placeholder="Chọn điểm đến" />
+              <SelectPicker
+                data={places}
+                size="lg"
+                placeholder="Chọn điểm đến"
+                onChange={(value) => {
+                  setSearch((preState) => ({
+                    ...preState,
+                    diemden: value,
+                  }));
+                }}
+              />
             </div>
             <div className={cx("box-search")}>
               Ngày khởi hành
               <DatePicker
-                format="dd/MM/yyyy"
-                size="lg"
+                format="yyyy-MM-dd"
+                placeholder="Chọn ngày khởi hành"
                 shouldDisableDate={(date) => isBefore(date, new Date())}
+                onChange={(value) => {
+                  setSearch((preState) => ({
+                    ...preState,
+                    ngaydi: format(value, "yyyy-MM-dd"),
+                  }));
+                }}
               />
             </div>
             <div className={cx("box-search")}>
@@ -80,13 +125,35 @@ function HomePage() {
                 size="lg"
                 placeholder="Tất cả"
                 searchable={false}
+                onChange={(value) => {
+                  switch (value) {
+                    case "Dưới 5tr":
+                      return setSearch((preState) => ({
+                        ...preState,
+                        giamin: 0,
+                        giamax: 5000000,
+                      }));
+                    case "guest":
+                      return setSearch((preState) => ({
+                        ...preState,
+                        giamin: 0,
+                        giamax: 5000000,
+                      }));
+                    default:
+                      return setSearch((preState) => ({
+                        ...preState,
+                        giamin: 0,
+                        giamax: 5000000,
+                      }));
+                  }
+                }}
               />
             </div>
-            <button className={cx("btn-search")}>
+            <button className={cx("btn-search")} onClick={handleSearch}>
               <FaSearch />
               <p>Tìm kiếm</p>
             </button>
-          </form>
+          </div>
         </div>
       </section>
       <section className={cx("hot_location")}>
@@ -126,13 +193,12 @@ function HomePage() {
             return (
               <CardTour
                 key={index}
-                id={index}
-                code={tour.code}
-                title_tour={tour.title_tour}
-                meet_place={tour.meet_place}
-                meet_date={tour.meet_date}
-                price={tour.price}
-                img_tour={tour.img_tour}
+                id={tour.id}
+                code={tour.matour}
+                title_tour={tour.tieude}
+                meet_place={tour.noikh}
+                price={tour.gia_a}
+                img_tour={tour.anh}
               ></CardTour>
             );
           })}

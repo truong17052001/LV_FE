@@ -59,7 +59,7 @@ function AdminHotel() {
   const handleCloseEdit = () => setOpenEdit(false);
 
   const filteredItems = hotels.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+    item.ten.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
@@ -114,25 +114,25 @@ function AdminHotel() {
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
       name: "Tên khách sạn",
-      selector: (row) => row.name,
+      selector: (row) => row.ten,
       sortable: true,
       width: "200px",
     },
     {
       name: "Số điện thoại",
-      selector: (row) => row.phone,
+      selector: (row) => row.sdt,
       sortable: true,
       width: "150px",
     },
     {
       name: "Địa chỉ",
-      selector: (row) => row.address,
+      selector: (row) => row.diachi,
       sortable: true,
       width: "150px",
     },
     {
       name: "Tiêu chuẩn",
-      selector: (row) => row.standard,
+      selector: (row) => row.tieuchuan,
       sortable: true,
       width: "150px",
     },
@@ -226,33 +226,33 @@ function AdminHotel() {
               <h5>Tên khách sạn</h5>
               <Input
                 placeholder="Nhập tên người dùng tại đây"
-                value={detailHotels.name || ""}
+                value={detailHotels.ten || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailHotels.phone || ""}
+                value={detailHotels.sdt || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    sdt: value,
                   }))
                 }
               />
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailHotels.address || ""}
+                value={detailHotels.diachi || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    address: value,
+                    diachi: value,
                   }))
                 }
               />
@@ -281,11 +281,11 @@ function AdminHotel() {
               <h5>Tiêu chuẩn</h5>
               <Input
                 placeholder="Nhập tiêu chuẩn tại đây"
-                value={detailHotels.standard || ""}
+                value={detailHotels.tieuchuan || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    standard: value,
+                    tieuchuan: value,
                   }))
                 }
               />
@@ -310,33 +310,33 @@ function AdminHotel() {
               <h5>Tên khách sạn</h5>
               <Input
                 placeholder="Nhập tên khách sạn tại đây"
-                value={detailHotels.name || ""}
+                value={detailHotels.ten || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Số điện thoại</h5>
               <Input
                 placeholder="Nhập số điện thoại tại đây"
-                value={detailHotels.phone || ""}
+                value={detailHotels.sdt || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    phone: value,
+                    sdt: value,
                   }))
                 }
               />
               <h5>Địa chỉ</h5>
               <Input
                 placeholder="Nhập địa chỉ tại đây"
-                value={detailHotels.address || ""}
+                value={detailHotels.diachi || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    address: value,
+                    diachi: value,
                   }))
                 }
               />
@@ -365,11 +365,11 @@ function AdminHotel() {
               <h5>Tiêu chuẩn</h5>
               <Input
                 placeholder="Nhập tiêu chuẩn tại đây"
-                value={detailHotels.standard || ""}
+                value={detailHotels.tieuchuan || ""}
                 onChange={(value) =>
                   setDetailHotels((prevState) => ({
                     ...prevState,
-                    standard: value,
+                    tieuchuan: value,
                   }))
                 }
               />

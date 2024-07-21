@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import classNames from "classnames/bind";
 import styles from "./Profile.module.scss";
 //components
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import CardTour from "../../components/CardTour/CardTour";
 //img
 import avatar from "../../assets/img/avatar.jpg";
 //icon
@@ -16,7 +18,11 @@ import "rsuite/DatePicker/styles/index.css";
 import "rsuite/Input/styles/index.css";
 import "rsuite/Button/styles/index.css";
 //api
-import { getUser, updateUser } from "../../core/services/apiServices";
+import {
+  getUser,
+  updateUser,
+  changePassword,
+} from "../../core/services/apiServices";
 const cx = classNames.bind(styles);
 const handleLogout = () => {
   localStorage.removeItem("user");
@@ -25,10 +31,11 @@ const handleLogout = () => {
 
 const user = localStorage.getItem("user");
 const customer = JSON.parse(user);
-
 function ProfilePage() {
   const [section, setSection] = useState(1);
   const [info, setInfo] = useState([]);
+  const [password, setPassword] = useState([]);
+  console.log(password);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,9 +58,25 @@ function ProfilePage() {
 
   const handleUpdate = async () => {
     try {
-      const response = await updateUser(customer.id,info);
+      const response = await updateUser(customer.id, info);
       if (response.data.message === "Success") {
+        toast.success("Cập nhật thành công!");
         window.location.href = `/info`;
+      }
+    } catch (error) {
+      console.error("Error update info:", error);
+    }
+  };
+  const handleChangePass = async () => {
+    try {
+      if (password.moi != password.moi_a) {
+        toast.error("Mật khẩu không trùng khớp");
+      } else {
+        const response = await changePassword(customer.id, password);
+        if (response.data.message === "Success") {
+          toast.success("Đổi mật khẩu thành công!");
+          window.location.href = `/info`;
+        }
       }
     } catch (error) {
       console.error("Error update info:", error);
@@ -66,9 +89,9 @@ function ProfilePage() {
         <div className={cx("left")}>
           <div className={cx("nav")}>
             <div className={cx("title")}>
-              <img src={info.img == null ? avatar : info.img}></img>
+              <img src={info.anh == null ? avatar : info.anh}></img>
               <div className={cx("heading")}>
-                <h5>{info.name == null? "Lữ hành" : info.name}</h5>
+                <h5>{info.ten == null ? "Lữ hành" : info.ten}</h5>
                 <p>{info.email}</p>
               </div>
             </div>
@@ -95,9 +118,14 @@ function ProfilePage() {
               </div>
               <h1>Đơn đặt chỗ</h1>
               <div>
-                <a>Tất cả</a>
-                <a>Chờ xác nhận</a>
-                <a>Đã đặt</a>
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDirect(3);
+                  }}
+                >
+                  Tất cả
+                </a>
               </div>
               <h1>Đánh giá</h1>
             </div>
@@ -117,11 +145,11 @@ function ProfilePage() {
               <div>
                 <Input
                   placeholder={"Nhập tên tại đây"}
-                  value={info.name || ""}
+                  value={info.ten || ""}
                   onChange={(value) =>
                     setInfo((preState) => ({
                       ...preState,
-                      name: value,
+                      ten: value,
                     }))
                   }
                 />
@@ -133,11 +161,11 @@ function ProfilePage() {
                 <DatePicker
                   format="yyyy-MM-dd"
                   placeholder="Nhập ngày sinh tại đây"
-                  value={parseISO(info.birthday)}
+                  value={parseISO(info.ngaysinh)}
                   onChange={(value) => {
                     setInfo((preState) => ({
                       ...preState,
-                      birthday: format(value, "yyyy-MM-dd"),
+                      ngaysinh: format(value, "yyyy-MM-dd"),
                     }));
                   }}
                 />
@@ -148,11 +176,11 @@ function ProfilePage() {
               <div>
                 <Input
                   placeholder={"Nhập địa chỉ tại đây"}
-                  value={info.address || ""}
+                  value={info.diachi || ""}
                   onChange={(value) =>
                     setInfo((preState) => ({
                       ...preState,
-                      address: value,
+                      diachi: value,
                     }))
                   }
                 />
@@ -163,11 +191,11 @@ function ProfilePage() {
               <div>
                 <Input
                   placeholder={"Nhập số điện thoại tại đây"}
-                  value={info.phone || ""}
+                  value={info.sdt || ""}
                   onChange={(value) =>
                     setInfo((preState) => ({
                       ...preState,
-                      phone: value,
+                      sdt: value,
                     }))
                   }
                 />
@@ -178,11 +206,11 @@ function ProfilePage() {
               <div>
                 <Input
                   placeholder={"Nhập giới tính tại đây"}
-                  value={info.gender || ""}
+                  value={info.gioitinh || ""}
                   onChange={(value) =>
                     setInfo((preState) => ({
                       ...preState,
-                      gender: value,
+                      gioitinh: value,
                     }))
                   }
                 />
@@ -210,19 +238,43 @@ function ProfilePage() {
             <div className={cx("content")}>
               <h5>Mật khẩu cũ</h5>
               <div>
-                <Input placeholder="Mật khẩu cũ" />
+                <Input
+                  placeholder={"Nhập mật khẩu cũ tại đây"}
+                  onChange={(value) =>
+                    setPassword((preState) => ({
+                      ...preState,
+                      cu: value,
+                    }))
+                  }
+                />
               </div>
             </div>
             <div className={cx("content")}>
               <h5>Mật khẩu mới</h5>
               <div>
-                <Input placeholder="Mật khẩu mới" name="oke" />
+                <Input
+                  placeholder={"Nhập mật khẩu mới tại đây"}
+                  onChange={(value) =>
+                    setPassword((preState) => ({
+                      ...preState,
+                      moi: value,
+                    }))
+                  }
+                />
               </div>
             </div>
             <div className={cx("content")}>
               <h5>Nhập lại mật khẩu mới</h5>
               <div>
-                <Input placeholder="Nhập lại mật khẩu mới" />
+                <Input
+                  placeholder={"Nhập lại mật khẩu mới tại đây"}
+                  onChange={(value) =>
+                    setPassword((preState) => ({
+                      ...preState,
+                      moi_a: value,
+                    }))
+                  }
+                />
               </div>
             </div>
             <div className={cx("content")}>
@@ -234,11 +286,19 @@ function ProfilePage() {
                   appearance="primary"
                   startIcon={<IoExitOutline />}
                   block
+                  onClick={handleChangePass}
                 >
                   Đổi mật khẩu
                 </Button>
               </div>
             </div>
+          </div>
+          <div className={cx("info", section != 3 ? "invisible" : "")}>
+            <div className={cx("heading", "mb")}>
+              <h5>Đơn đặt chỗ</h5>
+              <p>Gồm những tour khách hàng quan tâm.</p>
+            </div>
+            <div className={cx("content")}></div>
           </div>
         </div>
       </div>

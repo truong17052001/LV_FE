@@ -5,11 +5,13 @@ import styles from "./Tour.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { TagPicker, Button, Input, useToaster, Message } from "rsuite";
+import { TagPicker, Button, Input, TagInput } from "rsuite";
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/Button/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
+import "rsuite/TagInput/styles/index.css";
+
 // Services
 import {
   getTourDetails,
@@ -22,30 +24,20 @@ import {
 const cx = classNames.bind(styles);
 
 function AdminDetailTour() {
-  const [detailTours, setDetailTours] = useState({
-    code: "",
-    title_tour: "",
-    meet_place: "",
-    price: 0,
-    img_tour: "",
-    note: "",
-  });
+  const [detailTours, setDetailTours] = useState({});
   const [hotel, setHotel] = useState([]);
   const [vehicle, setVehicle] = useState([]);
   const [place, setPlace] = useState([]);
-  const [selectedHotels, setSelectedHotels] = useState([]);
 
-  const handleSelect = (value) => setSelectedHotels(value);
+  const handleChange = (value, name) =>
+    setDetailTours({ ...detailTours, [name]: value });
 
   const { id } = useParams();
-  const toaster = useToaster();
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateTour(id, {
-        ...detailTours,
-      });
+      const response = await updateTour(id, detailTours);
       if (response.data.message === "Success") {
         window.location.href = "/admin/tour";
       }
@@ -66,7 +58,15 @@ function AdminDetailTour() {
           ]);
 
         if (tourResponse.data.data) {
-          setDetailTours(tourResponse.data.data);
+          const { hotel, vehicle, place, images, ...restTourDetails } =
+            tourResponse.data.data;
+          setDetailTours({
+            ...restTourDetails,
+            hotel: hotel?.map((item) => item.maks) || [],
+            vehicle: vehicle?.map((item) => item.mapt) || [],
+            place: place?.map((item) => item.madd) || [],
+            images: images?.map((item) => item.nguon) || [],
+          });
         }
         if (hotelResponse.data.data) {
           setHotel(hotelResponse.data.data);
@@ -83,14 +83,13 @@ function AdminDetailTour() {
     };
     fetchData();
   }, [id]);
-
-  const hotels = hotel.map((item) => ({ label: item.name, value: item.id }));
+  const hotels = hotel.map((item) => ({ label: item.ten, value: item.id }));
   const transportMeans = vehicle.map((item) => ({
-    label: item.name,
+    label: item.ten,
     value: item.id,
   }));
   const landmarks = place.map((item) => ({
-    label: item.name_place,
+    label: item.ten,
     value: item.id,
   }));
 
@@ -106,55 +105,76 @@ function AdminDetailTour() {
                 <h5>Mã tour</h5>
                 <Input
                   placeholder="Nhập mã tại đây"
-                  value={detailTours.code || ""}
+                  value={detailTours.matour || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, code: value }))
+                    setDetailTours((prev) => ({ ...prev, matour: value }))
                   }
                 />
                 <h5>Tiêu đề tour</h5>
                 <Input
                   placeholder="Nhập tiêu đề tại đây"
-                  value={detailTours.title_tour || ""}
+                  value={detailTours.tieude || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, title_tour: value }))
+                    setDetailTours((prev) => ({ ...prev, tieude: value }))
                   }
                 />
                 <h5>Nơi tập trung</h5>
                 <Input
                   placeholder="Nhập nơi tập trung tại đây"
-                  value={detailTours.meet_place || ""}
+                  value={detailTours.noikh || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, meet_place: value }))
+                    setDetailTours((prev) => ({ ...prev, noikh: value }))
                   }
                 />
-                <h5>Giá tour (VND)</h5>
+                <h5>Giá người lớn (VND)</h5>
                 <Input
                   type="number"
-                  placeholder="Nhập giá tour tại đây"
+                  placeholder="Nhập giá tour người lớn tại đây"
                   value={
-                    isNaN(detailTours.price) ? "" : parseInt(detailTours.price)
+                    isNaN(detailTours.gia_a) ? "" : parseInt(detailTours.gia_a)
                   }
                   onChange={(value) =>
                     setDetailTours((prev) => ({
                       ...prev,
-                      price: parseFloat(value),
+                      gia_a: parseFloat(value),
                     }))
                   }
                 />
-                <h5>Ảnh</h5>
+                <h5>Giá trẻ em (VND)</h5>
+                <Input
+                  type="number"
+                  placeholder="Nhập giá tour trẻ em tại đây"
+                  value={
+                    isNaN(detailTours.gia_c) ? "" : parseInt(detailTours.gia_c)
+                  }
+                  onChange={(value) =>
+                    setDetailTours((prev) => ({
+                      ...prev,
+                      gia_c: parseFloat(value),
+                    }))
+                  }
+                />
+                <h5>Ảnh đại diện</h5>
                 <Input
                   placeholder="Nhập link ảnh tại đây"
-                  value={detailTours.img_tour || ""}
+                  value={detailTours.anh || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, img_tour: value }))
+                    setDetailTours((prev) => ({ ...prev, anh: value }))
                   }
+                />
+                <h5>Ảnh phụ</h5>
+                <TagInput
+                  placeholder={"Nhập link ảnh tại đây"}
+                  value={detailTours.images}
+                  onChange={(value) => handleChange(value, "images")}
+                  style={{ width: "100%" }}
                 />
                 <h5>Chú thích</h5>
                 <Input
                   placeholder="Nhập chú thích tại đây"
-                  value={detailTours.note || ""}
+                  value={detailTours.trangthai || ""}
                   onChange={(value) =>
-                    setDetailTours((prev) => ({ ...prev, note: value }))
+                    setDetailTours((prev) => ({ ...prev, trangthai: value }))
                   }
                 />
                 <Button
@@ -171,9 +191,10 @@ function AdminDetailTour() {
                   <TagPicker
                     data={hotels}
                     searchable
+                    value={detailTours.hotel}
                     style={{ width: "77%" }}
-                    onChange={handleSelect}
                     placeholder="Chọn khách sạn"
+                    onChange={(value) => handleChange(value, "hotel")}
                   />
                   <Button color="green" appearance="primary">
                     Chọn
@@ -183,22 +204,12 @@ function AdminDetailTour() {
                   <TagPicker
                     data={transportMeans}
                     searchable
+                    value={detailTours.vehicle}
                     style={{ width: "77%" }}
-                    onChange={handleSelect}
                     placeholder="Chọn phương tiện vận chuyển"
+                    onChange={(value) => handleChange(value, "vehicle")}
                   />
-                  <Button
-                    color="green"
-                    appearance="primary"
-                    onClick={() =>
-                      toaster.push(
-                        <Message showIcon type="success" closable>
-                          Thành công
-                        </Message>,
-                        { placement: "topEnd", duration: 2000 }
-                      )
-                    }
-                  >
+                  <Button color="green" appearance="primary">
                     Chọn
                   </Button>
                 </div>
@@ -206,9 +217,10 @@ function AdminDetailTour() {
                   <TagPicker
                     data={landmarks}
                     searchable
+                    value={detailTours.place}
                     style={{ width: "77%" }}
-                    onChange={handleSelect}
                     placeholder="Chọn địa danh"
+                    onChange={(value) => handleChange(value, "place")}
                   />
                   <Button color="green" appearance="primary">
                     Chọn

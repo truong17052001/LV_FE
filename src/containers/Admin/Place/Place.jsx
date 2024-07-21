@@ -65,7 +65,7 @@ function AdminPlace() {
   const handleCloseEdit = () => setOpenEdit(false);
 
   const filteredItems = places.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+    item.ten.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
@@ -120,19 +120,19 @@ function AdminPlace() {
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
       name: "Tên địa danh",
-      selector: (row) => row.name,
+      selector: (row) => row.ten,
       sortable: true,
       width: "250px",
     },
     {
       name: "Mô tả địa danh",
-      selector: (row) => row.dec,
+      selector: (row) => row.mota,
       sortable: true,
       width: "450px",
     },
     {
       name: "Trạng thái",
-      selector: (row) => row.state,
+      selector: (row) => row.trangthai,
       sortable: true,
       width: "120px",
     },
@@ -214,33 +214,33 @@ function AdminPlace() {
               <h5>Tên địa danh</h5>
               <Input
                 placeholder="Nhập tên địa danh tại đây"
-                value={detailPlaces.name || ""}
+                value={detailPlaces.ten || ""}
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Mô tả địa danh</h5>
               <Input
                 placeholder="Nhập mô tả địa danh tại đây"
-                value={detailPlaces.dec || ""}
+                value={detailPlaces.mota || ""}
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
-                    dec: value,
+                    mota: value,
                   }))
                 }
               />
               <h5>Trạng thái</h5>
               <Input
                 placeholder="Nhập trạng thái địa danh tại đây"
-                value={detailPlaces.state || ""}
+                value={detailPlaces.trangthai || ""}
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
-                    state: value,
+                    trangthai: value,
                   }))
                 }
               />
@@ -265,7 +265,7 @@ function AdminPlace() {
               <h5>Tên địa danh</h5>
               <Input
                 placeholder="Nhập tên địa danh tại đây"
-                value={detailPlaces.name || ""}
+                value={detailPlaces.ten || ""}
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
@@ -276,7 +276,7 @@ function AdminPlace() {
               <h5>Mô tả địa danh</h5>
               <Input
                 placeholder="Nhập mô tả địa danh tại đây"
-                value={detailPlaces.dec || ""}
+                value={detailPlaces.mota || ""}
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
@@ -287,7 +287,7 @@ function AdminPlace() {
               <h5>Trạng thái</h5>
               <Input
                 placeholder="Nhập trạng thái địa danh tại đây"
-                value={detailPlaces.state || ""}
+                value={detailPlaces.trangthai || ""}
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,

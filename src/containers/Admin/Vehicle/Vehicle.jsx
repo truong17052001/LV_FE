@@ -58,7 +58,7 @@ function AdminVehicle() {
   const handleCloseEdit = () => setOpenEdit(false);
 
   const filteredItems = vehicles.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+    item.ten.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
@@ -113,13 +113,13 @@ function AdminVehicle() {
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
       name: "Tên phương tiện",
-      selector: (row) => row.name,
+      selector: (row) => row.ten,
       sortable: true,
       width: "250px",
     },
     {
       name: "Loại phương tiện",
-      selector: (row) => row.capacity,
+      selector: (row) => row.loai,
       sortable: true,
       width: "450px",
     },
@@ -201,22 +201,22 @@ function AdminVehicle() {
               <h5>Tên phương tiện</h5>
               <Input
                 Vehicleholder="Nhập tên phương tiện tại đây"
-                value={detailVehicles.name || ""}
+                value={detailVehicles.ten || ""}
                 onChange={(value) =>
                   setDetailVehicles((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Loại phương tiện</h5>
               <Input
                 Vehicleholder="Nhập loại phương tiện tại đây"
-                value={detailVehicles.capacity || ""}
+                value={detailVehicles.loai || ""}
                 onChange={(value) =>
                   setDetailVehicles((prevState) => ({
                     ...prevState,
-                    capacity: value,
+                    loai: value,
                   }))
                 }
               />
@@ -241,22 +241,22 @@ function AdminVehicle() {
               <h5>Tên phương tiện</h5>
               <Input
                 Vehicleholder="Nhập tên phương tiện tại đây"
-                value={detailVehicles.name || ""}
+                value={detailVehicles.ten || ""}
                 onChange={(value) =>
                   setDetailVehicles((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
               <h5>Loại phương tiện</h5>
               <Input
                 Vehicleholder="Nhập loại phương tiện tại đây"
-                value={detailVehicles.capacity || ""}
+                value={detailVehicles.loai || ""}
                 onChange={(value) =>
                   setDetailVehicles((prevState) => ({
                     ...prevState,
-                    capacity: value,
+                    loai: value,
                   }))
                 }
               />

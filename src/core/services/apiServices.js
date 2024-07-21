@@ -30,14 +30,14 @@ export const getPlaces = () => {
 export const getPlace = (id) => {
   return axios.get(`${API_BASE_URL}/place/${id}`);
 };
-export const addPlace = (PlaceData) => {
-  return axios.post(`${API_BASE_URL}/Place/add`, PlaceData);
+export const addPlace = (placeData) => {
+  return axios.post(`${API_BASE_URL}/place/add`, placeData);
 };
-export const updatePlace = (id, PlaceData) => {
-  return axios.put(`${API_BASE_URL}/Place/edit/${id}`, PlaceData);
+export const updatePlace = (id, placeData) => {
+  return axios.put(`${API_BASE_URL}/place/edit/${id}`,placeData);
 };
 export const deletePlace = (id) => {
-  return axios.delete(`${API_BASE_URL}/Place/delete/${id}`);
+  return axios.delete(`${API_BASE_URL}/place/delete/${id}`);
 };
 //Vehicle
 export const getVehicles = () => {
@@ -56,8 +56,8 @@ export const deleteVehicle = (id) => {
   return axios.delete(`${API_BASE_URL}/vehicle/delete/${id}`);
 };
 //Tour
-export const getTours = () => {
-  return axios.get(`${API_BASE_URL}/tour`);
+export const getTours = (params) => {
+  return axios.get(`${API_BASE_URL}/tour`, {params});
 };
 export const addTour = (tourData) => {
   return axios.post(`${API_BASE_URL}/tour/add`, tourData);
@@ -131,4 +131,14 @@ export const updateUser = (id, userData) => {
 };
 export const deleteUser = (id) => {
   return axios.delete(`${API_BASE_URL}/user/delete/${id}`);
+};
+export const changePassword = (id,password) => {
+  return axios.post(`${API_BASE_URL}/user/password/${id}`, password);
+};
+//Payment
+export const momo = () => {
+  return axios.post(`${API_BASE_URL}/payment/momo`);
+};
+export const addPayment = (paymentData) => {
+  return axios.post(`${API_BASE_URL}/payment/add`,paymentData);
 };
