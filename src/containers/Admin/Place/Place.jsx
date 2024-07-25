@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
 import styles from "./Place.module.scss";
@@ -75,7 +76,7 @@ function AdminPlace() {
         window.location.href = "/admin/place";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -87,7 +88,7 @@ function AdminPlace() {
         window.location.href = "/admin/place";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -127,6 +128,12 @@ function AdminPlace() {
     {
       name: "Mô tả địa danh",
       selector: (row) => row.mota,
+      sortable: true,
+      width: "450px",
+    },
+    {
+      name: "Ảnh đại diện",
+      selector: (row) => row.anh,
       sortable: true,
       width: "450px",
     },
@@ -244,6 +251,17 @@ function AdminPlace() {
                   }))
                 }
               />
+              <h5>Ảnh</h5>
+              <Input
+                placeholder="Nhập link ảnh địa danh tại đây"
+                value={detailPlaces.anh || ""}
+                onChange={(value) =>
+                  setDetailPlaces((prevState) => ({
+                    ...prevState,
+                    anh: value,
+                  }))
+                }
+              />
             </div>
           </Modal.Body>
           <Modal.Footer>
@@ -269,7 +287,7 @@ function AdminPlace() {
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
-                    name: value,
+                    ten: value,
                   }))
                 }
               />
@@ -280,7 +298,7 @@ function AdminPlace() {
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
-                    dec: value,
+                    mota: value,
                   }))
                 }
               />
@@ -291,7 +309,18 @@ function AdminPlace() {
                 onChange={(value) =>
                   setDetailPlaces((prevState) => ({
                     ...prevState,
-                    state: value,
+                    trangthai: value,
+                  }))
+                }
+              />
+              <h5>Ảnh đại diện</h5>
+              <Input
+                placeholder="Nhập link ảnh địa danh tại đây"
+                value={detailPlaces.anh || ""}
+                onChange={(value) =>
+                  setDetailPlaces((prevState) => ({
+                    ...prevState,
+                    anh: value,
                   }))
                 }
               />

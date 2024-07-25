@@ -10,6 +10,7 @@ import {
   RangeSlider,
   Pagination,
   Input,
+  Button,
 } from "rsuite";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/SelectPicker/styles/index.css";
@@ -23,13 +24,12 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import CardTour from "../../components/CardTour/CardTour";
 //icon
-
+import TagFilterIcon from "@rsuite/icons/TagFilter";
 //api
 import { getPlaces, getTours } from "../../core/services/apiServices";
 const cx = classNames.bind(styles);
 
 function TourPage() {
-  const [value, setValue] = useState([0, 7000000]);
   const [tours, setTours] = useState([]);
   const [places, setPlaces] = useState([]);
   const [activePage, setActivePage] = useState(1);
@@ -65,19 +65,20 @@ function TourPage() {
 
   const limitOptions = [9, 15, 21];
 
-  useEffect(() => {
+  const handleFilter = () => {
     const params = {
       page: activePage,
       limit: limit,
       ...search,
     };
     fetchTours(params);
-  }, [activePage, limit, search]);
+  };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set("page", activePage);
     urlParams.set("limit", limit);
+    console.log(urlParams);
     fetchTours(urlParams);
   }, []);
 
@@ -181,24 +182,31 @@ function TourPage() {
                 <div className={cx("mb")}>
                   <h5> Ngân sách của quý khách</h5>
                   <div className={cx("p")}>
-                    <RangeSlider
-                      progress
-                      value={value}
-                      step={100000}
-                      min={0}
-                      max={10000000}
+                    Giá thấp nhất:
+                    <Input
+                      type="number"
+                      size="lg"
+                      placeholder="Giá thấp nhất"
+                      value={search.giamin}
                       onChange={(value) => {
-                        setValue(value);
                         setSearch((preState) => ({
-                          ...preState,
-                          giamin: value[0],
-                          giamax: value[1],
+                          giamin: value,
                         }));
                       }}
                     />
-                    <p>
-                      {value[0]} ₫ - {value[1]} ₫
-                    </p>
+                    Giá cao nhất
+                    <Input
+                      type="number"
+                      size="lg"
+                      placeholder="Giá cao nhất"
+                      value={search.giamax}
+                      onChange={(value) => {
+                        setSearch((preState) => ({
+                          ...preState,
+                          giamax: value,
+                        }));
+                      }}
+                    />
                   </div>
                 </div>
                 {/* <div className={cx("mb")}>
@@ -208,6 +216,18 @@ function TourPage() {
                     <Toggle></Toggle> Còn chỗ
                   </div>
                 </div> */}
+                <div className={cx("mb")}>
+                  <Button
+                    color="red"
+                    size="sx"
+                    appearance="primary"
+                    block
+                    startIcon={<TagFilterIcon />}
+                    onClick={handleFilter}
+                  >
+                    Lọc
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -260,6 +280,7 @@ function TourPage() {
                         meet_place={tour.noikh}
                         price={tour.gia_a}
                         img_tour={tour.anh}
+                        state={tour.trangthai}
                       ></CardTour>
                     );
                   })

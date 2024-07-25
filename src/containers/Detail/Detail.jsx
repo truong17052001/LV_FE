@@ -35,9 +35,9 @@ function DetailPage() {
   };
   const user = localStorage.getItem("user");
   const [tours, setTours] = useState([]);
-  const [hotel, setHotel] = useState([]);
-  const [vehicle, setVehicle] = useState([]);
-  const [place, setPlace] = useState([]);
+  const [hotels, setHotel] = useState([]);
+  const [vehicles, setVehicle] = useState([]);
+  const [places, setPlace] = useState([]);
   const [click, setClick] = useState(0);
   const [openDateGo, setOpenDateGo] = useState(false);
   const handleCloseDateGo = () => setOpenDateGo(false);
@@ -79,8 +79,10 @@ function DetailPage() {
   const activities = tours.activities || [];
   const guider = tours.tour_guide || [];
   const imageList = tours.images || [];
-  const hotels = tours.hotel || [];
-  const imageList = tours.images || [];
+  const hotel = tours.hotel || [];
+  const vehicle = tours.vehicle || [];
+  const place = tours.place || [];
+
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -130,7 +132,6 @@ function DetailPage() {
           <div className={cx("extra")}>
             {tours.images &&
               tours.images.slice(0, 4).map((value, index) => {
-                console.log(index);
                 return (
                   <img
                     key={index}
@@ -175,7 +176,7 @@ function DetailPage() {
             <div>
               <img src="https://travel.com.vn/images/icons/utility/phuong%20tien%20di%20chuyen.png"></img>
               <label>Phương tiện di chuyển</label>
-              <p>{console.log(tours.mapt)}</p>
+              <p>{vehicle.ten}</p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/diem%20tham%20quan.png"></img>

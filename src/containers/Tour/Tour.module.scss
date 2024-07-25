@@ -55,6 +55,9 @@
 }
 .p {
   padding: 5px;
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
 }
 .input {
   padding-top: 8px;

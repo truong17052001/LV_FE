@@ -29,7 +29,7 @@ function SideNav() {
         <IoIosPlanet fontSize={27} className={cx("icon")} />
         <p>Quang Trường Travel</p>
       </a>
-      <a href="/admin/dashboard" className={cx("wrapper")}>
+      <a href="/dashboard" className={cx("wrapper")}>
         <MdDashboard fontSize={27} className={cx("icon")} />
         <p>Thống kê</p>
       </a>

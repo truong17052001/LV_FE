@@ -22,6 +22,7 @@ import {
   getBooking,
   getDetailDate,
   addPayment,
+  moMo,
 } from "../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
@@ -36,6 +37,7 @@ function PaymentPage() {
   const detail = booking ? booking.detail : [];
   const start = new Date(date.ngay);
   const end = addDays(start, date.songaydi);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,19 +63,28 @@ function PaymentPage() {
     };
     fetchData();
   }, []);
+
   const handlePayment = async () => {
-    if ((payment.pttt = "Tiền mặt")) {
+    if (payment.pttt == "Tiền mặt") {
       try {
         const paymentResponse = await addPayment(payment);
-        if (paymentResponse.data.message === "Success") {
-          toast.success("Đã xác nhận thanh toán");
-          window.location.href = `/`;
-        } else {
-          toast.error(response.data.error);
+        console.log(paymentResponse);
+        if (paymentResponse.data.message == "Success") {
+          toast.success("Xác nhận phương thức thanh toán thành công");
+          window.location.href = "/";
         }
       } catch (error) {
         toast.error(error.response.data.message);
       }
+    } else if (payment.pttt == "Momo") {
+      try {
+        const paymentResponse = await moMo(payment);
+        window.location.href = paymentResponse.data;
+      } catch (error) {
+        toast.error(error.response.data.message);
+      }
+    }else{
+      toast.error("Vui lòng chọn phương thức thanh toán");
     }
   };
   return (

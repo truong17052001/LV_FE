@@ -9,12 +9,20 @@ const cx = classNames.bind(styles);
 //icon
 import { LuTicket } from "react-icons/lu";
 import { FaCartShopping } from "react-icons/fa6";
-function CardTour({ id, code, title_tour, meet_place, price, img_tour }) {
+function CardTour({
+  id,
+  code,
+  title_tour,
+  meet_place,
+  price,
+  img_tour,
+  state,
+}) {
   return (
     <div className={cx("item")}>
       <div className={cx("img")}>
         <img src={img_tour} placeholder="img"></img>
-        <div className={cx("summary")}>
+        {/* <div className={cx("summary")}>
           <div className={cx("rate")}>
             <span>9.4</span>
           </div>
@@ -22,7 +30,7 @@ function CardTour({ id, code, title_tour, meet_place, price, img_tour }) {
             <h3>Tuyệt vời</h3>
             <p>358 quan tâm</p>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className={cx("body")}>
         {/* <p className={cx("date")}> 3 ngày</p> */}
@@ -40,20 +48,20 @@ function CardTour({ id, code, title_tour, meet_place, price, img_tour }) {
           Nơi khởi hành: <span>{meet_place}</span>
         </p>
         <div className={cx("price")}>
-          Giá
-          <del>
+          Giá:              
+          <del>           
             {parseInt(price * 1 + (price * 6) / 100).toLocaleString("en-US")} ₫
           </del>
-          <div>
+          <a href={`/detail/${id}`}>
             {parseInt(price).toLocaleString("en-US")} VND
             <span>
               <FaCartShopping></FaCartShopping>Đặt ngay
             </span>
-          </div>
+          </a>
         </div>
       </div>
       <div className={cx("footer")}>
-        <div>Giảm 6%</div>
+        {state == "Ưu đãi" ? <div>Giảm 6%</div> : ""}
         {/* <p>
           Số chỗ còn <span>{dateGo.chongoi}</span>
         </p> */}

@@ -30,7 +30,11 @@ function BookingPage() {
 
   const [booking, setBooking] = useState({
     ngay: format(new Date(), "yyyy-MM-dd"),
-    trangthai: "Chưa thanh toán",
+    trangthai: "Chờ xác nhận",
+    ten: customer.ten,
+    sdt: customer.sdt,
+    email: customer.email,
+    diachi: customer.diachi,
     mand: id,
     makh: customer.id,
     magg: null,
@@ -43,7 +47,7 @@ function BookingPage() {
   const [date, setDate] = useState([]);
   const [adult, setAdult] = useState(1);
   const [children, setChildren] = useState(0);
-
+  console.log(detailBooking);
   const start = new Date(date.ngay);
   const end = addDays(start, date.songaydi);
   const data = ["Nam", "Nữ"].map((item) => ({ label: item, value: item }));
@@ -55,7 +59,8 @@ function BookingPage() {
       ? setBooking({
           ...booking,
           detailBooking: detailBooking,
-          tongtien: adult * date.tour.gia_a + children * date.tour.gia_c,
+          nguoilon: adult,
+          treem: children
         })
       : "";
   }, [detailBooking, adult, children]);
@@ -77,13 +82,13 @@ function BookingPage() {
     try {
       const response = await addBooking(booking);
       if (response.data.message === "Success") {
-        toast.success("Đặt chỗ thành công mời thanh toán");
+        toast.success("Đặt chỗ thành công vui lòng thanh toán");
         window.location.href = `/payment/${response.data.data.id}`;
-      }else{
+      } else {
         toast.error(response.data.error);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.error[0]);
     }
   };
   return (
@@ -142,8 +147,9 @@ function BookingPage() {
                   Số điện thoại <b>*</b>
                 </label>
                 <Input
-                  placeholder={"Nhập số điện thoại tại đây"}
+                  type="number"
                   value={booking.sdt}
+                  placeholder={"Nhập số điện thoại tại đây"}
                   onChange={(value) =>
                     setBooking((preState) => ({
                       ...preState,
@@ -157,8 +163,8 @@ function BookingPage() {
                   Địa chỉ <b>*</b>
                 </label>
                 <Input
-                  placeholder={"Nhập địa chỉ tại đây"}
                   value={booking.diachi}
+                  placeholder={"Nhập địa chỉ tại đây"}
                   onChange={(value) =>
                     setBooking((preState) => ({
                       ...preState,
@@ -265,7 +271,6 @@ function BookingPage() {
                 </div>
                 <div className={cx("birthday")}>
                   <label>Ngày sinh</label>
-                  <div>
                     <DatePicker
                       format="yyyy-MM-dd"
                       placeholder="Chọn ngày ngày sinh"
@@ -289,7 +294,6 @@ function BookingPage() {
                         });
                       }}
                     />
-                  </div>
                 </div>
               </div>
             ))}

@@ -84,6 +84,9 @@ export const updateDate = (id, dateData) => {
 export const deleteDate = (id) => {
   return axios.delete(`${API_BASE_URL}/date/delete/${id}`);
 };
+export const print = (id) => {
+  return axios.get(`${API_BASE_URL}/date/${id}/people/export`);
+};
 //Guider
 export const getGuiders = () => {
   return axios.get(`${API_BASE_URL}/guider`);
@@ -100,7 +103,7 @@ export const updateGuider = (id, guiderData) => {
 export const deleteGuider = (id) => {
   return axios.delete(`${API_BASE_URL}/guider/delete/${id}`);
 };
-//user
+//Booking
 export const getBookings = () => {
   return axios.get(`${API_BASE_URL}/booking`);
 };
@@ -135,9 +138,15 @@ export const deleteUser = (id) => {
 export const changePassword = (id,password) => {
   return axios.post(`${API_BASE_URL}/user/password/${id}`, password);
 };
+export const getOrdered = (id) => {
+  return axios.get(`${API_BASE_URL}/user/booking/${id}`);
+};
 //Payment
-export const momo = () => {
-  return axios.post(`${API_BASE_URL}/payment/momo`);
+export const moMo = (paymentData) => {
+  return axios.post(`${API_BASE_URL}/payment/momo`,paymentData);
+};
+export const resultPayment = (paymentData) => {
+  return axios.post(`${API_BASE_URL}/payment/momo/callback`,paymentData);
 };
 export const addPayment = (paymentData) => {
   return axios.post(`${API_BASE_URL}/payment/add`,paymentData);

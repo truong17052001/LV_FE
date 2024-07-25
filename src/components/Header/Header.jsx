@@ -64,9 +64,7 @@ function Header({ type }) {
             <a href="/" className={cx("text", "title")}>
               Trang chủ
             </a>
-            <a href="/about" className={cx("text", "title")}>
-              Giới thiệu
-            </a>
+
             <a href="/tour" className={cx("text", "title")}>
               Du lịch
             </a>
@@ -80,15 +78,12 @@ function Header({ type }) {
             <a href="/news" className={cx("text", "title")}>
               Tin tức
             </a>
-            <a href="/sale" className={cx("text", "title")}>
-              Khuyến mãi
-            </a>
-            <a href="/contact" className={cx("text", "title")}>
-              Liên hệ
+            <a href="/about" className={cx("text", "title")}>
+              Giới thiệu
             </a>
           </div>
 
-          <a href={ user != null ? "/info" : "/login" } className={cx("text")}>
+          <a href={user != null ? "/info" : "/login"} className={cx("text")}>
             <FaRegUser className={cx("a")} />
           </a>
         </div>

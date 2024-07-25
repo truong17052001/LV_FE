@@ -5,7 +5,10 @@ import styles from "./Booking.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Button, Input } from "rsuite";
+
+import { SelectPicker, Button, Input, DatePicker } from "rsuite";
+import { format, parseISO } from "date-fns";
+
 import "rsuite/SelectPicker/styles/index.css";
 import "rsuite/Button/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
@@ -16,21 +19,14 @@ import { getBooking, updateBooking } from "../../../core/services/apiServices";
 const cx = classNames.bind(styles);
 
 function AdminDetailBooking() {
-  const [detailBooking, setDetailBooking] = useState({
-    code: "",
-    title_tour: "",
-    meet_place: "",
-    price: 0,
-    img_tour: "",
-    note: "",
-  });
+  const [booking, setBooking] = useState({});
   const { id } = useParams();
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       const response = await updateBooking(id, {
-        ...detailBooking,
+        ...booking,
       });
       if (response.data.message === "Success") {
         window.location.href = "/admin/booking";
@@ -43,10 +39,10 @@ function AdminDetailBooking() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [tourResponse] = await Promise.all([getBooking(id)]);
+        const [bookingResponse] = await Promise.all([getBooking(id)]);
 
-        if (tourResponse.data.data) {
-          setDetailBooking(tourResponse.data.data);
+        if (bookingResponse.data.data) {
+          setBooking(bookingResponse.data.data);
         }
       } catch (error) {
         console.error(error);
@@ -54,75 +50,262 @@ function AdminDetailBooking() {
     };
     fetchData();
   }, [id]);
-
+  const listA = booking.detail || null;
+  console.log(listA);
   return (
     <div className={cx("wrapper")}>
       <div className={cx("content")}>
         <SideNav />
         <div className={cx("right")}>
           <div className={cx("box")}>
-            <h3>Chi tiết tour</h3>
+            <h3>Chi tiết booking</h3>
             <div className={cx("main")}>
               <div className={cx("info")}>
-                <h5>Mã tour</h5>
+                <h5>Họ tên</h5>
                 <Input
-                  placeholder="Nhập mã tại đây"
-                  value={detailBooking.ngay || ""}
+                  placeholder="Nhập họ tên tại đây"
+                  value={booking.ten || ""}
                   onChange={(value) =>
-                    setDetailBooking((prev) => ({ ...prev, code: value }))
+                    setBooking((prev) => ({ ...prev, ten: value }))
                   }
                 />
-                <h5>Tiêu đề tour</h5>
+                <h5>Địa chỉ</h5>
                 <Input
-                  placeholder="Nhập tiêu đề tại đây"
-                  value={detailBooking.ten || ""}
+                  placeholder="Nhập địa chỉ tại đây"
+                  value={booking.diachi || ""}
                   onChange={(value) =>
-                    setDetailBooking((prev) => ({ ...prev, title_tour: value }))
+                    setBooking((prev) => ({ ...prev, diachi: value }))
                   }
                 />
-                <h5>Nơi tập trung</h5>
-                <Input
-                  placeholder="Nhập nơi tập trung tại đây"
-                  value={detailBooking.diachi || ""}
-                  onChange={(value) =>
-                    setDetailBooking((prev) => ({ ...prev, meet_place: value }))
-                  }
-                />
-                <h5>Giá tour (VND)</h5>
+                <h5>Số điện thoại</h5>
                 <Input
                   type="number"
                   placeholder="Nhập giá tour tại đây"
-                  value={detailBooking.sdt}
+                  value={booking.sdt}
                   onChange={(value) =>
-                    setDetailBooking((prev) => ({
+                    setBooking((prev) => ({
                       ...prev,
-                      price: parseFloat(value),
+                      sdt: value,
                     }))
                   }
                 />
-                <h5>Ảnh</h5>
+                <h5>Tổng tiền</h5>
                 <Input
-                  placeholder="Nhập link ảnh tại đây"
-                  value={detailBooking.email || ""}
+                  type="number"
+                  placeholder="Nhập chi phí đặt chỗ tại đây"
+                  value={booking.tongtien}
                   onChange={(value) =>
-                    setDetailBooking((prev) => ({ ...prev, img_tour: value }))
+                    setBooking((prev) => ({
+                      ...prev,
+                      tongtien: value,
+                    }))
                   }
                 />
-                <h5>Chú thích</h5>
+                <h5>Email</h5>
+                <Input
+                  placeholder="Nhập email tại đây"
+                  value={booking.email || ""}
+                  onChange={(value) =>
+                    setBooking((prev) => ({ ...prev, email: value }))
+                  }
+                />
+                <h5>Trạng thái</h5>
                 <Input
                   placeholder="Nhập chú thích tại đây"
-                  value={detailBooking.note || ""}
+                  value={booking.trangthai || ""}
                   onChange={(value) =>
-                    setDetailBooking((prev) => ({ ...prev, note: value }))
+                    setBooking((prev) => ({ ...prev, trangthai: value }))
                   }
                 />
-                <Button
+                {/* <Button
                   color="green"
                   appearance="primary"
                   onClick={handleUpdate}
                 >
                   Lưu
-                </Button>
+                </Button> */}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={cx("right")}>
+          <div className={cx("box")}>
+            <h3>Danh sách booking</h3>
+            <div className={cx("main")}>
+              <div className={cx("info")}>
+                {listA != null
+                  ? listA.map((value) => {
+                      if (value.loai == 1) {
+                        return (
+                          <div>
+                            <h5>Người lớn</h5>
+                            <h5>Họ và tên</h5>
+                            <Input
+                              style={{ width: 350 }}
+                              block
+                              value={value.ten}
+                              placeholder={"Nhập họ tên"}
+                              onChange={(value) => {
+                                setDetailBooking((prevState) => {
+                                  const newState = { ...prevState };
+                                  const newAdults = [...newState.adults];
+                                  if (i >= 0 && i < newAdults.length) {
+                                    newAdults[i] = {
+                                      ...newAdults[i],
+                                      ten: value,
+                                    };
+                                  } else {
+                                    newAdults.push({ ten: value });
+                                  }
+                                  newState.adults = newAdults;
+                                  return newState;
+                                });
+                              }}
+                            />
+                            <h5>Giới tính</h5>
+                            <SelectPicker
+                              data={[
+                                { label: "Nam", value: "Nam" },
+                                { label: "Nữ", value: "Nữ" },
+                              ]}
+                              style={{ width: 150 }}
+                              searchable={false}
+                              block
+                              value={value.gioitinh}
+                              placeholder={"Giới tính"}
+                              onChange={(value) => {
+                                setDetailBooking((prevState) => {
+                                  const newState = { ...prevState };
+                                  const newAdults = [...newState.adults];
+                                  if (i >= 0 && i < newAdults.length) {
+                                    newAdults[i] = {
+                                      ...newAdults[i],
+                                      gioitinh: value,
+                                    };
+                                  } else {
+                                    newAdults.push({ gioitinh: value });
+                                  }
+                                  newState.adults = newAdults;
+                                  return newState;
+                                });
+                              }}
+                            />
+                            <h5>Ngày sinh</h5>
+                            <div>
+                              <DatePicker
+                                format="yyyy-MM-dd"
+                                placeholder="Chọn ngày ngày sinh"
+                                block
+                                value={parseISO(value.ngaysinh)}
+                                onChange={(value) => {
+                                  setDetailBooking((prevState) => {
+                                    const newState = { ...prevState };
+                                    const newAdults = [...newState.adults];
+                                    if (i >= 0 && i < newAdults.length) {
+                                      newAdults[i] = {
+                                        ...newAdults[i],
+                                        ngaysinh: format(value, "yyyy-MM-dd"),
+                                      };
+                                    } else {
+                                      newAdults.push({
+                                        ngaysinh: format(value, "yyyy-MM-dd"),
+                                      });
+                                    }
+                                    newState.adults = newAdults;
+                                    return newState;
+                                  });
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      } else{
+                        return (
+                          <div>
+                            <h5>Trẻ em</h5>
+                            <h5>Họ và tên</h5>
+                            <Input
+                              style={{ width: 350 }}
+                              block
+                              value={value.ten}
+                              placeholder={"Nhập họ tên"}
+                              onChange={(value) => {
+                                setDetailBooking((prevState) => {
+                                  const newState = { ...prevState };
+                                  const newAdults = [...newState.adults];
+                                  if (i >= 0 && i < newAdults.length) {
+                                    newAdults[i] = {
+                                      ...newAdults[i],
+                                      ten: value,
+                                    };
+                                  } else {
+                                    newAdults.push({ ten: value });
+                                  }
+                                  newState.adults = newAdults;
+                                  return newState;
+                                });
+                              }}
+                            />
+                            <h5>Giới tính</h5>
+                            <SelectPicker
+                              data={[
+                                { label: "Nam", value: "Nam" },
+                                { label: "Nữ", value: "Nữ" },
+                              ]}
+                              style={{ width: 150 }}
+                              searchable={false}
+                              block
+                              value={value.gioitinh}
+                              placeholder={"Giới tính"}
+                              onChange={(value) => {
+                                setDetailBooking((prevState) => {
+                                  const newState = { ...prevState };
+                                  const newAdults = [...newState.adults];
+                                  if (i >= 0 && i < newAdults.length) {
+                                    newAdults[i] = {
+                                      ...newAdults[i],
+                                      gioitinh: value,
+                                    };
+                                  } else {
+                                    newAdults.push({ gioitinh: value });
+                                  }
+                                  newState.adults = newAdults;
+                                  return newState;
+                                });
+                              }}
+                            />
+                            <h5>Ngày sinh</h5>
+                            <div>
+                              <DatePicker
+                                format="yyyy-MM-dd"
+                                placeholder="Chọn ngày ngày sinh"
+                                block
+                                value={parseISO(value.ngaysinh)}
+                                onChange={(value) => {
+                                  setDetailBooking((prevState) => {
+                                    const newState = { ...prevState };
+                                    const newAdults = [...newState.adults];
+                                    if (i >= 0 && i < newAdults.length) {
+                                      newAdults[i] = {
+                                        ...newAdults[i],
+                                        ngaysinh: format(value, "yyyy-MM-dd"),
+                                      };
+                                    } else {
+                                      newAdults.push({
+                                        ngaysinh: format(value, "yyyy-MM-dd"),
+                                      });
+                                    }
+                                    newState.adults = newAdults;
+                                    return newState;
+                                  });
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      }
+                    })
+                  : ""}
               </div>
             </div>
           </div>

@@ -3,7 +3,6 @@
 }
 
 .container {
-  height: 100vh;
   padding: 60px;
   margin: 24px 0px;
   display: flex;
@@ -64,6 +63,42 @@
     border-radius: 10px;
     box-sizing: border-box;
     padding: 24px;
+    height: 100%;
+    .booking {
+      width: 100%;
+      padding: 12px;
+      box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075);
+      border-radius: 12px;
+      display: flex;
+      p {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+      }
+    }
+    
+    .list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding: 16px 8px;
+      color: #2d4271;
+      border-top: 1px solid #d5d5d5;
+      gap: 12px;
+      .field {
+        display: flex;
+        span {
+          flex: 1;
+          display: flex;
+          font-weight: 600;
+          font-size: 17px;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
   }
 }
 .mb {
@@ -122,4 +157,28 @@
   line-height: 24px;
   font-size: 15px;
   background-color: #f0f0f0;
+}
+.date{
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap:12px;
+  div{
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075);
+    display: flex;
+    width: 100%;
+    padding: 12px;
+    span{
+      flex: 3;
+      font-weight: 600;
+      color: red;
+    }
+    p{
+      flex:7;
+      font-size: 15px;
+    }
+
+  }
 }

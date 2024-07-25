@@ -37,7 +37,9 @@ function LoginPage() {
       if (response.data != null) {
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
         toast.success("Đăng nhập thành công!");
-        window.location.href = "/";
+        if (response.data.data.user.quyen == "Admin")
+          window.location.href = "/dashboard";
+        else window.location.href = "/";
       } else {
         window.location.href = "/login";
       }

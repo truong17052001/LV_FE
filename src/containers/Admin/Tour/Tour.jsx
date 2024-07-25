@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
 import styles from "./Tour.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
-import { Modal, Button, Input, InputGroup, IconButton, TagPicker, TagInput } from "rsuite";
+import {
+  Modal,
+  Button,
+  Input,
+  InputGroup,
+  IconButton,
+  TagPicker,
+  TagInput,
+} from "rsuite";
 import SearchIcon from "@rsuite/icons/Search";
 import PlusIcon from "@rsuite/icons/Plus";
 import MinusIcon from "@rsuite/icons/Minus";
@@ -18,7 +27,14 @@ import "rsuite/TagPicker/styles/index.css";
 import "rsuite/TagInput/styles/index.css";
 
 // Services
-import { getHotels, getPlaces, getVehicles, getTours, addTour, deleteTour } from "../../../core/services/apiServices";
+import {
+  getHotels,
+  getPlaces,
+  getVehicles,
+  getTours,
+  addTour,
+  deleteTour,
+} from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
@@ -31,24 +47,48 @@ function AdminTour() {
   const [vehicles, setVehicles] = useState([]);
 
   const [openAdd, setOpenAdd] = useState(false);
- 
+
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
-  const handleChange = (value, name) => setNewTour({ ...newTour, [name]: value });
+  const handleChange = (value, name) =>
+    setNewTour({ ...newTour, [name]: value });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [toursResponse, hotelsResponse, placesResponse, vehiclesResponse] = await Promise.all([
+        const [
+          toursResponse,
+          hotelsResponse,
+          placesResponse,
+          vehiclesResponse,
+        ] = await Promise.all([
           getTours(),
           getHotels(),
           getPlaces(),
-          getVehicles()
+          getVehicles(),
         ]);
         if (toursResponse.data.data) setTours(toursResponse.data.data);
-        if (hotelsResponse.data.data) setHotels(hotelsResponse.data.data.map(hotel => ({ label: hotel.ten, value: hotel.id })));
-        if (placesResponse.data.data) setPlaces(placesResponse.data.data.map(place => ({ label: place.ten, value: place.id })));
-        if (vehiclesResponse.data.data) setVehicles(vehiclesResponse.data.data.map(vehicle => ({ label: vehicle.ten, value: vehicle.id })));
+        if (hotelsResponse.data.data)
+          setHotels(
+            hotelsResponse.data.data.map((hotel) => ({
+              label: hotel.ten,
+              value: hotel.id,
+            }))
+          );
+        if (placesResponse.data.data)
+          setPlaces(
+            placesResponse.data.data.map((place) => ({
+              label: place.ten,
+              value: place.id,
+            }))
+          );
+        if (vehiclesResponse.data.data)
+          setVehicles(
+            vehiclesResponse.data.data.map((vehicle) => ({
+              label: vehicle.ten,
+              value: vehicle.id,
+            }))
+          );
       } catch (error) {
         console.log(error);
       }
@@ -61,15 +101,16 @@ function AdminTour() {
       item.tieude.toLowerCase().includes(search.toLowerCase()) ||
       item.matour.toLowerCase().includes(search.toLowerCase())
   );
-    console.log(newTour);
+
   const handleAdd = async () => {
     try {
       const response = await addTour(newTour);
       if (response.data.message === "Success") {
+        toast.success("Thêm tour thành công");
         window.location.href = "/admin/tour";
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -81,87 +122,90 @@ function AdminTour() {
         window.location.href = "/admin/tour";
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
-  const columns = useMemo(() => [
-    {
-      name: "STT",
-      selector: (row) => row.id,
-      sortable: true,
-      width: "70px",
-    },
-    {
-      name: "Ảnh",
-      selector: (row) => <img src={row.anh} alt="tour" />,
-      sortable: true,
-      width: "120px",
-    },
-    {
-      name: "Mã tour",
-      selector: (row) => row.matour,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Tiêu đề",
-      selector: (row) => row.tieude,
-      sortable: true,
-      width: "300px",
-    },
-    {
-      name: "Giá người lớn",
-      selector: (row) => parseInt(row.gia_a).toLocaleString("en-US") + " VND",
-      sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Giá trẻ em",
-      selector: (row) => parseInt(row.gia_c).toLocaleString("en-US") + " VND",
-      sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Nơi tập trung",
-      selector: (row) => row.noikh,
-      sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Trạng thái",
-      selector: (row) => row.trangthai,
-      sortable: true,
-      width: "120px",
-    },
-    {
-      name: "Thao tác",
-      selector: (row) => (
-        <div className={cx("action")}>
-          <IconButton
-            width={"12px"}
-            appearance="primary"
-            color="red"
-            icon={<MinusIcon />}
-            onClick={(e) => handleDelete(row.id, e)}
-          >
-            Xóa
-          </IconButton>
-          <IconButton
-            width={"12px"}
-            appearance="primary"
-            color="blue"
-            icon={<EyeCloseIcon />}
-            href={`/admin/detail_tour/${row.id}`}
-          >
-            Xem
-          </IconButton>
-        </div>
-      ),
-      sortable: true,
-      width: "250px",
-    },
-  ], []);
+  const columns = useMemo(
+    () => [
+      {
+        name: "STT",
+        selector: (row) => row.id,
+        sortable: true,
+        width: "70px",
+      },
+      {
+        name: "Ảnh",
+        selector: (row) => <img src={row.anh} alt="tour" />,
+        sortable: true,
+        width: "120px",
+      },
+      {
+        name: "Mã tour",
+        selector: (row) => row.matour,
+        sortable: true,
+        width: "200px",
+      },
+      {
+        name: "Tiêu đề",
+        selector: (row) => row.tieude,
+        sortable: true,
+        width: "300px",
+      },
+      {
+        name: "Giá người lớn",
+        selector: (row) => parseInt(row.gia_a).toLocaleString("en-US") + " VND",
+        sortable: true,
+        width: "150px",
+      },
+      {
+        name: "Giá trẻ em",
+        selector: (row) => parseInt(row.gia_c).toLocaleString("en-US") + " VND",
+        sortable: true,
+        width: "150px",
+      },
+      {
+        name: "Nơi tập trung",
+        selector: (row) => row.noikh,
+        sortable: true,
+        width: "150px",
+      },
+      {
+        name: "Trạng thái",
+        selector: (row) => row.trangthai,
+        sortable: true,
+        width: "120px",
+      },
+      {
+        name: "Thao tác",
+        selector: (row) => (
+          <div className={cx("action")}>
+            <IconButton
+              width={"12px"}
+              appearance="primary"
+              color="red"
+              icon={<MinusIcon />}
+              onClick={(e) => handleDelete(row.id, e)}
+            >
+              Xóa
+            </IconButton>
+            <IconButton
+              width={"12px"}
+              appearance="primary"
+              color="blue"
+              icon={<EyeCloseIcon />}
+              href={`/admin/detail_tour/${row.id}`}
+            >
+              Xem
+            </IconButton>
+          </div>
+        ),
+        sortable: true,
+        width: "250px",
+      },
+    ],
+    []
+  );
 
   return (
     <div className={cx("wrapper")}>
@@ -253,7 +297,7 @@ function AdminTour() {
                 placeholder={"Nhập link ảnh tại đây"}
                 value={newTour.images}
                 onChange={(value) => handleChange(value, "images")}
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
               />
               <h5>Chú thích</h5>
               <Input
@@ -266,7 +310,7 @@ function AdminTour() {
                 data={hotels}
                 value={newTour.hotels}
                 onChange={(value) => handleChange(value, "hotels")}
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 placeholder="Chọn khách sạn"
               />
               <h5>Địa danh</h5>
@@ -274,7 +318,7 @@ function AdminTour() {
                 data={places}
                 value={newTour.places}
                 onChange={(value) => handleChange(value, "places")}
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 placeholder="Chọn địa danh"
               />
               <h5>Phương tiện</h5>
@@ -282,7 +326,7 @@ function AdminTour() {
                 data={vehicles}
                 value={newTour.vehicles}
                 onChange={(value) => handleChange(value, "vehicles")}
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 placeholder="Chọn phương tiện"
               />
             </div>

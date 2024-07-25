@@ -1,6 +1,6 @@
 // AdminDateGo.jsx
-
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
 import styles from "./DateGo.module.scss";
@@ -19,6 +19,7 @@ import SearchIcon from "@rsuite/icons/Search";
 import PlusIcon from "@rsuite/icons/Plus";
 import MinusIcon from "@rsuite/icons/Minus";
 import EditIcon from "@rsuite/icons/Edit";
+import FileDownloadIcon from "@rsuite/icons/FileDownload";
 import {
   getDates,
   getDetailDate,
@@ -27,6 +28,7 @@ import {
   deleteDate,
   getTours,
   getGuiders,
+  print,
 } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
@@ -90,6 +92,29 @@ function AdminDateGo() {
     setOpenEdit(false);
   };
 
+  const handlePrint = async (id) => {
+    let url = `http://127.0.0.1:8000/api/client/date/${id}/people/export`;
+
+    axios({
+      url: url,
+      method: "GET",
+      responseType: "blob",
+    })
+      .then((response) => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(new Blob([response.data]));
+        link.download = "customers.xlsx";
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading the file:", error);
+      });
+  };
+
   const handleAdd = async () => {
     try {
       const response = await addDate(detailDate);
@@ -130,9 +155,7 @@ function AdminDateGo() {
       tours[item.matour - 1]?.matour
         .toLowerCase()
         .includes(search.toLowerCase()) ||
-      guiders[item.mahdv - 1]?.ten
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      guiders[item.mahdv - 1]?.ten.toLowerCase().includes(search.toLowerCase())
   );
 
   const columns = [
@@ -191,10 +214,18 @@ function AdminDateGo() {
           >
             Sửa
           </IconButton>
+          <IconButton
+            appearance="primary"
+            color="blue"
+            icon={<FileDownloadIcon />}
+            onClick={() => handlePrint(row.id)}
+          >
+            In danh sách
+          </IconButton>
         </div>
       ),
       sortable: true,
-      width: "250px",
+      width: "400px",
     },
   ];
 
@@ -223,6 +254,7 @@ function AdminDateGo() {
                   >
                     Thêm
                   </IconButton>
+
                   <InputGroup style={{ width: 400 }}>
                     <Input
                       placeholder={"Tìm kiếm theo tên hoặc mã"}

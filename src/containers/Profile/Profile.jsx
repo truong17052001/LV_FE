@@ -5,15 +5,15 @@ import styles from "./Profile.module.scss";
 //components
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import CardTour from "../../components/CardTour/CardTour";
 //img
 import avatar from "../../assets/img/avatar.jpg";
 //icon
 import { IoExitOutline } from "react-icons/io5";
 import { CiSaveDown2 } from "react-icons/ci";
 //rsuite
-import { Input, DatePicker, Button } from "rsuite";
+import { Input, DatePicker, Button, Modal } from "rsuite";
 import { parseISO, format } from "date-fns";
+import "rsuite/Modal/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/Input/styles/index.css";
 import "rsuite/Button/styles/index.css";
@@ -22,8 +22,12 @@ import {
   getUser,
   updateUser,
   changePassword,
+  getOrdered,
+  getDetailDate,
 } from "../../core/services/apiServices";
+
 const cx = classNames.bind(styles);
+
 const handleLogout = () => {
   localStorage.removeItem("user");
   window.location.href = "/";
@@ -31,11 +35,17 @@ const handleLogout = () => {
 
 const user = localStorage.getItem("user");
 const customer = JSON.parse(user);
+
 function ProfilePage() {
   const [section, setSection] = useState(1);
   const [info, setInfo] = useState([]);
+  const [booking, setBooking] = useState([]);
+  const [date, setDate] = useState([]);
   const [password, setPassword] = useState([]);
-  console.log(password);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +53,10 @@ function ProfilePage() {
         const userResponse = await getUser(customer.id);
         if (userResponse.data.data) {
           setInfo(userResponse.data.data);
+        }
+        const bookingResponse = await getOrdered(customer.id);
+        if (bookingResponse.data.data) {
+          setBooking(bookingResponse.data.data.bookings);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -55,7 +69,16 @@ function ProfilePage() {
   const handleDirect = (number) => {
     setSection(number);
   };
-
+  const handleView = async (id) => {
+    try {
+      const response = await getDetailDate(id);
+      console.log(response.data.data);
+      setDate(response.data.data);
+      handleOpen();
+    } catch (error) {
+      toast.error(error.response.data.error[0]);
+    }
+  };
   const handleUpdate = async () => {
     try {
       const response = await updateUser(customer.id, info);
@@ -64,7 +87,7 @@ function ProfilePage() {
         window.location.href = `/info`;
       }
     } catch (error) {
-      console.error("Error update info:", error);
+      toast.error(error.response.data.error[0]);
     }
   };
   const handleChangePass = async () => {
@@ -79,7 +102,7 @@ function ProfilePage() {
         }
       }
     } catch (error) {
-      console.error("Error update info:", error);
+      toast.error(error.response.data.error[0]);
     }
   };
   return (
@@ -298,7 +321,64 @@ function ProfilePage() {
               <h5>Đơn đặt chỗ</h5>
               <p>Gồm những tour khách hàng quan tâm.</p>
             </div>
-            <div className={cx("content")}></div>
+            <div className={cx("list")}>
+              <div className={cx("field")}>
+                <span>Số booking</span>
+                <span>Ngày đặt</span>
+                <span>Tổng tiền (VND)</span>
+                <span>Trạng thái</span>
+                <span>Thao tác</span>
+              </div>
+              {booking.map((value) => {
+                return (
+                  <div className={cx("booking")}>
+                    <p>{value.sobooking}</p>
+                    <p>{value.ngay}</p>
+                    <p>{parseInt(value.tongtien).toLocaleString("en-US")}</p>
+                    <p>{value.trangthai}</p>
+                    <p>
+                      <Button
+                        color="blue"
+                        size="sx"
+                        appearance="primary"
+                        block
+                        startIcon={<IoExitOutline />}
+                        onClick={() => handleView(value.mand)}
+                      >
+                        Xem
+                      </Button>
+                    </p>
+                  </div>
+                );
+              })}
+              ;
+            </div>
+            <Modal open={open} onClose={handleClose}>
+              <Modal.Header>
+                <Modal.Title>Chi tiết</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className={cx("date")}>
+                  <img src={date.length==0?"":date.tour.anh}></img>
+                  <div>
+                    <span>Ngày đi</span>
+                    <p>{date.length==0?"":date.ngay}</p>
+                  </div>
+                  <div>
+                    <span>Số ngày đi</span>
+                    <p>{date.length==0?"":date.songaydi}</p>
+                  </div>
+                  <div>
+                    <span>Tiêu đề tour</span>
+                    <p>{date.length==0?"":date.tour.tieude}</p>
+                  </div>
+                  <div>
+                    <span>Nơi khởi hành</span>
+                    <p>{date.length==0?"":date.tour.noikh}</p>
+                  </div>
+                </div>
+              </Modal.Body>
+            </Modal>
           </div>
         </div>
       </div>
