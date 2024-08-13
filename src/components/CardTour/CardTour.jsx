@@ -17,7 +17,9 @@ function CardTour({
   price,
   img_tour,
   state,
+  date
 }) {
+  // console.log(date);
   return (
     <div className={cx("item")}>
       <div className={cx("img")}>
@@ -33,7 +35,7 @@ function CardTour({
         </div> */}
       </div>
       <div className={cx("body")}>
-        {/* <p className={cx("date")}> 3 ngày</p> */}
+        {date && date[0]  ? <p className={cx("date")}>{date[0].songaydi} ngày</p> : ""}
         <p className={cx("title")}>
           <a href={`/detail/${id}`}>{title_tour}</a>
         </p>
@@ -47,9 +49,16 @@ function CardTour({
         <p className={cx("departure")}>
           Nơi khởi hành: <span>{meet_place}</span>
         </p>
+        {date && date[0] != null ? (
+          <p className={cx("departure")}>
+            Ngày khởi hành: <span>{date[0].ngay}</span>
+          </p>
+        ) : (
+          ""
+        )}
         <div className={cx("price")}>
-          Giá:              
-          <del>           
+          Giá:
+          <del>
             {parseInt(price * 1 + (price * 6) / 100).toLocaleString("en-US")} ₫
           </del>
           <a href={`/detail/${id}`}>
@@ -61,10 +70,15 @@ function CardTour({
         </div>
       </div>
       <div className={cx("footer")}>
-        {state == "Ưu đãi" ? <div>Giảm 6%</div> : ""}
-        {/* <p>
-          Số chỗ còn <span>{dateGo.chongoi}</span>
-        </p> */}
+        {state == "Ưu đãi" ? <div>Giảm 6%</div> : <div>Giá tiêu chuẩn</div>}
+
+        {date && date[0] != null ? (
+          <p>
+            Số chỗ còn <span>{date[0].chongoi}</span>
+          </p>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

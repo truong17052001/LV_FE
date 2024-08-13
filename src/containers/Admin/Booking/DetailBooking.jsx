@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./Booking.module.scss";
@@ -14,21 +15,45 @@ import "rsuite/Button/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
 // Services
-import { getBooking, updateBooking } from "../../../core/services/apiServices";
+import {
+  getBooking,
+  updateBooking,
+  updatePayment,
+} from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
 function AdminDetailBooking() {
   const [booking, setBooking] = useState({});
+  const [detailBooking, setDetailBooking] = useState({
+    adults: [],
+    childrens: [],
+  });
   const { id } = useParams();
 
-  const handleUpdate = async (e) => {
+  const handleUpdateBooking = async (e) => {
     e.preventDefault();
     try {
       const response = await updateBooking(id, {
         ...booking,
       });
       if (response.data.message === "Success") {
+        toast.success("Cập nhật thông tin đặt chỗ thành công");
+        window.location.href = "/admin/booking";
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUpdatePayment = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await updatePayment(payment.id, {
+        ...payment,
+      });
+      if (response.data.message === "Success") {
+        toast.success("Cập nhật thông tin thanh toán thành công");
         window.location.href = "/admin/booking";
       }
     } catch (error) {
@@ -52,6 +77,8 @@ function AdminDetailBooking() {
   }, [id]);
   const listA = booking.detail || null;
   console.log(listA);
+  console.log(detailBooking);
+
   return (
     <div className={cx("wrapper")}>
       <div className={cx("content")}>
@@ -61,6 +88,14 @@ function AdminDetailBooking() {
             <h3>Chi tiết booking</h3>
             <div className={cx("main")}>
               <div className={cx("info")}>
+                <h5>Ngày đặt</h5>
+                <Input
+                  disabled
+                  value={booking.ngay || ""}
+                  onChange={(value) =>
+                    setBooking((prev) => ({ ...prev, ten: value }))
+                  }
+                />
                 <h5>Họ tên</h5>
                 <Input
                   placeholder="Nhập họ tên tại đây"
@@ -80,7 +115,7 @@ function AdminDetailBooking() {
                 <h5>Số điện thoại</h5>
                 <Input
                   type="number"
-                  placeholder="Nhập giá tour tại đây"
+                  placeholder="Nhập số điện thoại tại đây"
                   value={booking.sdt}
                   onChange={(value) =>
                     setBooking((prev) => ({
@@ -92,8 +127,9 @@ function AdminDetailBooking() {
                 <h5>Tổng tiền</h5>
                 <Input
                   type="number"
+                  disabled
                   placeholder="Nhập chi phí đặt chỗ tại đây"
-                  value={booking.tongtien}
+                  value={parseInt(booking.tongtien).toLocaleString("en-US")}
                   onChange={(value) =>
                     setBooking((prev) => ({
                       ...prev,
@@ -111,19 +147,26 @@ function AdminDetailBooking() {
                 />
                 <h5>Trạng thái</h5>
                 <Input
-                  placeholder="Nhập chú thích tại đây"
+                  placeholder="Nhập trạng thái tại đây"
                   value={booking.trangthai || ""}
                   onChange={(value) =>
                     setBooking((prev) => ({ ...prev, trangthai: value }))
                   }
                 />
-                {/* <Button
+                <Button
                   color="green"
                   appearance="primary"
-                  onClick={handleUpdate}
+                  onClick={handleUpdateBooking}
                 >
-                  Lưu
-                </Button> */}
+                  Cập nhật thông tin đặt chỗ
+                </Button>
+                <Button
+                  color="green"
+                  appearance="primary"
+                  onClick={handleUpdatePayment}
+                >
+                  Cập nhật thông tin thanh toán
+                </Button>
               </div>
             </div>
           </div>
@@ -144,23 +187,24 @@ function AdminDetailBooking() {
                               style={{ width: 350 }}
                               block
                               value={value.ten}
+                              disabled
                               placeholder={"Nhập họ tên"}
-                              onChange={(value) => {
-                                setDetailBooking((prevState) => {
-                                  const newState = { ...prevState };
-                                  const newAdults = [...newState.adults];
-                                  if (i >= 0 && i < newAdults.length) {
-                                    newAdults[i] = {
-                                      ...newAdults[i],
-                                      ten: value,
-                                    };
-                                  } else {
-                                    newAdults.push({ ten: value });
-                                  }
-                                  newState.adults = newAdults;
-                                  return newState;
-                                });
-                              }}
+                              // onChange={(value) => {
+                              //   setDetailBooking((prevState) => {
+                              //     const newState = { ...prevState };
+                              //     const newAdults = [...newState.adults];
+                              //     if (i >= 0 && i < newAdults.length) {
+                              //       newAdults[i] = {
+                              //         ...newAdults[i],
+                              //         ten: value,
+                              //       };
+                              //     } else {
+                              //       newAdults.push({ ten: value });
+                              //     }
+                              //     newState.adults = newAdults;
+                              //     return newState;
+                              //   });
+                              // }}
                             />
                             <h5>Giới tính</h5>
                             <SelectPicker
@@ -171,24 +215,25 @@ function AdminDetailBooking() {
                               style={{ width: 150 }}
                               searchable={false}
                               block
+                              disabled
                               value={value.gioitinh}
                               placeholder={"Giới tính"}
-                              onChange={(value) => {
-                                setDetailBooking((prevState) => {
-                                  const newState = { ...prevState };
-                                  const newAdults = [...newState.adults];
-                                  if (i >= 0 && i < newAdults.length) {
-                                    newAdults[i] = {
-                                      ...newAdults[i],
-                                      gioitinh: value,
-                                    };
-                                  } else {
-                                    newAdults.push({ gioitinh: value });
-                                  }
-                                  newState.adults = newAdults;
-                                  return newState;
-                                });
-                              }}
+                              // onChange={(value) => {
+                              //   setDetailBooking((prevState) => {
+                              //     const newState = { ...prevState };
+                              //     const newAdults = [...newState.adults];
+                              //     if (i >= 0 && i < newAdults.length) {
+                              //       newAdults[i] = {
+                              //         ...newAdults[i],
+                              //         gioitinh: value,
+                              //       };
+                              //     } else {
+                              //       newAdults.push({ gioitinh: value });
+                              //     }
+                              //     newState.adults = newAdults;
+                              //     return newState;
+                              //   });
+                              // }}
                             />
                             <h5>Ngày sinh</h5>
                             <div>
@@ -196,30 +241,31 @@ function AdminDetailBooking() {
                                 format="yyyy-MM-dd"
                                 placeholder="Chọn ngày ngày sinh"
                                 block
+                                disabled
                                 value={parseISO(value.ngaysinh)}
-                                onChange={(value) => {
-                                  setDetailBooking((prevState) => {
-                                    const newState = { ...prevState };
-                                    const newAdults = [...newState.adults];
-                                    if (i >= 0 && i < newAdults.length) {
-                                      newAdults[i] = {
-                                        ...newAdults[i],
-                                        ngaysinh: format(value, "yyyy-MM-dd"),
-                                      };
-                                    } else {
-                                      newAdults.push({
-                                        ngaysinh: format(value, "yyyy-MM-dd"),
-                                      });
-                                    }
-                                    newState.adults = newAdults;
-                                    return newState;
-                                  });
-                                }}
+                                // onChange={(value) => {
+                                //   setDetailBooking((prevState) => {
+                                //     const newState = { ...prevState };
+                                //     const newAdults = [...newState.adults];
+                                //     if (i >= 0 && i < newAdults.length) {
+                                //       newAdults[i] = {
+                                //         ...newAdults[i],
+                                //         ngaysinh: format(value, "yyyy-MM-dd"),
+                                //       };
+                                //     } else {
+                                //       newAdults.push({
+                                //         ngaysinh: format(value, "yyyy-MM-dd"),
+                                //       });
+                                //     }
+                                //     newState.adults = newAdults;
+                                //     return newState;
+                                //   });
+                                // }}
                               />
                             </div>
                           </div>
                         );
-                      } else{
+                      } else {
                         return (
                           <div>
                             <h5>Trẻ em</h5>
@@ -229,22 +275,22 @@ function AdminDetailBooking() {
                               block
                               value={value.ten}
                               placeholder={"Nhập họ tên"}
-                              onChange={(value) => {
-                                setDetailBooking((prevState) => {
-                                  const newState = { ...prevState };
-                                  const newAdults = [...newState.adults];
-                                  if (i >= 0 && i < newAdults.length) {
-                                    newAdults[i] = {
-                                      ...newAdults[i],
-                                      ten: value,
-                                    };
-                                  } else {
-                                    newAdults.push({ ten: value });
-                                  }
-                                  newState.adults = newAdults;
-                                  return newState;
-                                });
-                              }}
+                              // onChange={(value) => {
+                              //   setDetailBooking((prevState) => {
+                              //     const newState = { ...prevState };
+                              //     const newAdults = [...newState.adults];
+                              //     if (i >= 0 && i < newAdults.length) {
+                              //       newAdults[i] = {
+                              //         ...newAdults[i],
+                              //         ten: value,
+                              //       };
+                              //     } else {
+                              //       newAdults.push({ ten: value });
+                              //     }
+                              //     newState.adults = newAdults;
+                              //     return newState;
+                              //   });
+                              // }}
                             />
                             <h5>Giới tính</h5>
                             <SelectPicker
@@ -257,22 +303,22 @@ function AdminDetailBooking() {
                               block
                               value={value.gioitinh}
                               placeholder={"Giới tính"}
-                              onChange={(value) => {
-                                setDetailBooking((prevState) => {
-                                  const newState = { ...prevState };
-                                  const newAdults = [...newState.adults];
-                                  if (i >= 0 && i < newAdults.length) {
-                                    newAdults[i] = {
-                                      ...newAdults[i],
-                                      gioitinh: value,
-                                    };
-                                  } else {
-                                    newAdults.push({ gioitinh: value });
-                                  }
-                                  newState.adults = newAdults;
-                                  return newState;
-                                });
-                              }}
+                              // onChange={(value) => {
+                              //   setDetailBooking((prevState) => {
+                              //     const newState = { ...prevState };
+                              //     const newAdults = [...newState.adults];
+                              //     if (i >= 0 && i < newAdults.length) {
+                              //       newAdults[i] = {
+                              //         ...newAdults[i],
+                              //         gioitinh: value,
+                              //       };
+                              //     } else {
+                              //       newAdults.push({ gioitinh: value });
+                              //     }
+                              //     newState.adults = newAdults;
+                              //     return newState;
+                              //   });
+                              // }}
                             />
                             <h5>Ngày sinh</h5>
                             <div>
@@ -281,24 +327,24 @@ function AdminDetailBooking() {
                                 placeholder="Chọn ngày ngày sinh"
                                 block
                                 value={parseISO(value.ngaysinh)}
-                                onChange={(value) => {
-                                  setDetailBooking((prevState) => {
-                                    const newState = { ...prevState };
-                                    const newAdults = [...newState.adults];
-                                    if (i >= 0 && i < newAdults.length) {
-                                      newAdults[i] = {
-                                        ...newAdults[i],
-                                        ngaysinh: format(value, "yyyy-MM-dd"),
-                                      };
-                                    } else {
-                                      newAdults.push({
-                                        ngaysinh: format(value, "yyyy-MM-dd"),
-                                      });
-                                    }
-                                    newState.adults = newAdults;
-                                    return newState;
-                                  });
-                                }}
+                                // onChange={(value) => {
+                                //   setDetailBooking((prevState) => {
+                                //     const newState = { ...prevState };
+                                //     const newAdults = [...newState.adults];
+                                //     if (i >= 0 && i < newAdults.length) {
+                                //       newAdults[i] = {
+                                //         ...newAdults[i],
+                                //         ngaysinh: format(value, "yyyy-MM-dd"),
+                                //       };
+                                //     } else {
+                                //       newAdults.push({
+                                //         ngaysinh: format(value, "yyyy-MM-dd"),
+                                //       });
+                                //     }
+                                //     newState.adults = newAdults;
+                                //     return newState;
+                                //   });
+                                // }}
                               />
                             </div>
                           </div>

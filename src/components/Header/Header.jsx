@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import styles from "./Header.module.scss";
-
+//icon
 import { FaInstagram } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
@@ -13,6 +13,9 @@ const cx = classNames.bind(styles);
 /* eslint-disable react/prop-types */
 function Header({ type }) {
   const user = localStorage.getItem("user");
+
+  // console.log(currentUrl);
+
   return (
     <div className={cx("wrapper", type != 1 ? "bg1" : "")}>
       {type != 1 ? <div className={cx("foverlay")}></div> : ""}
@@ -64,10 +67,10 @@ function Header({ type }) {
             <a href="/" className={cx("text", "title")}>
               Trang chủ
             </a>
-
+            {/* 
             <a href="/tour" className={cx("text", "title")}>
               Du lịch
-            </a>
+            </a> */}
             <a className={cx("brand")}>
               <img
                 src="https://mytour.webtravel.vn/images/logo-white.svg"
@@ -75,12 +78,15 @@ function Header({ type }) {
               ></img>
               Quang Trường Travel
             </a>
-            <a href="/news" className={cx("text", "title")}>
+            <a href="/tour" className={cx("text", "title")}>
+              Du lịch
+            </a>
+            {/* <a href="/news" className={cx("text", "title")}>
               Tin tức
             </a>
             <a href="/about" className={cx("text", "title")}>
               Giới thiệu
-            </a>
+            </a> */}
           </div>
 
           <a href={user != null ? "/info" : "/login"} className={cx("text")}>

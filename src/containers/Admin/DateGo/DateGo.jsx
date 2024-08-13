@@ -1,5 +1,6 @@
 // AdminDateGo.jsx
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
@@ -54,7 +55,6 @@ function AdminDateGo() {
         if (toursResponse.data.data) {
           setTours(toursResponse.data.data);
         }
-
         const guidersResponse = await getGuiders();
         if (guidersResponse.data.data) {
           setGuiders(guidersResponse.data.data);
@@ -119,10 +119,11 @@ function AdminDateGo() {
     try {
       const response = await addDate(detailDate);
       if (response.data.message === "Success") {
+        toast.success("Thêm ngày đi thành công");
         window.location.href = "/admin/date";
       }
     } catch (error) {
-      console.error("Error adding date:", error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -131,10 +132,11 @@ function AdminDateGo() {
     try {
       const response = await updateDate(detailDate.id, detailDate);
       if (response.data.message === "Success") {
+        toast.success("Cập nhật ngày đi thành công");
         window.location.href = "/admin/date";
       }
     } catch (error) {
-      console.error("Error updating date:", error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -143,6 +145,7 @@ function AdminDateGo() {
     try {
       const response = await deleteDate(id);
       if (response.data.message === "Success") {
+        toast.success("Xóa ngày đi thành công");
         window.location.href = "/admin/date";
       }
     } catch (error) {
@@ -155,7 +158,10 @@ function AdminDateGo() {
       tours[item.matour - 1]?.matour
         .toLowerCase()
         .includes(search.toLowerCase()) ||
-      guiders[item.mahdv - 1]?.ten.toLowerCase().includes(search.toLowerCase())
+      guiders[item.mahdv - 1]?.ten
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      item.ngay.toLowerCase().includes(search.toLowerCase())
   );
 
   const columns = [
@@ -182,17 +188,18 @@ function AdminDateGo() {
       name: "Số chỗ còn lại",
       selector: (row) => row.chongoi,
       sortable: true,
-      width: "150px",
+      width: "100px",
     },
     {
       name: "Mã tour",
-      selector: (row) => tours[row.matour - 1]?.matour,
+      selector: (row) => tours[row.matour -1 ]?.matour,
       sortable: true,
     },
     {
       name: "Hướng dẫn viên",
       selector: (row) => guiders[row.mahdv - 1]?.ten,
       sortable: true,
+      width: "150px",
     },
     {
       name: "Thao tác",
@@ -257,7 +264,9 @@ function AdminDateGo() {
 
                   <InputGroup style={{ width: 400 }}>
                     <Input
-                      placeholder={"Tìm kiếm theo tên hoặc mã"}
+                      placeholder={
+                        "Tìm kiếm theo tên hdv hoặc mã tour và ngày đi"
+                      }
                       value={search}
                       onChange={setSearch}
                     />
@@ -286,13 +295,21 @@ function AdminDateGo() {
                 placeholder="Chọn ngày khởi hành"
                 block
                 value={parseISO(detailDate.ngay)}
-                onChange={(value) =>
-                  setDetailDate((prev) => ({
-                    ...prev,
-                    ngay: format(value, "yyyy-MM-dd"),
-                    thang: getMonth(value) + 1,
-                  }))
-                }
+                onChange={(value) => {
+                  if (value) {
+                    setDetailDate((prev) => ({
+                      ...prev,
+                      ngay: format(value, "yyyy-MM-dd"),
+                      thang: getMonth(value) + 1,
+                    }));
+                  } else {
+                    setDetailDate((prev) => ({
+                      ...prev,
+                      ngay: null,
+                      thang: getMonth(null) + 1,
+                    }));
+                  }
+                }}
                 shouldDisableDate={(date) => isBefore(date, new Date())}
               />
               <h5>Tháng khởi hành</h5>
@@ -328,7 +345,7 @@ function AdminDateGo() {
               <h5>Mã tour</h5>
               <SelectPicker
                 data={tours.map((item) => ({
-                  label: item.matour,
+                  label: " ID: " + item.id + " - " + item.matour,
                   value: item.id,
                 }))}
                 searchable
@@ -383,13 +400,21 @@ function AdminDateGo() {
                 placeholder="Chọn ngày khởi hành"
                 block
                 value={parseISO(detailDate.ngay)}
-                onChange={(value) =>
-                  setDetailDate((prev) => ({
-                    ...prev,
-                    ngay: format(value, "yyyy-MM-dd"),
-                    thang: getMonth(value) + 1,
-                  }))
-                }
+                onChange={(value) => {
+                  if (value) {
+                    setDetailDate((prev) => ({
+                      ...prev,
+                      ngay: format(value, "yyyy-MM-dd"),
+                      thang: getMonth(value) + 1,
+                    }));
+                  } else {
+                    setDetailDate((prev) => ({
+                      ...prev,
+                      ngay: null,
+                      thang: getMonth(null) + 1,
+                    }));
+                  }
+                }}
                 shouldDisableDate={(date) => isBefore(date, new Date())}
               />
               <h5>Tháng khởi hành</h5>
@@ -413,7 +438,7 @@ function AdminDateGo() {
               <h5>Mã tour</h5>
               <SelectPicker
                 data={tours.map((item) => ({
-                  label: item.matour,
+                  label: " ID: " + item.id + " - " + item.matour,
                   value: item.id,
                 }))}
                 searchable
@@ -430,7 +455,7 @@ function AdminDateGo() {
               <h5>Hướng dẫn viên</h5>
               <SelectPicker
                 data={guiders.map((item) => ({
-                  label: item.ten,
+                  label: " ID: " + item.id + " - " + item.ten,
                   value: item.id,
                 }))}
                 searchable

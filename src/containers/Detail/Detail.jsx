@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import parse from "html-react-parser";
@@ -41,12 +41,26 @@ function DetailPage() {
   const [click, setClick] = useState(0);
   const [openDateGo, setOpenDateGo] = useState(false);
   const handleCloseDateGo = () => setOpenDateGo(false);
-  const handleOpenDateGo = () => {
+  const elementRef = useRef(null);
+
+  const scrollToElement = () => {
+    if (elementRef.current) {
+      elementRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  const booking = (id) => {
     if (user) {
-      setOpenDateGo(true);
+      window.location.href = `/booking/${id}`;
     } else toast.warn("Bạn phải đăng nhập để đặt tour!");
   };
   const { id } = useParams();
+  const isDateWithin3Days = (dateString) => {
+    const targetDate = new Date(dateString);
+    const currentDate = new Date();
+    const timeDifference = targetDate.getTime() - currentDate.getTime();
+    const daysDifference = timeDifference / (1000 * 3600 * 24);
+    return daysDifference >= 3;
+  };
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -55,11 +69,7 @@ function DetailPage() {
           setTours(response.data.data);
         }
         const [hotelResponse, placeResponse, vehicleResponse] =
-        await Promise.all([
-          getHotels(),
-          getPlaces(),
-          getVehicles(),
-        ]);
+          await Promise.all([getHotels(), getPlaces(), getVehicles()]);
         if (hotelResponse.data.data) {
           setHotel(hotelResponse.data.data);
         }
@@ -82,7 +92,30 @@ function DetailPage() {
   const hotel = tours.hotel || [];
   const vehicle = tours.vehicle || [];
   const place = tours.place || [];
-
+  const result = vehicles
+    .map((vehicleItem) => {
+      const matchingVehicle = vehicle.find(
+        (vehicleElement) => vehicleElement.mapt === vehicleItem.id
+      );
+      return matchingVehicle ? vehicleItem.ten : null;
+    })
+    .filter((name) => name !== null);
+  const result2 = hotels
+    .map((hotelItem) => {
+      const matchingHotel = hotel.find(
+        (hotelElement) => hotelElement.mapt === hotelItem.id
+      );
+      return matchingHotel ? hotelItem.ten + ", ": null;
+    })
+    .filter((name) => name !== null);
+  const result1 = places
+    .map((placeItem) => {
+      const matchingPlace = place.find(
+        (placeElement) => placeElement.madd === placeItem.id
+      );
+      return matchingPlace ? placeItem.ten + ", " : null;
+    })
+    .filter((name) => name !== null);
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -114,10 +147,10 @@ function DetailPage() {
           <div className={cx("right")}>
             <span> {parseInt(tours.gia_a).toLocaleString("en-US")} VND</span>/
             khách
-            <div onClick={handleOpenDateGo}>
+            <div onClick={scrollToElement}>
               <a>
                 <FaShoppingCart />
-                Chọn ngày
+                Đặt tour
               </a>
             </div>
           </div>
@@ -147,41 +180,59 @@ function DetailPage() {
         </div>
         <div className={cx("description")}>
           <div className={cx("left")}>
-            <p>
-              Tập trung{" "}
-              <b>{dateGo.length != 0 ? dateGo[0].ngay : "Đang cập nhật"}</b>
-            </p>
-            <p>
-              Thời gian{" "}
-              <b>
-                {dateGo.length != 0
-                  ? dateGo[0].songaydi + " ngày"
-                  : "Đang cập nhật"}
-              </b>
-            </p>
-            <p>
+            {/* <p>
               Nơi khởi hành <b>{tours.noikh}</b>
-            </p>
-            <p>
-              Số chỗ còn nhận{" "}
-              <b>{dateGo.length != 0 ? dateGo[0].chongoi : "Đang cập nhật"}</b>
-            </p>
+            </p> */}
+            <div className={cx("list")} ref={elementRef}>
+              <h3>Lịch khởi hành</h3>
+              <div className={cx("field")}>
+                <span>Ngày đi</span>
+                <span>Số chỗ còn lại</span>
+                <span>Số ngày đi</span>
+                <span>Thao tác</span>
+              </div>
+              {dateGo.map((value) => {
+                if (isDateWithin3Days(value.ngay))
+                  return (
+                    <div className={cx("date")}>
+                      <p>{value.ngay}</p>
+                      <p>{value.chongoi}</p>
+                      <p>{value.songaydi}</p>
+                      <p>
+                        <Button
+                          color="blue"
+                          size="sx"
+                          appearance="primary"
+                          block
+                          onClick={() => booking(value.id)}
+                          // href={`/booking/${value.id}`}
+                          disabled={value.chongoi<=0?true:false}
+                        >
+                          Chọn
+                        </Button>
+                      </p>
+                    </div>
+                  );
+              })}
+            </div>
           </div>
           <div className={cx("right")}>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/thoi%20gian.png"></img>
               <label>Thời gian</label>
-              <p>{dateGo.length != 0 ? dateGo[0].songaydi : "Đang cập nhật"} ngày</p>
+              <p>
+                {dateGo.length != 0 ? dateGo[0].songaydi : "Đang cập nhật"} ngày
+              </p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/phuong%20tien%20di%20chuyen.png"></img>
               <label>Phương tiện di chuyển</label>
-              <p>{vehicle.ten}</p>
+              <p>{result}</p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/diem%20tham%20quan.png"></img>
               <label>Điểm tham quan</label>
-              <p>Thành phố Hồ Chí Minh, Bus 2 tầng, Du thuyền Sài Gòn</p>
+              <p>{result1}</p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/am%20thuc.png"></img>
@@ -191,7 +242,7 @@ function DetailPage() {
             <div>
               <img src="https://travel.com.vn/images/icons/utility/khach%20san.png"></img>
               <label>Khách sạn</label>
-              <p></p>
+              <p>{result2}</p>
             </div>
             <div>
               <img src="https://travel.com.vn/images/icons/utility/thoi%20gian%20ly%20tuong.png"></img>
@@ -278,7 +329,7 @@ function DetailPage() {
 
                   <tr className={cx("total")}>
                     <td>Phụ thu phòng đơn</td>
-                    <td className={cx("price")}>1.500.000 ₫</td>
+                    <td className={cx("price")}>Chưa có</td>
                   </tr>
                 </tbody>
               </table>
@@ -295,10 +346,20 @@ function DetailPage() {
                     : "Đang cập nhật"}
                 </p>
                 <span>
-                  190 Pasteur, Phường Võ Thị Sáu, Quận 3, TP.HCM, Viet Nam
+                  {tours.length != 0 && guider != null
+                    ? guider.diachi
+                    : "Đang cập nhật"}
                 </span>
-                <span>+84 938927980</span>
-                <span>tam.dangthithanh@gmail.com</span>
+                <span>
+                  {tours.length != 0 && guider != null
+                    ? guider.sdt
+                    : "Đang cập nhật"}
+                </span>
+                <span>
+                  {tours.length != 0 && guider != null
+                    ? guider.email
+                    : "Đang cập nhật"}
+                </span>
               </div>
             </div>
           </div>

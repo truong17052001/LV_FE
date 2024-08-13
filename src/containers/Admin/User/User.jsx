@@ -71,9 +71,12 @@ function AdminUser() {
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
-  
-  const filteredItems = users.filter((item) =>
-  item.ten.toLowerCase().includes(search.toLowerCase()))
+
+  const filteredItems = users.filter(
+    (item) =>
+      item.ten.toLowerCase().includes(search.toLowerCase()) ||
+      item.sdt.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleAdd = async () => {
     try {
@@ -82,7 +85,7 @@ function AdminUser() {
         window.location.href = "/admin/user";
       }
     } catch (error) {
-      toast.error(error.response.data.error[0])
+      toast.error(error.response.data.error[0]);
     }
   };
   const handleUpdate = async (e) => {
@@ -302,23 +305,12 @@ function AdminUser() {
                   }))
                 }
               />
-              <h5>Quyền hạn</h5>
-              <SelectPicker
-                data={permission}
-                style={{ width: 150 }}
-                searchable={false}
-                placeholder={"Quyền"}
-                onChange={(value) => {
-                  setDetailUsers((prevState) => ({
-                    ...prevState,
-                    quyen: value,
-                  }));
-                }}
-              />
+
               <h5>Ngày sinh</h5>
               <DatePicker
                 format="yyyy-MM-dd"
                 placeholder="Nhập ngày sinh tại đây"
+                block
                 value={parseISO(detailUsers.ngaysinh)}
                 onChange={(value) => {
                   setDetailUsers((preState) => ({
@@ -348,6 +340,19 @@ function AdminUser() {
                     anh: value,
                   }))
                 }
+              />
+              <h5>Quyền hạn</h5>
+              <SelectPicker
+                data={permission}
+                searchable={false}
+                block
+                placeholder={"Quyền"}
+                onChange={(value) => {
+                  setDetailUsers((prevState) => ({
+                    ...prevState,
+                    quyen: value,
+                  }));
+                }}
               />
             </div>
           </Modal.Body>
@@ -415,6 +420,7 @@ function AdminUser() {
               <DatePicker
                 format="yyyy-MM-dd"
                 placeholder="Nhập ngày sinh tại đây"
+                block
                 value={parseISO(detailUsers.ngaysinh)}
                 onChange={(value) => {
                   setDetailUsers((preState) => ({
@@ -448,8 +454,8 @@ function AdminUser() {
               <h5>Quyền hạn</h5>
               <SelectPicker
                 data={permission}
-                style={{ width: 150 }}
                 searchable={false}
+                block
                 placeholder={"Quyền"}
                 onChange={(value) => {
                   setDetailUsers((prevState) => ({

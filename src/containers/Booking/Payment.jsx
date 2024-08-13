@@ -68,22 +68,21 @@ function PaymentPage() {
     if (payment.pttt == "Tiền mặt") {
       try {
         const paymentResponse = await addPayment(payment);
-        console.log(paymentResponse);
         if (paymentResponse.data.message == "Success") {
           toast.success("Xác nhận phương thức thanh toán thành công");
           window.location.href = "/";
         }
       } catch (error) {
-        toast.error(error.response.data.message);
+        // toast.error(error.response.data.message);
       }
     } else if (payment.pttt == "Momo") {
       try {
         const paymentResponse = await moMo(payment);
         window.location.href = paymentResponse.data;
       } catch (error) {
-        toast.error(error.response.data.message);
+        toast.error(error.response.data.error);
       }
-    }else{
+    } else {
       toast.error("Vui lòng chọn phương thức thanh toán");
     }
   };
@@ -244,10 +243,10 @@ function PaymentPage() {
             </div>
           </div>
           <div className={cx("detail")}>
-            <div className={cx("total")}>
+            {/* <div className={cx("total")}>
               <h3>Tổng tiền</h3>
               <span>5.300.000 ₫</span>
-            </div>
+            </div> */}
             <Button
               size="lg"
               color="red"

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Tour.module.scss";
@@ -37,6 +38,14 @@ function TourPage() {
   const [limit, setLimit] = useState(9);
   const [search, setSearch] = useState([]);
 
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+  const id_location = urlParams.get("diemden");
+  const place = places.map((place) => ({
+    label: place.ten,
+    value: place.id,
+  }));
+
   const fetchTours = async (params) => {
     try {
       const response = await axios.get(
@@ -48,15 +57,12 @@ function TourPage() {
         setTotal(
           response.data.paginate.limit * response.data.paginate.total_page
         );
+      } else {
+        toast.warn("Không tìm thấy tour nào phù hợp với yêu cầu của quý khách");
       }
       const placesResponse = await getPlaces();
       if (placesResponse.data.data) {
-        setPlaces(
-          placesResponse.data.data.map((place) => ({
-            label: place.ten,
-            value: place.id,
-          }))
-        );
+        setPlaces(placesResponse.data.data);
       }
     } catch (error) {
       console.error("Error fetching tours:", error);
@@ -64,24 +70,28 @@ function TourPage() {
   };
 
   const limitOptions = [9, 15, 21];
-
   const handleFilter = () => {
+    const params = {
+      page: 1,
+      limit: limit,
+      ...search,
+    };
+    fetchTours(params);
+  };
+  useEffect(() => {
     const params = {
       page: activePage,
       limit: limit,
       ...search,
     };
     fetchTours(params);
-  };
-
+  }, [activePage]);
+  // console.log(search.diemden);
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
     urlParams.set("page", activePage);
     urlParams.set("limit", limit);
-    console.log(urlParams);
     fetchTours(urlParams);
   }, []);
-
   return (
     <div className={cx("wrapper")}>
       <Header type={2}></Header>
@@ -112,35 +122,33 @@ function TourPage() {
                 </div> */}
                 <div className={cx("mb")}>
                   <h5> Điểm đến</h5>
-                  <div>
-                    <SelectPicker
-                      data={places}
-                      size="lg"
-                      placeholder="Chọn điểm đến"
-                      onChange={(value) => {
-                        setSearch((preState) => ({
-                          ...preState,
-                          diemden: value,
-                        }));
-                      }}
-                    />
-                  </div>
+                  <SelectPicker
+                    data={place}
+                    size="lg"
+                    placeholder="Chọn điểm đến"
+                    block
+                    onChange={(value) => {
+                      setSearch((preState) => ({
+                        ...preState,
+                        diemden: value,
+                      }));
+                    }}
+                  />
                 </div>
                 <div className={cx("mb")}>
                   <h5> Số ngày</h5>
-                  <div className={cx("group")}>
-                    <Input
-                      type="number"
-                      size="lg"
-                      placeholder="Nhập số ngày đi"
-                      onChange={(value) => {
-                        setSearch((preState) => ({
-                          ...preState,
-                          songay: value,
-                        }));
-                      }}
-                    />
-                  </div>
+                  <Input
+                    type="number"
+                    size="lg"
+                    placeholder="Nhập số ngày đi"
+                    block
+                    onChange={(value) => {
+                      setSearch((preState) => ({
+                        ...preState,
+                        songay: value,
+                      }));
+                    }}
+                  />
                 </div>
                 <div className={cx("mb")}>
                   <h5>Ngày đi</h5>
@@ -165,49 +173,47 @@ function TourPage() {
                 </div>
                 <div className={cx("mb")}>
                   <h5> Số người</h5>
-                  <div className={cx("group")}>
-                    <Input
-                      type="number"
-                      size="lg"
-                      placeholder="Nhập số người"
-                      onChange={(value) => {
-                        setSearch((preState) => ({
-                          ...preState,
-                          songuoi: value,
-                        }));
-                      }}
-                    />
-                  </div>
+                  <Input
+                    type="number"
+                    size="lg"
+                    placeholder="Nhập số người"
+                    onChange={(value) => {
+                      setSearch((preState) => ({
+                        ...preState,
+                        songuoi: value,
+                      }));
+                    }}
+                  />
                 </div>
                 <div className={cx("mb")}>
                   <h5> Ngân sách của quý khách</h5>
-                  <div className={cx("p")}>
-                    Giá thấp nhất:
-                    <Input
-                      type="number"
-                      size="lg"
-                      placeholder="Giá thấp nhất"
-                      value={search.giamin}
-                      onChange={(value) => {
-                        setSearch((preState) => ({
-                          giamin: value,
-                        }));
-                      }}
-                    />
-                    Giá cao nhất
-                    <Input
-                      type="number"
-                      size="lg"
-                      placeholder="Giá cao nhất"
-                      value={search.giamax}
-                      onChange={(value) => {
-                        setSearch((preState) => ({
-                          ...preState,
-                          giamax: value,
-                        }));
-                      }}
-                    />
-                  </div>
+                  {/* <div className={cx("p")}> */}
+                  Giá thấp nhất:
+                  <Input
+                    type="number"
+                    size="lg"
+                    placeholder="Giá thấp nhất"
+                    value={search.giamin}
+                    onChange={(value) => {
+                      setSearch((preState) => ({
+                        giamin: value,
+                      }));
+                    }}
+                  />
+                  Giá cao nhất
+                  <Input
+                    type="number"
+                    size="lg"
+                    placeholder="Giá cao nhất"
+                    value={search.giamax}
+                    onChange={(value) => {
+                      setSearch((preState) => ({
+                        ...preState,
+                        giamax: value,
+                      }));
+                    }}
+                  />
+                  {/* </div> */}
                 </div>
                 {/* <div className={cx("mb")}>
                   <h5> Hiển thị những chuyến đi có</h5>
@@ -219,7 +225,6 @@ function TourPage() {
                 <div className={cx("mb")}>
                   <Button
                     color="red"
-                    size="sx"
                     appearance="primary"
                     block
                     startIcon={<TagFilterIcon />}
@@ -232,32 +237,22 @@ function TourPage() {
             </div>
           </div>
           <div className={cx("right")}>
-            <div className={cx("info")}>
-              <h1>Du lịch TP. Hồ Chí Minh</h1>
-              <div className={cx("description")}>
-                <p>
-                  Du lịch đến với thành phố Hồ Chí Minh bạn có thể gặp những tòa
-                  nhà cao tầng nằm san sát, những khu vui chơi giải trí, trung
-                  tâm mua sắm sầm uất, nhưng cũng không thiếu những biệt thự cổ
-                  kính, những ngôi chợ truyền thống. Sài Gòn rộng lớn và không
-                  thiếu những “đặc sản” du lịch như du ngoạn ven sông Sài Gòn
-                  bằng tàu, thăm phố Tây Phạm Ngũ Lão, mua sắm ở chợ Bến Thành
-                  hay về với biển Cần Giờ.
-                </p>
-                <p>
-                  Đăng ký tour TP. Hồ Chí Minhcùng Vietravel, Quý khách có thể
-                  đến khám phá các điểm đến nổi bật sau: Củ Chi, Địa đạo Củ Chi,
-                  KDL Nông Trang Xanh, Cần Giờ, Bưu điện Trung tâm TP. Hồ Chí
-                  Minh, ...
-                </p>
-                <p>
-                  Để hiểu hơn về TP. Hồ Chí Minh Mời Quý khách tham khảo Kinh
-                  nghiệm du lịch TP. Hồ Chí Minh
-                </p>
-              </div>
-            </div>
-            <div className={cx("orther")}>
-              <div>Đã tìm thấy 78 tours cho Quý khách.</div>
+            {id_location != null || search.diemden != null
+              ? places.map((value, index) => {
+                  if (value.id == id_location) {
+                    return (
+                      <div className={cx("info")}>
+                        <h1>{value.ten}</h1>
+                        <div className={cx("description")}>
+                          <p>{value.mota}</p>
+                        </div>
+                      </div>
+                    );
+                  }
+                })
+              : ""}
+            {/* <div className={cx("orther")}>
+              <div>Đã tìm thấy tours cho Quý khách.</div>
               <div>
                 Sắp xếp theo
                 <SelectPicker
@@ -267,7 +262,7 @@ function TourPage() {
                   searchable={false}
                 />
               </div>
-            </div>
+            </div> */}
             <div className={cx("list")}>
               {tours.length
                 ? tours.map((tour, index) => {
@@ -281,6 +276,7 @@ function TourPage() {
                         price={tour.gia_a}
                         img_tour={tour.anh}
                         state={tour.trangthai}
+                        date={tour.date_go}
                       ></CardTour>
                     );
                   })

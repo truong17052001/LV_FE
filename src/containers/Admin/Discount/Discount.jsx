@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
-import styles from "./Hotel.module.scss";
+import styles from "./Discount.module.scss";
 //components
 import SideNav from "../../../components/SideNav/SideNav";
 //rsuite
@@ -28,24 +28,24 @@ import "rsuite/IconButton/styles/index.css";
 import "rsuite/DatePicker/styles/index.css";
 
 import {
-  getHotels,
-  getHotel,
-  addHotel,
-  updateHotel,
-  deleteHotel,
+  getDiscounts,
+  getDiscount,
+  addDiscount,
+  updateDiscount,
+  deleteDiscount,
 } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
-function AdminHotel() {
-  const [hotels, setHotels] = useState([]);
-  const [detailHotels, setDetailHotels] = useState({});
+function AdminDiscount() {
+  const [discounts, setDiscounts] = useState([]);
+  const [detailDiscounts, setDetailDiscounts] = useState({});
   const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
   const handleOpenAdd = () => {
-    setDetailHotels({});
+    setDetailDiscounts({});
     setOpenAdd(true);
   };
 
@@ -53,9 +53,9 @@ function AdminHotel() {
 
   const handleOpenEdit = async (id) => {
     try {
-      const response = await getHotel(id);
+      const response = await getDiscount(id);
       if (response.data.data) {
-        setDetailHotels(response.data.data);
+        setDetailDiscounts(response.data.data);
       }
     } catch (error) {
       console.error(error);
@@ -65,16 +65,16 @@ function AdminHotel() {
 
   const handleCloseEdit = () => setOpenEdit(false);
 
-  const filteredItems = hotels.filter((item) =>
-    item.ten.toLowerCase().includes(search.toLowerCase())
+  const filteredItems = discounts.filter((item) =>
+    item.magiamgia.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
     try {
-      const response = await addHotel(detailHotels);
+      const response = await addDiscount(detailDiscounts);
       if (response.data.message === "Success") {
-        toast.success("Thêm khách sạn thành công");
-        window.location.href = "/admin/hotel";
+        toast.success("Thêm ưu đãi thành công");
+        window.location.href = "/admin/discount";
       }
     } catch (error) {
       toast.error(error.response.data.error[0]);
@@ -84,10 +84,13 @@ function AdminHotel() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateHotel(detailHotels.id, detailHotels);
+      const response = await updateDiscount(
+        detailDiscounts.id,
+        detailDiscounts
+      );
       if (response.data.message === "Success") {
-        toast.success("Cập nhật khách sạn thành công");
-        window.location.href = "/admin/hotel";
+        toast.success("Cập nhật ưu đãi thành công");
+        window.location.href = "/admin/discount";
       }
     } catch (error) {
       toast.error(error.response.data.error[0]);
@@ -97,10 +100,10 @@ function AdminHotel() {
   const handleDelete = async (id, e) => {
     e.preventDefault();
     try {
-      const response = await deleteHotel(id);
+      const response = await deleteDiscount(id);
       if (response.data.message === "Success") {
-        toast.success("Xóa khách sạn thành công");
-        window.location.href = "/admin/hotel";
+        toast.success("Xóa ưu đãi thành công");
+        window.location.href = "/admin/discount";
       }
     } catch (error) {
       console.error(error);
@@ -108,55 +111,37 @@ function AdminHotel() {
   };
 
   useEffect(() => {
-    const fetchHotels = async () => {
+    const fetchDiscounts = async () => {
       try {
-        const response = await getHotels();
+        const response = await getDiscounts();
         if (response.data.data) {
-          setHotels(response.data.data);
+          setDiscounts(response.data.data);
         }
       } catch (error) {
         console.error(error);
       }
     };
-    fetchHotels();
+    fetchDiscounts();
   }, []);
   const columns = [
     { name: "STT", selector: (row) => row.id, sortable: true, width: "70px" },
     {
-      name: "Tên khách sạn",
-      selector: (row) => row.ten,
+      name: "Mã giảm giá",
+      selector: (row) => row.magiamgia,
       sortable: true,
-      width: "200px",
+      width: "250px",
     },
     {
-      name: "Số điện thoại",
-      selector: (row) => row.sdt,
+      name: "Phần trăm giảm giá",
+      selector: (row) => row.phantram,
       sortable: true,
-      width: "150px",
+      width: "250px",
     },
     {
-      name: "Địa chỉ",
-      selector: (row) => row.diachi,
+      name: "Ngày hết hạn",
+      selector: (row) => row.hansd,
       sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Tiêu chuẩn",
-      selector: (row) => row.tieuchuan,
-      sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Website",
-      selector: (row) => row.website,
-      sortable: true,
-      width: "150px",
-    },
-    {
-      name: "Email",
-      selector: (row) => row.email,
-      sortable: true,
-      width: "200px",
+      width: "250px",
     },
     {
       name: "Thao tác",
@@ -192,7 +177,7 @@ function AdminHotel() {
         <div className={cx("right")}>
           <div className={cx("table")}>
             <DataTable
-              title="Danh sách khách sạn"
+              title="Danh sách mã giảm giá"
               columns={columns}
               data={filteredItems}
               dense
@@ -212,7 +197,7 @@ function AdminHotel() {
                   </IconButton>
                   <InputGroup style={{ width: 400 }}>
                     <Input
-                      placeholder="Tìm kiếm theo tên"
+                      placeholder="Tìm kiếm theo mã"
                       value={search}
                       onChange={(value) => setSearch(value)}
                     />
@@ -229,73 +214,40 @@ function AdminHotel() {
 
         <Modal open={openAdd} onClose={handleCloseAdd}>
           <Modal.Header>
-            <Modal.Title>THÊM KHÁCH SẠN</Modal.Title>
+            <Modal.Title>THÊM MÃ GIẢM GIÁ</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Tên khách sạn</h5>
+              <h5>Mã giảm giá</h5>
               <Input
-                placeholder="Nhập tên người dùng tại đây"
-                value={detailHotels.ten || ""}
+                placeholder="Nhập mã giảm giá tại đây"
+                value={detailDiscounts.magiamgia || ""}
                 onChange={(value) =>
-                  setDetailHotels((prevState) => ({
+                  setDetailDiscounts((prevState) => ({
                     ...prevState,
-                    ten: value,
+                    magiamgia: value,
                   }))
                 }
               />
-              <h5>Số điện thoại</h5>
-              <Input
-                placeholder="Nhập số điện thoại tại đây"
-                value={detailHotels.sdt || ""}
+              <h5>Ngày hết hạn</h5>
+              <DatePicker
+                value={parseISO(detailDiscounts.hansd) || null}
                 onChange={(value) =>
-                  setDetailHotels((prevState) => ({
+                  setDetailDiscounts((prevState) => ({
                     ...prevState,
-                    sdt: value,
+                    hansd: format(value, "yyyy-MM-dd"),
                   }))
                 }
               />
-              <h5>Địa chỉ</h5>
+              <h5>Phần trăm giảm giá</h5>
               <Input
-                placeholder="Nhập địa chỉ tại đây"
-                value={detailHotels.diachi || ""}
+                type="number"
+                placeholder="Nhập phần trăm giảm giá tại đây"
+                value={detailDiscounts.phantram || ""}
                 onChange={(value) =>
-                  setDetailHotels((prevState) => ({
+                  setDetailDiscounts((prevState) => ({
                     ...prevState,
-                    diachi: value,
-                  }))
-                }
-              />
-              <h5>Email</h5>
-              <Input
-                placeholder="Nhập email tại đây"
-                value={detailHotels.email || ""}
-                onChange={(value) =>
-                  setDetailHotels((prevState) => ({
-                    ...prevState,
-                    email: value,
-                  }))
-                }
-              />
-              <h5>Website</h5>
-              <Input
-                placeholder="Nhập link website tại đây"
-                value={detailHotels.website || ""}
-                onChange={(value) =>
-                  setDetailHotels((prevState) => ({
-                    ...prevState,
-                    website: value,
-                  }))
-                }
-              />
-              <h5>Tiêu chuẩn</h5>
-              <Input
-                placeholder="Nhập tiêu chuẩn tại đây"
-                value={detailHotels.tieuchuan || ""}
-                onChange={(value) =>
-                  setDetailHotels((prevState) => ({
-                    ...prevState,
-                    tieuchuan: value,
+                    phantram: value,
                   }))
                 }
               />
@@ -313,73 +265,40 @@ function AdminHotel() {
 
         <Modal open={openEdit} onClose={handleCloseEdit}>
           <Modal.Header>
-            <Modal.Title>CẬP NHẬT KHÁCH SẠN</Modal.Title>
+            <Modal.Title>CẬP NHẬT MÃ GIẢM GIÁ</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className={cx("form")}>
-              <h5>Tên khách sạn</h5>
+              <h5>Mã giảm giá</h5>
               <Input
-                placeholder="Nhập tên khách sạn tại đây"
-                value={detailHotels.ten || ""}
+                placeholder="Nhập mã giảm giá tại đây"
+                value={detailDiscounts.magiamgia || ""}
                 onChange={(value) =>
-                  setDetailHotels((prevState) => ({
+                  setDetailDiscounts((prevState) => ({
                     ...prevState,
-                    ten: value,
+                    magiamgia: value,
                   }))
                 }
               />
-              <h5>Số điện thoại</h5>
-              <Input
-                placeholder="Nhập số điện thoại tại đây"
-                value={detailHotels.sdt || ""}
+              <h5>Ngày hết hạn</h5>
+              <DatePicker
+                value={parseISO(detailDiscounts.hansd) || null}
                 onChange={(value) =>
-                  setDetailHotels((prevState) => ({
+                  setDetailDiscounts((prevState) => ({
                     ...prevState,
-                    sdt: value,
+                    hansd: format(value, "yyyy-MM-dd"),
                   }))
                 }
               />
-              <h5>Địa chỉ</h5>
+              <h5>Phần trăm giảm giá</h5>
               <Input
-                placeholder="Nhập địa chỉ tại đây"
-                value={detailHotels.diachi || ""}
+                type="number"
+                placeholder="Nhập phần trăm giảm giá tại đây"
+                value={detailDiscounts.phantram || ""}
                 onChange={(value) =>
-                  setDetailHotels((prevState) => ({
+                  setDetailDiscounts((prevState) => ({
                     ...prevState,
-                    diachi: value,
-                  }))
-                }
-              />
-              <h5>Email</h5>
-              <Input
-                placeholder="Nhập email tại đây"
-                value={detailHotels.email || ""}
-                onChange={(value) =>
-                  setDetailHotels((prevState) => ({
-                    ...prevState,
-                    email: value,
-                  }))
-                }
-              />
-              <h5>Website</h5>
-              <Input
-                placeholder="Nhập link website tại đây"
-                value={detailHotels.website || ""}
-                onChange={(value) =>
-                  setDetailHotels((prevState) => ({
-                    ...prevState,
-                    website: value,
-                  }))
-                }
-              />
-              <h5>Tiêu chuẩn</h5>
-              <Input
-                placeholder="Nhập tiêu chuẩn tại đây"
-                value={detailHotels.tieuchuan || ""}
-                onChange={(value) =>
-                  setDetailHotels((prevState) => ({
-                    ...prevState,
-                    tieuchuan: value,
+                    phantram: value,
                   }))
                 }
               />
@@ -399,4 +318,4 @@ function AdminHotel() {
   );
 }
 
-export default AdminHotel;
+export default AdminDiscount;

@@ -34,7 +34,7 @@ export const addPlace = (placeData) => {
   return axios.post(`${API_BASE_URL}/place/add`, placeData);
 };
 export const updatePlace = (id, placeData) => {
-  return axios.put(`${API_BASE_URL}/place/edit/${id}`,placeData);
+  return axios.put(`${API_BASE_URL}/place/edit/${id}`, placeData);
 };
 export const deletePlace = (id) => {
   return axios.delete(`${API_BASE_URL}/place/delete/${id}`);
@@ -57,7 +57,7 @@ export const deleteVehicle = (id) => {
 };
 //Tour
 export const getTours = (params) => {
-  return axios.get(`${API_BASE_URL}/tour`, {params});
+  return axios.get(`${API_BASE_URL}/tour`, { params });
 };
 export const addTour = (tourData) => {
   return axios.post(`${API_BASE_URL}/tour/add`, tourData);
@@ -110,6 +110,9 @@ export const getBookings = () => {
 export const getBooking = (id) => {
   return axios.get(`${API_BASE_URL}/booking/${id}`);
 };
+export const downLoadBill = (id) => {
+  return axios.get(`${API_BASE_URL}/booking/bill/${id}`);
+};
 export const addBooking = (bookingData) => {
   return axios.post(`${API_BASE_URL}/booking/add`, bookingData);
 };
@@ -135,7 +138,7 @@ export const updateUser = (id, userData) => {
 export const deleteUser = (id) => {
   return axios.delete(`${API_BASE_URL}/user/delete/${id}`);
 };
-export const changePassword = (id,password) => {
+export const changePassword = (id, password) => {
   return axios.post(`${API_BASE_URL}/user/password/${id}`, password);
 };
 export const getOrdered = (id) => {
@@ -143,11 +146,55 @@ export const getOrdered = (id) => {
 };
 //Payment
 export const moMo = (paymentData) => {
-  return axios.post(`${API_BASE_URL}/payment/momo`,paymentData);
+  return axios.post(`${API_BASE_URL}/payment/momo`, paymentData);
 };
 export const resultPayment = (paymentData) => {
-  return axios.post(`${API_BASE_URL}/payment/momo/callback`,paymentData);
+  return axios.post(`${API_BASE_URL}/payment/momo/callback`, paymentData);
+};
+export const paidPayment = (id, paymentData) => {
+  return axios.put(`${API_BASE_URL}/payment/paid/${id}`, paymentData);
 };
 export const addPayment = (paymentData) => {
-  return axios.post(`${API_BASE_URL}/payment/add`,paymentData);
+  return axios.post(`${API_BASE_URL}/payment/add`, paymentData);
+};
+export const getPayment = (id) => {
+  return axios.get(`${API_BASE_URL}/payment/${id}`);
+};
+export const updatePayment = (id, paymentData) => {
+  return axios.put(`${API_BASE_URL}/payment/edit/${id}`, paymentData);
+};
+//Discount
+export const getDiscounts = () => {
+  return axios.get(`${API_BASE_URL}/discount`);
+};
+export const getDiscount = (id) => {
+  return axios.get(`${API_BASE_URL}/discount/${id}`);
+};
+export const addDiscount = (discountData) => {
+  return axios.post(`${API_BASE_URL}/discount/add`, discountData);
+};
+export const updateDiscount = (id, discountData) => {
+  return axios.put(`${API_BASE_URL}/discount/edit/${id}`, discountData);
+};
+export const deleteDiscount = (id) => {
+  return axios.delete(`${API_BASE_URL}/discount/delete/${id}`);
+};
+export const apllyDiscount = (ma) => {
+  return axios.get(`${API_BASE_URL}/discount/apply/${ma}`);
+};
+//Activity
+export const getActivitys = () => {
+  return axios.get(`${API_BASE_URL}/activity`);
+};
+export const getActivity = (id) => {
+  return axios.get(`${API_BASE_URL}/activity/${id}`);
+};
+export const addActivity = (activityData) => {
+  return axios.post(`${API_BASE_URL}/activity/add`, activityData);
+};
+export const updateActivity = (id, activityData) => {
+  return axios.put(`${API_BASE_URL}/activity/edit/${id}`, activityData);
+};
+export const deleteActivity = (id) => {
+  return axios.delete(`${API_BASE_URL}/activity/delete/${id}`);
 };

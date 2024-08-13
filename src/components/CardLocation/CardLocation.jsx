@@ -11,8 +11,8 @@ function CardLocation({ id, name, amount, url }) {
         <img src={url} placeholder="img"></img>
       </div>
       <div className={cx("content_location")}>
-        <a href='/'>{name}</a>
-        <p>Đã có {amount} lượt khách</p>
+        <a href={`/tour?diemden=${id}`}>{name}</a>
+        {/* <p>Đã có {amount} lượt khách</p> */}
       </div>
     </div>
   );

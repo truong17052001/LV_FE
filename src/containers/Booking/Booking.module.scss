@@ -191,6 +191,9 @@
   box-shadow: 0 4px 40px rgba(0, 0, 0, 0.08);
   padding: 30px;
   margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap:10px;
   h3 {
     color: #2d4271;
     font-size: 24px;
@@ -209,7 +212,7 @@
   .info {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    gap: 20px;
   }
   .name,
   .gender,

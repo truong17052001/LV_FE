@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
@@ -24,6 +25,8 @@ function LoginPage() {
 
   const [visible, setVisible] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleChange = () => {
     setVisible(!visible);
   };
@@ -36,15 +39,23 @@ function LoginPage() {
       );
       if (response.data != null) {
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        localStorage.setItem(
+          "auth_token",
+          JSON.stringify(response.data.data.token)
+        );
         toast.success("Đăng nhập thành công!");
         if (response.data.data.user.quyen == "Admin")
           window.location.href = "/dashboard";
-        else window.location.href = "/";
+        else {
+          navigate(-1);
+        }
       } else {
         window.location.href = "/login";
       }
     } catch (error) {
-      toast.error("Đăng nhập thất bại!");
+      if (Array.isArray(error.response.data.error))
+        toast.error(error.response.data.error[0]);
+      else toast.error(error.response.data.error);
     }
   }
 

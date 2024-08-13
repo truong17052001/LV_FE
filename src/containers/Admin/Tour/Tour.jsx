@@ -98,8 +98,8 @@ function AdminTour() {
 
   const filteredItems = tours.filter(
     (item) =>
-      item.tieude.toLowerCase().includes(search.toLowerCase()) ||
-      item.matour.toLowerCase().includes(search.toLowerCase())
+    item.tieude.toLowerCase().includes(search.toLowerCase()) ||
+    item.matour.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async () => {
@@ -119,6 +119,7 @@ function AdminTour() {
     try {
       const response = await deleteTour(id);
       if (response.data.message === "Success") {
+        toast.success("Xóa tour thành công");
         window.location.href = "/admin/tour";
       }
     } catch (error) {
@@ -234,7 +235,7 @@ function AdminTour() {
                   </IconButton>
                   <InputGroup style={{ width: 400 }}>
                     <Input
-                      placeholder={"Tìm kiếm theo tiêu đề"}
+                      placeholder={"Tìm kiếm theo tiêu đề hoặc mã tour"}
                       value={search}
                       onChange={setSearch}
                     />

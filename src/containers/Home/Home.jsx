@@ -37,8 +37,6 @@ function HomePage() {
   const [places, setPlaces] = useState([]);
   const [search, setSearch] = useState([]);
   const params = {
-    page: 1,
-    limit: 4,
     ...search,
   };
 
@@ -74,6 +72,7 @@ function HomePage() {
             extraData: extraData,
             resultCode: resultCode,
           });
+          console.log(response);
         } catch (error) {
           console.error("Error checking payment status:", error);
         }
@@ -102,10 +101,10 @@ function HomePage() {
         <div className={cx("search-home")}>
           <div className={cx("form-search")}>
             <div className={cx("box-search")}>
-              Tên tour
+              Tiêu đề tour
               <Input
                 size="lg"
-                placeholder="Nhập tên tour"
+                placeholder="Nhập tiêu đề tour"
                 onChange={(value) => {
                   setSearch((preState) => ({
                     ...preState,
@@ -196,42 +195,40 @@ function HomePage() {
         <h2>Điểm đến yêu thích</h2>
         <div className={cx("list_location")}>
           {places.map((value, index) => {
-            console.log(value, index);
-            if (index < 5) {
+            if (value.trangthai == "Hot") {
               return (
                 <CardLocation
                   id={value.id}
                   name={value.ten}
                   amount="17.000"
                   url={value.anh}
+                  key={index}
                 ></CardLocation>
               );
             }
           })}
-          {/* 
-            url="https://i.pinimg.com/564x/90/18/68/901868d5cd433ee33ebff26a41af6948.jpg"
-            url="https://i.pinimg.com/564x/7d/c2/b9/7dc2b90aeb23fba4fd4ed56c596b73aa.jpg"
-            url="https://i.pinimg.com/736x/ff/8d/c1/ff8dc1ecb5269399e00033fbc92e934c.jpg"
-            url="https://i.pinimg.com/564x/03/eb/2c/03eb2c14d9af611d8dc6ed0e8bcf79ad.jpg"
-            url="https://i.pinimg.com/564x/ae/17/d8/ae17d8585b8d214ea2398b3ab17f1e31.jpg" */}
         </div>
       </section>
       <section className={cx("hot_tour")}>
         <h2>Tour ưu đãi</h2>
         <div className={cx("list_tour")}>
           {tours.map((tour, index) => {
-            return (
-              <CardTour
-                key={index}
-                id={tour.id}
-                code={tour.matour}
-                title_tour={tour.tieude}
-                meet_place={tour.noikh}
-                price={tour.gia_a}
-                img_tour={tour.anh}
-                state={tour.trangthai}
-              ></CardTour>
-            );
+            if (tour.trangthai == "Ưu đãi")
+              return (
+                <CardTour
+                  key={index}
+                  id={tour.id}
+                  code={tour.matour}
+                  title_tour={tour.tieude}
+                  meet_place={tour.noikh}
+                  price={tour.gia_a}
+                  img_tour={tour.anh}
+                  state={tour.trangthai}
+                ></CardTour>
+              );
+            else {
+              ("");
+            }
           })}
         </div>
       </section>

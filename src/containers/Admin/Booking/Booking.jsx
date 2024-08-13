@@ -15,6 +15,7 @@ import {
   TagPicker,
   SelectPicker,
   DatePicker,
+  InputNumber,
 } from "rsuite";
 import { format, addDays, getMonth, getDate, getYear } from "date-fns";
 
@@ -27,6 +28,8 @@ import "rsuite/Input/styles/index.css";
 import "rsuite/InputGroup/styles/index.css";
 import "rsuite/IconButton/styles/index.css";
 import "rsuite/TagPicker/styles/index.css";
+import "rsuite/InputNumber/styles/index.css";
+
 // Services
 import {
   getDates,
@@ -34,16 +37,20 @@ import {
   addBooking,
   deleteBooking,
   getUsers,
+  getPayment,
+  paidPayment,
 } from "../../../core/services/apiServices";
 
 const cx = classNames.bind(styles);
 
 function AdminBooking() {
   const [bookings, setBookings] = useState([]);
+  const [payment, setPayment] = useState([]);
   const [search, setSearch] = useState("");
   const [newBooking, setNewBooking] = useState({
     ngay: format(new Date(), "yyyy-MM-dd"),
-    makh: null,
+    nguoilon: 1,
+    treem: 0,
   });
   const [detailBooking, setDetailBooking] = useState({
     adults: [],
@@ -52,11 +59,37 @@ function AdminBooking() {
   const [dates, setDates] = useState([]);
   const [customer, setCustomer] = useState([]);
   const [openAdd, setOpenAdd] = useState(false);
-
+  const [openView, setOpenView] = useState(false);
+  console.log(payment);
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
+  const handleOpenView = async (id) => {
+    try {
+      const paymentResponse = await getPayment(id);
+      if (paymentResponse.data.message === "Success") {
+        setPayment(paymentResponse.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setOpenView(true);
+  };
+  const handlePayment = async (id) => {
+    try {
+      console.log(payment);
+      const paymentResponse = await paidPayment(id,payment);
+      if (paymentResponse.data.message === "Success") {
+        toast.success("Thanh toán thành công");
+        window.location.href = "/admin/booking";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleCloseView = () => setOpenView(false);
   const handleChange = (value, name) =>
     setNewBooking({ ...newBooking, [name]: value });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -100,6 +133,7 @@ function AdminBooking() {
   const filteredItems = bookings.filter(
     (item) =>
       item.ten.toLowerCase().includes(search.toLowerCase()) ||
+      item.sobooking.toLowerCase().includes(search.toLowerCase()) ||
       item.sobooking.toLowerCase().includes(search.toLowerCase())
   );
   console.log(newBooking);
@@ -108,6 +142,7 @@ function AdminBooking() {
       "Họ tên: " + user.ten + " - SDT: " + user.sdt + " - Email: " + user.email,
     value: user.id,
   }));
+
   const handleAdd = async () => {
     try {
       const response = await addBooking(newBooking);
@@ -128,6 +163,21 @@ function AdminBooking() {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleUpdatePayment = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await updatePayment(payment.id, {
+        ...payment,
+      });
+      if (response.data.message === "Success") {
+        toast.success("Cập nhật thông tin thanh toán thành công");
+        window.location.href = "/admin/booking";
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -163,18 +213,18 @@ function AdminBooking() {
         sortable: true,
         width: "100px",
       },
-      {
-        name: "Địa chỉ",
-        selector: (row) => row.diachi,
-        sortable: true,
-        width: "100px",
-      },
-      {
-        name: "Email",
-        selector: (row) => row.email,
-        sortable: true,
-        width: "100px",
-      },
+      // {
+      //   name: "Địa chỉ",
+      //   selector: (row) => row.diachi,
+      //   sortable: true,
+      //   width: "100px",
+      // },
+      // {
+      //   name: "Email",
+      //   selector: (row) => row.email,
+      //   sortable: true,
+      //   width: "100px",
+      // },
       {
         name: "Tổng tiền",
         selector: (row) =>
@@ -210,10 +260,19 @@ function AdminBooking() {
             >
               Xem
             </IconButton>
+            <IconButton
+              width={"12px"}
+              appearance="primary"
+              color="blue"
+              icon={<EyeCloseIcon />}
+              onClick={(e) => handleOpenView(row.id, e)}
+            >
+              Lịch sử thanh toán
+            </IconButton>
           </div>
         ),
         sortable: true,
-        width: "250px",
+        width: "450px",
       },
     ],
     []
@@ -312,14 +371,16 @@ function AdminBooking() {
                 placeholder="Chọn ngày đi"
               />
               <h5>Số người lớn</h5>
-              <Input
+              <InputNumber
+                max={20}
                 type="number"
                 placeholder={"Nhập số người lớn tại đây"}
                 value={newBooking.nguoilon || ""}
                 onChange={(value) => handleChange(value, "nguoilon")}
               />
               <h5>Số trẻ em</h5>
-              <Input
+              <InputNumber
+                max={20}
                 type="number"
                 placeholder={"Nhập số trẻ em tại đây"}
                 value={newBooking.treem || ""}
@@ -414,6 +475,74 @@ function AdminBooking() {
               Thêm
             </Button>
             <Button onClick={handleCloseAdd} appearance="subtle">
+              Hủy
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <Modal open={openView} onClose={handleCloseView}>
+          <Modal.Header>
+            <Modal.Title>Lịch sử thanh toán</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className={cx("form")}>
+              {payment
+                ? payment.map((payments) => {
+                    return (
+                      <div className={cx("form_payment")}>
+                        <h5>Phương thức thanh toán</h5>
+                        <Input
+                          placeholder="Nhập phương thức thanh toán tại đây"
+                          value={payments.pttt || ""}
+                          onChange={(value) =>
+                            setPayment((prev) => ({ ...prev, pttt: value }))
+                          }
+                        />
+                        <h5>Thành tiền</h5>
+                        <Input
+                          placeholder="Nhập phương thức thanh toán tại đây"
+                          value={parseInt(payments.giatri).toLocaleString("en-US") || ""}
+                          onChange={(value) =>
+                            setPayment((prev) => ({ ...prev, pttt: value }))
+                          }
+                        />
+                        <h5>Trạng thái thanh toán</h5>
+                        <Input
+                          placeholder="Nhập trạng thái thanh toán tại đây"
+                          disabled
+                          value={payments.trangthai || ""}
+                          // onChange={(value) =>
+                          //   setPayment((prev) => ({
+                          //     ...prev,
+                          //     trangthai: value,
+                          //   }))
+                          // }
+                        />
+                        {payments.pttt == "Tiền mặt" &&
+                        payments.trangthai == "Chưa thanh toán" ? (
+                          <IconButton
+                            appearance="primary"
+                            color="red"
+                            onClick={() => handlePayment(payments.id)}
+                          >
+                            Đã thanh toán
+                          </IconButton>
+                        ) : (
+                          ""
+                        )}
+                        <h5>
+                          <hr></hr>
+                        </h5>
+                      </div>
+                    );
+                  })
+                : ""}
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            {/* <Button onClick={handleView} appearance="primary">
+              Thêm
+            </Button> */}
+            <Button onClick={handleCloseView} appearance="subtle">
               Hủy
             </Button>
           </Modal.Footer>

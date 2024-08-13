@@ -10,11 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^43.0.0",
+    "@ckeditor/ckeditor5-react": "^9.0.0",
+    "@ckeditor/ckeditor5-upload": "^43.0.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "axios": "^1.7.2",
+    "ckeditor5": "^43.0.0",
+    "ckeditor5-premium-features": "^43.0.0",
     "classnames": "^2.5.1",
     "customize-cra": "^1.0.0",
     "datatables.net-dt": "^2.0.8",

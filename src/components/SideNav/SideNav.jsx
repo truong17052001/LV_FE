@@ -19,12 +19,16 @@ import { MdDashboard } from "react-icons/md";
 import ExitIcon from "@rsuite/icons/Exit";
 
 function SideNav() {
-    const [expanded, setExpanded] = useState(true);
-    const handleOpen = () => {
-      setExpanded(!expanded);
-    }
+  const [expanded, setExpanded] = useState(true);
+  const handleOpen = () => {
+    setExpanded(!expanded);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
   return (
-    <div className={cx("content",expanded==true ? "": "mini")}>
+    <div className={cx("content", expanded == true ? "mini" : "")}>
       <a className={cx("header")} onClick={handleOpen}>
         <IoIosPlanet fontSize={27} className={cx("icon")} />
         <p>Quang Trường Travel</p>
@@ -65,15 +69,15 @@ function SideNav() {
         <MdPlace fontSize={27} className={cx("icon")} />
         <p>Danh sách địa điểm</p>
       </a>
-      <a href="/admin/news" className={cx("wrapper")}>
+      <a href="/admin/activity" className={cx("wrapper")}>
         <FaRegNewspaper fontSize={27} className={cx("icon")} />
-        <p>Quản lý tin tức</p>
+        <p>Quản lý lịch trình</p>
       </a>
       <a href="/admin/discount" className={cx("wrapper")}>
         <MdDiscount fontSize={27} className={cx("icon")} />
         <p>Danh sách ưu đãi</p>
       </a>
-      <a href="/admin/discount" className={cx("wrapper")}>
+      <a onClick={handleLogout} className={cx("wrapper")}>
         <ExitIcon fontSize={27} className={cx("icon")} />
         <p>Đăng xuất</p>
       </a>

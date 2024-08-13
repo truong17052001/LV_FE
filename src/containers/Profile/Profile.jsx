@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
 import styles from "./Profile.module.scss";
@@ -23,8 +24,11 @@ import {
   updateUser,
   changePassword,
   getOrdered,
+  getBooking,
   getDetailDate,
+  downLoadBill,
 } from "../../core/services/apiServices";
+import { FaDownload } from "react-icons/fa6";
 
 const cx = classNames.bind(styles);
 
@@ -40,13 +44,15 @@ function ProfilePage() {
   const [section, setSection] = useState(1);
   const [info, setInfo] = useState([]);
   const [booking, setBooking] = useState([]);
+  const [detailBooking, setDetailBooking] = useState([]);
+  const [payment, setPayment] = useState([]);
   const [date, setDate] = useState([]);
   const [password, setPassword] = useState([]);
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  // console.log(info);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -69,15 +75,45 @@ function ProfilePage() {
   const handleDirect = (number) => {
     setSection(number);
   };
-  const handleView = async (id) => {
+  const handleView = async (mand, mabooking) => {
     try {
-      const response = await getDetailDate(id);
-      console.log(response.data.data);
-      setDate(response.data.data);
+      const response = await getDetailDate(mand);
+      if (response.data.data) {
+        setDate(response.data.data);
+      }
+      const detailBookingResponse = await getBooking(mabooking);
+      if (detailBookingResponse.data.data) {
+        setDetailBooking(detailBookingResponse.data.data.detail);
+        setPayment(detailBookingResponse.data.data.detail_payment);
+      }
       handleOpen();
     } catch (error) {
       toast.error(error.response.data.error[0]);
     }
+  };
+  // console.log(detailBooking);
+  const handleDownload = async (id) => {
+    console.log(id);
+    let url = `http://127.0.0.1:8000/api/client/booking/bill/${id}`;
+
+    axios({
+      url: url,
+      method: "GET",
+      responseType: "blob",
+    })
+      .then((response) => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(new Blob([response.data]));
+        link.download = "bill.pdf";
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading the file:", error);
+      });
   };
   const handleUpdate = async () => {
     try {
@@ -102,7 +138,9 @@ function ProfilePage() {
         }
       }
     } catch (error) {
-      toast.error(error.response.data.error[0]);
+      if (Array.isArray(error.response.data.error))
+        toast.error(error.response.data.error[0]);
+      else toast.error(error.response.data.error);
     }
   };
   return (
@@ -186,10 +224,17 @@ function ProfilePage() {
                   placeholder="Nhập ngày sinh tại đây"
                   value={parseISO(info.ngaysinh)}
                   onChange={(value) => {
-                    setInfo((preState) => ({
-                      ...preState,
-                      ngaysinh: format(value, "yyyy-MM-dd"),
-                    }));
+                    if (value) {
+                      setInfo((preState) => ({
+                        ...preState,
+                        ngaysinh: format(value, "yyyy-MM-dd"),
+                      }));
+                    } else {
+                      setInfo((preState) => ({
+                        ...preState,
+                        ngaysinh: null,
+                      }));
+                    }
                   }}
                 />
               </div>
@@ -329,9 +374,9 @@ function ProfilePage() {
                 <span>Trạng thái</span>
                 <span>Thao tác</span>
               </div>
-              {booking.map((value) => {
+              {booking.map((value, index) => {
                 return (
-                  <div className={cx("booking")}>
+                  <div className={cx("booking")} key={index}>
                     <p>{value.sobooking}</p>
                     <p>{value.ngay}</p>
                     <p>{parseInt(value.tongtien).toLocaleString("en-US")}</p>
@@ -339,11 +384,10 @@ function ProfilePage() {
                     <p>
                       <Button
                         color="blue"
-                        size="sx"
                         appearance="primary"
                         block
                         startIcon={<IoExitOutline />}
-                        onClick={() => handleView(value.mand)}
+                        onClick={() => handleView(value.mand, value.id)}
                       >
                         Xem
                       </Button>
@@ -351,7 +395,6 @@ function ProfilePage() {
                   </div>
                 );
               })}
-              ;
             </div>
             <Modal open={open} onClose={handleClose}>
               <Modal.Header>
@@ -359,22 +402,111 @@ function ProfilePage() {
               </Modal.Header>
               <Modal.Body>
                 <div className={cx("date")}>
-                  <img src={date.length==0?"":date.tour.anh}></img>
+                  <img src={date.length == 0 ? "" : date.tour.anh}></img>
                   <div>
                     <span>Ngày đi</span>
-                    <p>{date.length==0?"":date.ngay}</p>
+                    <p>{date.length == 0 ? "" : date.ngay}</p>
                   </div>
                   <div>
                     <span>Số ngày đi</span>
-                    <p>{date.length==0?"":date.songaydi}</p>
+                    <p>{date.length == 0 ? "" : date.songaydi}</p>
                   </div>
                   <div>
                     <span>Tiêu đề tour</span>
-                    <p>{date.length==0?"":date.tour.tieude}</p>
+                    <p>{date.length == 0 ? "" : date.tour.tieude}</p>
+                  </div>
+                  <div>
+                    <span>Giá tour ( Người lớn )</span>
+                    <p>
+                      {date.length == 0
+                        ? ""
+                        : parseInt(date.tour.gia_a).toLocaleString(
+                            "en-US"
+                          )}{" "}
+                      VND
+                    </p>
+                  </div>
+                  <div>
+                    <span>Giá tour ( Trẻ em )</span>
+                    <p>
+                      {date.length == 0
+                        ? ""
+                        : parseInt(date.tour.gia_c).toLocaleString(
+                            "en-US"
+                          )}{" "}
+                      VND
+                    </p>
                   </div>
                   <div>
                     <span>Nơi khởi hành</span>
-                    <p>{date.length==0?"":date.tour.noikh}</p>
+                    <p>{date.length == 0 ? "" : date.tour.noikh}</p>
+                  </div>
+                  <div>
+                    <span>Tên hướng dẫn viên</span>
+                    <p>{date.length == 0 ? "" : date.guider.ten}</p>
+                  </div>
+                  <div>
+                    <span>Số điện thoại hdv</span>
+                    <p>{date.length == 0 ? "" : date.guider.sdt}</p>
+                  </div>
+                  <div>
+                    <span>Email hdv</span>
+                    <p>{date.length == 0 ? "" : date.guider.email}</p>
+                  </div>
+                  <div>
+                    <span>Lịch sử thanh toán</span>
+                    <div className={cx("list")}>
+                      {payment.map((value) => {
+                        return (
+                          <p>
+                            {value.pttt} -{" "}
+                            {parseInt(value.giatri).toLocaleString("en-US")}
+                            {"  VND"}-{value.trangthai}
+                            {value.trangthai == "Đã thanh toán" ? (
+                              <Button
+                                color="red"
+                                size="sx"
+                                appearance="primary"
+                                block
+                                startIcon={<FaDownload />}
+                                onClick={() => handleDownload(value.mabooking)}
+                              >
+                                Tải hóa đơn
+                              </Button>
+                            ) : (
+                              ""
+                            )}
+                            {value.pttt == "Momo" &&
+                            value.trangthai == "Thanh toán thất bại" ? (
+                              <Button
+                                color="red"
+                                size="sx"
+                                appearance="primary"
+                                block
+                                startIcon={<FaDownload />}
+                                href={`/payment/${value.mabooking}`}
+                              >
+                                Thanh toán lại
+                              </Button>
+                            ) : (
+                              ""
+                            )}
+                          </p>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <span>Danh sách người đi</span>
+                    <div className={cx("list")}>
+                      {detailBooking.map((value,index) => {
+                        return (
+                          <p key={index}>
+                            {value.ten} - {value.gioitinh} - {value.ngaysinh}
+                          </p>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </Modal.Body>

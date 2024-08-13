@@ -20,7 +20,11 @@ import { CiCircleMinus } from "react-icons/ci";
 import { IoPeople } from "react-icons/io5";
 import { CiCalendar } from "react-icons/ci";
 //api
-import { addBooking, getDetailDate } from "../../core/services/apiServices";
+import {
+  addBooking,
+  getDetailDate,
+  apllyDiscount,
+} from "../../core/services/apiServices";
 const cx = classNames.bind(styles);
 
 function BookingPage() {
@@ -30,27 +34,49 @@ function BookingPage() {
 
   const [booking, setBooking] = useState({
     ngay: format(new Date(), "yyyy-MM-dd"),
-    trangthai: "Chờ xác nhận",
+    trangthai: "Mới đặt",
     ten: customer.ten,
     sdt: customer.sdt,
     email: customer.email,
     diachi: customer.diachi,
     mand: id,
     makh: customer.id,
-    magg: null,
+    giatrigiamgia: 0,
   });
+  // console.log(booking);
   const [detailBooking, setDetailBooking] = useState({
     adults: [],
     childrens: [],
   });
 
   const [date, setDate] = useState([]);
+  const [discount, setDiscount] = useState({ giatrigiamgia: 0 });
   const [adult, setAdult] = useState(1);
   const [children, setChildren] = useState(0);
-  console.log(detailBooking);
+  console.log(discount);
   const start = new Date(date.ngay);
   const end = addDays(start, date.songaydi);
   const data = ["Nam", "Nữ"].map((item) => ({ label: item, value: item }));
+  const handleDiscount = async () => {
+    const discountResponse = await apllyDiscount(discount.magiamgia);
+    if (discountResponse.data.data) {
+      setDiscount({
+        ...discount,
+        giatrigiamgia:
+          ((adult * date.tour.gia_a + children * date.tour.gia_c) *
+            discountResponse.data.data.phantram) /
+          100,
+      });
+      setBooking({
+        ...booking,
+        giatrigiamgia:
+          ((adult * date.tour.gia_a + children * date.tour.gia_c) *
+            discountResponse.data.data.phantram) /
+          100,
+        magg: discountResponse.data.data.id,
+      });
+    }
+  };
   const handleBooking = () => {
     handleAdd();
   };
@@ -60,7 +86,7 @@ function BookingPage() {
           ...booking,
           detailBooking: detailBooking,
           nguoilon: adult,
-          treem: children
+          treem: children,
         })
       : "";
   }, [detailBooking, adult, children]);
@@ -190,8 +216,13 @@ function BookingPage() {
                 <span className={cx("number")}>{adult}</span>
                 <CiCirclePlus
                   size={"25px"}
-                  onClick={() => setAdult((prev) => prev + 1)}
+                  onClick={() => {
+                    adult + children < date.chongoi
+                      ? setAdult((prev) => prev + 1)
+                      : toast.error(`Chỉ còn ${date.chongoi} chỗ ngổi`);
+                  }}
                 />
+                {/* {console.log(adult, children, date.chongoi)} */}
               </div>
             </div>
             <div className={cx("change")}>
@@ -207,7 +238,11 @@ function BookingPage() {
                 <span className={cx("number")}>{children}</span>
                 <CiCirclePlus
                   size={"25px"}
-                  onClick={() => setChildren((prev) => prev + 1)}
+                  onClick={() => {
+                    adult + children < date.chongoi
+                      ? setChildren((prev) => prev + 1)
+                      : toast.error(`Chỉ còn ${date.chongoi} chỗ ngổi`);
+                  }}
                 />
               </div>
             </div>
@@ -271,11 +306,12 @@ function BookingPage() {
                 </div>
                 <div className={cx("birthday")}>
                   <label>Ngày sinh</label>
-                    <DatePicker
-                      format="yyyy-MM-dd"
-                      placeholder="Chọn ngày ngày sinh"
-                      block
-                      onChange={(value) => {
+                  <DatePicker
+                    format="yyyy-MM-dd"
+                    placeholder="Chọn ngày ngày sinh"
+                    block
+                    onChange={(value) => {
+                      if (value) {
                         setDetailBooking((prevState) => {
                           const newState = { ...prevState };
                           const newAdults = [...newState.adults];
@@ -292,8 +328,26 @@ function BookingPage() {
                           newState.adults = newAdults;
                           return newState;
                         });
-                      }}
-                    />
+                      } else {
+                        setDetailBooking((prevState) => {
+                          const newState = { ...prevState };
+                          const newAdults = [...newState.adults];
+                          if (i >= 0 && i < newAdults.length) {
+                            newAdults[i] = {
+                              ...newAdults[i],
+                              ngaysinh: null,
+                            };
+                          } else {
+                            newAdults.push({
+                              ngaysinh: null,
+                            });
+                          }
+                          newState.adults = newAdults;
+                          return newState;
+                        });
+                      }
+                    }}
+                  />
                 </div>
               </div>
             ))}
@@ -363,22 +417,41 @@ function BookingPage() {
                       placeholder="Chọn ngày ngày sinh"
                       block
                       onChange={(value) => {
-                        setDetailBooking((prevState) => {
-                          const newState = { ...prevState };
-                          const newChildren = [...newState.childrens];
-                          if (i >= 0 && i < newChildren.length) {
-                            newChildren[i] = {
-                              ...newChildren[i],
-                              ngaysinh: format(value, "yyyy-MM-dd"),
-                            };
-                          } else {
-                            newChildren.push({
-                              ngaysinh: format(value, "yyyy-MM-dd"),
-                            });
-                          }
-                          newState.childrens = newChildren;
-                          return newState;
-                        });
+                        if (value) {
+                          setDetailBooking((prevState) => {
+                            const newState = { ...prevState };
+                            const newChildren = [...newState.childrens];
+                            if (i >= 0 && i < newChildren.length) {
+                              newChildren[i] = {
+                                ...newChildren[i],
+                                ngaysinh: format(value, "yyyy-MM-dd"),
+                              };
+                            } else {
+                              newChildren.push({
+                                ngaysinh: format(value, "yyyy-MM-dd"),
+                              });
+                            }
+                            newState.childrens = newChildren;
+                            return newState;
+                          });
+                        } else {
+                          setDetailBooking((prevState) => {
+                            const newState = { ...prevState };
+                            const newChildren = [...newState.childrens];
+                            if (i >= 0 && i < newChildren.length) {
+                              newChildren[i] = {
+                                ...newChildren[i],
+                                ngaysinh: null,
+                              };
+                            } else {
+                              newChildren.push({
+                                ngaysinh: null,
+                              });
+                            }
+                            newState.childrens = newChildren;
+                            return newState;
+                          });
+                        }
                       }}
                     />
                   </div>
@@ -480,19 +553,39 @@ function BookingPage() {
                 ) : (
                   ""
                 )}
-
-                {/* <tr className={cx("th")}>
-                  <td>Phụ thu phòng đơn</td>
-                  <td className={cx("price")}>1.610.000 ₫</td>
-                </tr> */}
+                {discount.giatrigiamgia != 0 ? (
+                  <tr className={cx("th")}>
+                    <td>Giảm giá</td>
+                    <td className={cx("price")}>
+                      -{" "}
+                      {parseInt(discount.giatrigiamgia).toLocaleString("en-US")}{" "}
+                      ₫
+                    </td>
+                  </tr>
+                ) : (
+                  ""
+                )}
               </tbody>
             </table>
             <div>
               <div className={cx("couppon")}>
                 Mã giảm giá
                 <div>
-                  <Input style={{ width: "370px" }} placeholder={"Nhập mã"} />
-                  <Button size="lg" color="green" appearance="primary">
+                  <Input
+                    onChange={(value) =>
+                      setDiscount((preState) => ({
+                        ...preState,
+                        magiamgia: value,
+                      }))
+                    }
+                    placeholder={"Nhập mã giảm giá"}
+                  />
+                  <Button
+                    size="lg"
+                    color="green"
+                    appearance="primary"
+                    onClick={handleDiscount}
+                  >
                     Áp dụng
                   </Button>
                 </div>
@@ -500,7 +593,14 @@ function BookingPage() {
               <div className={cx("total")}>
                 <h3>Tổng tiền</h3>
                 <span>
-                  {parseInt(booking.tongtien).toLocaleString("en-US")} ₫
+                  {date.length != 0
+                    ? parseInt(
+                        adult * date.tour.gia_a +
+                          children * date.tour.gia_c -
+                          discount.giatrigiamgia
+                      ).toLocaleString("en-US")
+                    : 0}{" "}
+                  ₫
                 </span>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
@@ -10,8 +11,8 @@ import login from "../../assets/img/login.jpg";
 //
 import { Input, Button, InputGroup } from "rsuite";
 import { Message, useToaster } from "rsuite";
-import 'rsuite/Message/styles/index.css';
-import 'rsuite/useToaster/styles/index.css';
+import "rsuite/Message/styles/index.css";
+import "rsuite/useToaster/styles/index.css";
 //icon
 import { IoExitOutline } from "react-icons/io5";
 import EyeIcon from "@rsuite/icons/legacy/Eye";
@@ -19,7 +20,7 @@ import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
 import AvatarIcon from "@rsuite/icons/legacy/Avatar";
 
 const message = (
-  <Message showIcon type={'error'} closable>
+  <Message showIcon type={"error"} closable>
     Mật khẩu không trùng khớp
   </Message>
 );
@@ -29,7 +30,6 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [subPassword, setSubPassword] = useState("");
-  const toaster = useToaster();
 
   const [visible, setVisible] = useState(false);
 
@@ -39,20 +39,23 @@ function RegisterPage() {
 
   async function handleRegister() {
     try {
-      if(password != subPassword){
-          toaster.push(message, { placement:'topCenter', duration: 5000 });
-      }
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/client/user/register",
-        { email: email, matkhau: password, quyen: 'Khách hàng' }
-      );
-      if (response.data != null && password == subPassword) {
-        window.location.href = "/login";
+      if (password != subPassword) {
+        toast.error("Mật khẩu không trùng khớp");
       } else {
-        window.location.href = "/register";
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/client/user/register",
+          { email: email, matkhau: password }
+          );
+          if (response.data != null) {
+          toast.success("Đăng ký thành công");
+          window.location.href = "/login";
+        } else {
+          toast.success("Đăng ký thất bại");
+          window.location.href = "/register";
+        }
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.error[0]);
     }
   }
   return (

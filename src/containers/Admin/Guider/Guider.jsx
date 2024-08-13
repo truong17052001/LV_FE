@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import classNames from "classnames/bind";
 import styles from "./Guider.module.scss";
@@ -56,17 +57,19 @@ function AdminGuider() {
   const handleCloseEdit = () => setOpenEdit(false);
 
   const filteredItems = guiders.filter((item) =>
-    item.ten.toLowerCase().includes(search.toLowerCase())
+    item.ten.toLowerCase().includes(search.toLowerCase()) ||
+    item.sdt.toLowerCase().includes(search.toLowerCase()) 
   );
 
   const handleAdd = async () => {
     try {
       const response = await addGuider(detailGuiders);
       if (response.data.message === "Success") {
+        toast.success("Thêm hướng dẫn viên thành công");
         window.location.href = "/admin/guider";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -75,10 +78,11 @@ function AdminGuider() {
     try {
       const response = await updateGuider(detailGuiders.id, detailGuiders);
       if (response.data.message === "Success") {
+        toast.success("Cập nhật hướng dẫn viên thành công");
         window.location.href = "/admin/guider";
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error.response.data.error[0]);
     }
   };
 
@@ -87,6 +91,7 @@ function AdminGuider() {
     try {
       const response = await deleteGuider(id);
       if (response.data.message === "Success") {
+        toast.success("Xóa hướng dẫn viên thành công");
         window.location.href = "/admin/guider";
       }
     } catch (error) {
@@ -194,7 +199,7 @@ function AdminGuider() {
                   </IconButton>
                   <InputGroup style={{ width: 400 }}>
                     <Input
-                      placeholder="Tìm kiếm theo tên hoặc mã"
+                      placeholder="Tìm kiếm theo tên hoặc số điện thoại"
                       value={search}
                       onChange={(value) => setSearch(value)}
                     />

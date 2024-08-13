@@ -28,7 +28,9 @@
     color: #fff;
   }
   .main {
+    display: grid;
     gap: 16px;
+    grid-template-columns: 70% auto;
     width: 100%;
     padding: 0px 16px;
     .info {
@@ -41,19 +43,18 @@
       h5 {
         font-size: 14px;
         color: #fff;
+
       }
     }
     .others {
       border-radius: 16px;
       background-color: #2d4271;
+      color: #fff;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      h4 {
-        color: #fff;
-      }
-      .item {
+      .item{
         display: flex;
         justify-content: space-between;
       }
@@ -92,15 +93,5 @@
     display: flex;
     gap: 5px;
     gap: 5px;
-  }
-}
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  .form_payment {
-    display: flex;
-    flex-direction: column;
-    gap: 10px
   }
 }

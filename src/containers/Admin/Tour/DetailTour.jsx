@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./Tour.module.scss";
@@ -39,6 +40,7 @@ function AdminDetailTour() {
     try {
       const response = await updateTour(id, detailTours);
       if (response.data.message === "Success") {
+        toast.success("Cập nhật tour thành công");
         window.location.href = "/admin/tour";
       }
     } catch (error) {
@@ -192,39 +194,30 @@ function AdminDetailTour() {
                     data={hotels}
                     searchable
                     value={detailTours.hotel}
-                    style={{ width: "77%" }}
+                    style={{ width: "100%" }}
                     placeholder="Chọn khách sạn"
                     onChange={(value) => handleChange(value, "hotel")}
                   />
-                  <Button color="green" appearance="primary">
-                    Chọn
-                  </Button>
                 </div>
                 <div className={cx("item")}>
                   <TagPicker
                     data={transportMeans}
                     searchable
                     value={detailTours.vehicle}
-                    style={{ width: "77%" }}
+                    style={{ width: "100%" }}
                     placeholder="Chọn phương tiện vận chuyển"
                     onChange={(value) => handleChange(value, "vehicle")}
                   />
-                  <Button color="green" appearance="primary">
-                    Chọn
-                  </Button>
                 </div>
                 <div className={cx("item")}>
                   <TagPicker
                     data={landmarks}
                     searchable
                     value={detailTours.place}
-                    style={{ width: "77%" }}
+                    style={{ width: "100%" }}
                     placeholder="Chọn địa danh"
                     onChange={(value) => handleChange(value, "place")}
                   />
-                  <Button color="green" appearance="primary">
-                    Chọn
-                  </Button>
                 </div>
               </div>
             </div>

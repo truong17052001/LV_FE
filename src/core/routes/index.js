@@ -17,6 +17,9 @@ import AdminHotel from "../../containers/Admin/Hotel/Hotel";
 import AdminPlace from "../../containers/Admin/Place/Place";
 import AdminVehicle from "../../containers/Admin/Vehicle/Vehicle";
 import AdminDateGo from "../../containers/Admin/DateGo/DateGo";
+import AdminDiscount from "../../containers/Admin/Discount/Discount";
+import AdminActivity from "../../containers/Admin/Activity/Activity";
+
 const publicRoutes = [
   { path: "/", component: HomePage },
   { path: "/tour", component: TourPage },
@@ -40,8 +43,8 @@ const privateRoutes = [
   { path: "/admin/place", component: AdminPlace },
   { path: "/admin/hotel", component: AdminHotel },
   { path: "/admin/vehicle", component: AdminVehicle },
-  { path: "/admin/activity", component: AdminDateGo },
-  { path: "/admin/discount", component: AdminDateGo },
+  { path: "/admin/activity", component: AdminActivity },
+  { path: "/admin/discount", component: AdminDiscount },
   { path: "/admin/news", component: AdminDateGo },
 ];
 
